@@ -554,9 +554,8 @@
 				});
 				
 				dailyGraphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day+ "&u=" + currentStatus", function(data) {
-					dailyGraphData = data[0];
-				});
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day&u=" + currentStatus, function(data) {dailyGraphData = data[0];});
+		
 				allGraphData = "";
 				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u=" + currentStatus, function(data) {
 					allGraphData = data[0];
