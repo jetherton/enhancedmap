@@ -6,6 +6,31 @@ This maps shows you all of the reports you are authorized to see. This includes 
 <div id="bar"></div>
 		<!-- right column -->
 		<div id="right">
+		       <!-- status filters -->
+			<div class="cat-filters clearingfix">
+				<strong>Status Filters:</strong>
+				<!-- keep track of what status we're looking at -->
+				<form action="">
+					<input type = "hidden" value="3" name="currentStatus" id="currentStatus">
+				</form>
+				<ul id="category_switch" class="category-filters">
+					<li>
+						<a class="active" id="status_1" href="#">
+							<div class="swatch" style="background-color:#000000"></div>
+							<div class="status-title">Unapproved Reports</div>
+						</a>
+					</li>
+					<li>
+						<a class="active" id="status_2" href="#">
+							<div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div>
+							<div class="status-title">Approved Reports</div>
+						</a>
+					</li>
+
+				</ul>
+			</div>		       
+		       <!-- /status filters -->
+		
 
 			<!-- category filters -->
 			<div class="cat-filters clearingfix">

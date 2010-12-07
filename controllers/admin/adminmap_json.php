@@ -59,7 +59,7 @@ class Adminmap_json_Controller extends Admin_Controller
         $incident_id = "";
         $neighboring = "";
         $media_type = "";
-	$show_unapproved="2"; //0 show only approved, 1 show only unapproved, 2 show all
+	$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
 
         $category_id = ( isset($_GET['c']) AND ! empty($_GET['c']) ) ?
 			(int) $_GET['c'] : 0;
@@ -71,18 +71,35 @@ class Adminmap_json_Controller extends Admin_Controller
             $show_unapproved = (int) $_GET['u'];
         }
 	$approved_text = "";
-	if($show_unapproved == 0)
+	if($show_unapproved == 1)
 	{
 		$approved_text = "incident.incident_active = 1 ";
 	}
-	else if ($show_unapproved == 1)
+	else if ($show_unapproved == 2)
 	{
 		$approved_text = "incident.incident_active = 0 ";
 	}
-	else if ($show_unapproved == 2)
+	else if ($show_unapproved == 3)
 	{
 		$approved_text = "incident.incident_active = 0 OR incident.incident_active = 1";
 	}
+	//figure out if we're showing unapproved stuff or what.
+        if (isset($_GET['u']) AND !empty($_GET['u']))
+        {
+            $show_unapproved = (int) $_GET['u'];
+        }
+	
+	
+	//should we color unapproved reports a different color?
+	$color_unapproved = true;
+        if (isset($_GET['uc']) AND !empty($_GET['uc']))
+        {
+            $color_unapproved = false;
+        }
+	
+	
+	
+	
 
         if (isset($_GET['i']) AND !empty($_GET['i']))
         {
@@ -166,7 +183,7 @@ class Adminmap_json_Controller extends Admin_Controller
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
             $json_item .= "\"id\": \"".$marker->id."\", \n";
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . "reports/view/" . $marker->id . "'>" . htmlentities($marker->incident_title) . "</a>")) . "\",";
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . "admin/reports/edit/" . $marker->id . "'>" . htmlentities($marker->incident_title) . "</a>")) . "\",";
 
             if (isset($category)) {
                 $json_item .= "\"category\":[" . $category_id . "], ";
@@ -175,7 +192,7 @@ class Adminmap_json_Controller extends Admin_Controller
             }
 	    
 	    //check if it's a unapproved/unactive report
-	    if($marker->incident_active == 0)
+	    if($marker->incident_active == 0 && $color_unapproved)
 	    {
 	        $json_item .= "\"color\": \"000000\", \n";
 		$json_item .= "\"icon\": \"".$icon."\", \n";
@@ -232,25 +249,34 @@ class Adminmap_json_Controller extends Admin_Controller
         $color = Kohana::config('settings.default_map_all');
         $icon = "";
 	
-	$show_unapproved="2"; //0 show only approved, 1 show only unapproved, 2 show all
+	$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
 	//figure out if we're showing unapproved stuff or what.
         if (isset($_GET['u']) AND !empty($_GET['u']))
         {
             $show_unapproved = (int) $_GET['u'];
         }
 	$approved_text = "";
-	if($show_unapproved == 0)
+	if($show_unapproved == 1)
 	{
 		$approved_text = "i.incident_active = 1 ";
 	}
-	else if ($show_unapproved == 1)
+	else if ($show_unapproved == 2)
 	{
 		$approved_text = "i.incident_active = 0 ";
 	}
-	else if ($show_unapproved == 2)
+	else if ($show_unapproved == 3)
 	{
 		$approved_text = "i.incident_active = 0 OR i.incident_active = 1";
 	}
+	
+	
+	
+	//should we color unapproved reports a different color?
+	$color_unapproved = true;
+        if (isset($_GET['uc']) AND !empty($_GET['uc']))
+        {
+            $color_unapproved = false;
+        }
 	
 	
 
@@ -456,9 +482,9 @@ class Adminmap_json_Controller extends Admin_Controller
             $json_item = "{";
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "reports/index/?c=".$category_id."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " Reports</a>")) . "\",";
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ',   "Number of Reports: ".$cluster_count )) . "\",";
             $json_item .= "\"category\":[0], ";
-	    if($contains_nonactive)
+	    if($contains_nonactive && $color_unapproved)
 	    {
 	        $json_item .= "\"color\": \"000000\", \n";
 		$json_item .= "\"icon\": \"".$icon."\", \n";
@@ -485,7 +511,7 @@ class Adminmap_json_Controller extends Admin_Controller
             $json_item = "{";
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "reports/view/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "\",";   
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "admin/reports/edit/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "\",";   
             $json_item .= "\"category\":[0], ";
 	    //check if it's a unapproved/unactive report
 	    if($single['active'] == 0)
@@ -519,6 +545,7 @@ class Adminmap_json_Controller extends Admin_Controller
 
     /**
      * Retrieve Single Marker
+     * ETHERTON: Not sure we need this for this particular plugin.
      */
     public function single($incident_id = 0)
     {
@@ -605,6 +632,30 @@ class Adminmap_json_Controller extends Admin_Controller
 
         $this->auto_render = FALSE;
         $db = new Database();
+	
+	
+	
+	$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
+	//figure out if we're showing unapproved stuff or what.
+        if (isset($_GET['u']) AND !empty($_GET['u']))
+        {
+            $show_unapproved = (int) $_GET['u'];
+        }
+	$approved_text = "";
+	if($show_unapproved == 1)
+	{
+		$approved_text = "incident.incident_active = 1 ";
+	}
+	else if ($show_unapproved == 2)
+	{
+		$approved_text = "incident.incident_active = 0 ";
+	}
+	else if ($show_unapproved == 3)
+	{
+		$approved_text = "incident.incident_active = 0 OR incident.incident_active = 1";
+	}
+	
+	
 
         $interval = (isset($_GET["i"]) AND !empty($_GET["i"])) ?
             $_GET["i"] : "month";
@@ -676,7 +727,7 @@ class Adminmap_json_Controller extends Admin_Controller
             $incident_id_in = ' AND id IN ('.implode(',',$allowed_ids).')';
         }
 
-        $query = 'SELECT UNIX_TIMESTAMP('.$select_date_text.') AS time, COUNT(id) AS number FROM '.$this->table_prefix.'incident WHERE incident_active = 1 '.$incident_id_in.' GROUP BY '.$groupby_date_text;
+        $query = 'SELECT UNIX_TIMESTAMP('.$select_date_text.') AS time, COUNT(id) AS number FROM '.$this->table_prefix.'incident WHERE '.$approved_text. $incident_id_in.' GROUP BY '.$groupby_date_text;
         $query = $db->query($query);
 
         foreach ( $query as $items )

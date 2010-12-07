@@ -135,7 +135,6 @@ div.cat-filters{
 div.cat-filters strong{
     float: left;
     margin: 0 10px 0 0;
-    background: url(../images/cat-filters-bg.jpg) 0 3px no-repeat;
     padding: 0 0 0 10px;
 }
 
@@ -337,7 +336,6 @@ ul.category-filters li.child{
 	padding:3px 6px 3px 15px;
 	color:#666;
 	font-weight:bold;
-	background-image:url(../images/arrow-play.gif);
 	background-position:5px 50%;
 	background-repeat:no-repeat;
 	font-size:1.2em;

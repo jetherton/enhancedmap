@@ -21,6 +21,8 @@
 		var map;
 		// Selected Category
 		var currentCat;
+		// Selected Status
+		var currentStatus;
 		// Selected Layer
 		var thisLayer;
 		// WGS84 Datum
@@ -63,6 +65,10 @@
 		function addMarkers(catID,startDate,endDate, currZoom, currCenter,
 			mediaType, thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor)
 		{
+		
+			// Get Current Status
+			currStatus = $("#currentStatus").val();
+				
 			return $.timeline({categoryId: catID,
 			                   startTime: new Date(startDate * 1000),
 			                   endTime: new Date(endDate * 1000),
@@ -70,7 +76,7 @@
 							  }).addMarkers(
 								startDate, endDate, gMap.getZoom(),
 								gMap.getCenter(), thisLayerID, thisLayerType, 
-								thisLayerUrl, thisLayerColor, json_url);
+								thisLayerUrl, thisLayerColor, json_url, currStatus);
 		}
 
 		/*
@@ -167,6 +173,9 @@
 			{
 				// Get Current Category
 				currCat = $("#currentCat").val();
+				
+				// Get Current Status
+				currStatus = $("#currentStatus").val();
 
 				// Get Current Start Date
 				currStartDate = $("#startDate").val();
@@ -217,6 +226,8 @@
 		function refreshGraph(startDate, endDate)
 		{
 			var currentCat = gCategoryId;
+			// Get Current Status
+			var currStatus = $("#currentStatus").val();
 
 			// refresh graph
 			if (!currentCat || currentCat == '0')
@@ -233,7 +244,7 @@
 			// plot hourly incidents when period is within 2 days
 			if ((endTime - startTime) / (1000 * 60 * 60 * 24) <= 3)
 			{
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=hour", function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=hour&u="+currStatus, function(data) {
 					graphData = data[0];
 
 					gTimeline = $.timeline({categoryId: currentCat,
@@ -248,7 +259,7 @@
 			else if ((endTime - startTime) / (1000 * 60 * 60 * 24) <= 124)
 			{
 			    // weekly if period > 2 months
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=day", function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=day&u="+currStatus, function(data) {
 					graphData = data[0];
 
 					gTimeline = $.timeline({categoryId: currentCat,
@@ -263,7 +274,7 @@
 			else if ((endTime - startTime) / (1000 * 60 * 60 * 24) > 124)
 			{
 				// monthly if period > 4 months
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?u="+currStatus, function(data) {
 					graphData = data[0];
 
 					gTimeline = $.timeline({categoryId: currentCat,
@@ -277,12 +288,12 @@
 			}
 
 			// Get dailyGraphData for All Categories
-			$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=day", function(data) {
+			$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=day&u="+currStatus, function(data) {
 				dailyGraphData = data[0];
 			});
 
 			// Get allGraphData for All Categories
-			$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat, function(data) {
+			$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u="+currStatus, function(data) {
 				allGraphData = data[0];
 			});
 
@@ -429,13 +440,16 @@
 				// Get Current Center
 				currCenter = map.getCenter();
 				
+				// Get Current Status
+				currStatus = $("#currentStatus").val();
+				
 				gCategoryId = catID;
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
 				addMarkers(catID, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 								
 				graphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID + "?u="+currStatus, function(data) {
 					graphData = data[0];
 
 					gTimeline = $.timeline({categoryId: catID, startTime: startTime, endTime: endTime,
@@ -446,16 +460,113 @@
 				});
 				
 				dailyGraphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day", function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day&u="+currStatus, function(data) {
 					dailyGraphData = data[0];
 				});
 				allGraphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u="+currStatus, function(data) {
 					allGraphData = data[0];
 				});
 				
 				return false;
 			});
+			
+			
+			
+			//////////////////////////////////////////////////////
+			//status switcher
+			//////////////////////////////////////////////////////
+			$("a[id^='status_']").click(function()
+			{
+				
+				var statID = this.id.substring(7);
+				//check and see if the just clicked element should have "active" class or not
+				if( $("#status_" + statID).hasClass("active"))
+				{
+					//we have it so remove it
+					$("#status_" + statID).removeClass("active"); // Remove All active
+				}
+				else
+				{
+					//we don't have it so add it
+					$("#status_" + statID).addClass("active"); // Add Highlight
+				}
+			
+
+				//both are active
+				if($("#status_1").hasClass("active") && $("#status_2").hasClass("active"))
+				{
+					currentStatus = 3;
+				}
+				else if($("#status_1").hasClass("active") && !($("#status_2").hasClass("active")))
+				{
+					currentStatus = 2;
+				}
+				else if(!($("#status_1").hasClass("active")) && $("#status_2").hasClass("active"))
+				{
+					currentStatus = 1;
+				}
+				else //this shouldn't happen, so undo what was done above, can't have no reports showing. That's just silly
+				{
+					if( $("#status_" + statID).hasClass("active"))
+					{
+						//we have it so remove it
+						$("#status_" + statID).removeClass("active"); // Remove All active
+					}
+					else
+					{
+						//we don't have it so add it
+						$("#status_" + statID).addClass("active"); // Add Highlight
+					}
+					return false;
+				}
+				
+				$("#currentStatus").val(currentStatus);
+
+	
+				
+				// Destroy any open popups
+				onPopupClose();
+				
+				// Get Current Zoom
+				currZoom = map.getZoom();
+				
+				// Get Current Center
+				currCenter = map.getCenter();
+
+				// Get Current Category
+				gCategoryId = currentCat;
+				var catID = currentCat;
+				
+				var startTime = new Date($("#startDate").val() * 1000);
+				var endTime = new Date($("#endDate").val() * 1000);
+				addMarkers(catID, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
+								
+				graphData = "";
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID + "?u=" + currentStatus, function(data) {
+					graphData = data[0];
+
+					gTimeline = $.timeline({categoryId: catID, startTime: startTime, endTime: endTime,
+						graphData: graphData,
+						mediaType: gMediaType
+					});
+					gTimeline.plot();
+				});
+				
+				dailyGraphData = "";
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day+ "&u=" + currentStatus", function(data) {
+					dailyGraphData = data[0];
+				});
+				allGraphData = "";
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u=" + currentStatus, function(data) {
+					allGraphData = data[0];
+				});
+
+				return false;
+			});
+			
+			
+			
 			
 			// Sharing Layer[s] Switch Action
 			$("a[id^='share_']").click(function()

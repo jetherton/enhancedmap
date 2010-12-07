@@ -26,6 +26,10 @@ class adminmap_Controller extends Admin_Controller
 		//set the CSS for this
 		plugin::add_stylesheet("adminmap/css/adminmap");
 		
+		plugin::add_javascript("adminmap/js/jquery.flot");
+		plugin::add_javascript("adminmap/js/excanvas.min");
+		plugin::add_javascript("adminmap/js/timeline");
+		
 		$this->template->content = new View('adminmap/mapview');
 		// Get Default Color
 		$this->template->content->default_map_all = Kohana::config('settings.default_map_all');
@@ -170,7 +174,7 @@ class adminmap_Controller extends Admin_Controller
 		///////////////////////////////////////////////////////////////MAP JAVA SCRIPT////////////////////////////////////////////////////////////////////////////
 		
 		//turn the map on, also turn on the timeline
-		$this->template->flot_enabled = TRUE;
+		//$this->template->flot_enabled = TRUE; //this is done using our own custom .js files in the adminmap/js folder.
 		$this->template->map_enabled = TRUE;
 		$this->template->js->default_map = Kohana::config('settings.default_map');
 		$this->template->js->default_zoom = Kohana::config('settings.default_zoom');
