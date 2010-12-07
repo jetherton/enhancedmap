@@ -272,10 +272,10 @@ class Adminmap_json_Controller extends Admin_Controller
 	
 	
 	//should we color unapproved reports a different color?
-	$color_unapproved = true;
+	$color_unapproved = 2;
         if (isset($_GET['uc']) AND !empty($_GET['uc']))
         {
-            $color_unapproved = false;
+	    $color_unapproved = (int) $_GET['uc'];
         }
 	
 	
@@ -484,7 +484,7 @@ class Adminmap_json_Controller extends Admin_Controller
             $json_item .= "\"properties\": {";
             $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ',   "Number of Reports: ".$cluster_count )) . "\",";
             $json_item .= "\"category\":[0], ";
-	    if($contains_nonactive && $color_unapproved)
+	    if($contains_nonactive && $color_unapproved==2)
 	    {
 	        $json_item .= "\"color\": \"000000\", \n";
 		$json_item .= "\"icon\": \"".$icon."\", \n";
@@ -514,7 +514,7 @@ class Adminmap_json_Controller extends Admin_Controller
             $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "admin/reports/edit/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "\",";   
             $json_item .= "\"category\":[0], ";
 	    //check if it's a unapproved/unactive report
-	    if($single['active'] == 0)
+	    if($single['active'] == 0 && $color_unapproved==2)
 	    {
 	        $json_item .= "\"color\": \"000000\", \n";
 		$json_item .= "\"icon\": \"".$icon."\", \n";

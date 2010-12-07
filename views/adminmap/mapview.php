@@ -7,13 +7,14 @@ This maps shows you all of the reports you are authorized to see. This includes 
 		<!-- right column -->
 		<div id="right">
 		       <!-- status filters -->
-			<div class="cat-filters clearingfix">
+			<div class="stat-filters clearingfix">
 				<strong>Status Filters:</strong>
 				<!-- keep track of what status we're looking at -->
 				<form action="">
 					<input type = "hidden" value="3" name="currentStatus" id="currentStatus">
+					<input type = "hidden" value="2" name="colorCurrentStatus" id="colorCurrentStatus">
 				</form>
-				<ul id="category_switch" class="category-filters">
+				<ul id="status_switch" class="status-filters">
 					<li>
 						<a class="active" id="status_1" href="#">
 							<div class="swatch" style="background-color:#000000"></div>
@@ -27,6 +28,12 @@ This maps shows you all of the reports you are authorized to see. This includes 
 						</a>
 					</li>
 
+					<li>
+						<a class="active" id="color_status_1" href="#">
+							<div class="swatch" style="background-color:#000000"></div>
+							<div class="status-title">Color Unapproved Reports Black</div>
+						</a>
+					</li>
 				</ul>
 			</div>		       
 		       <!-- /status filters -->

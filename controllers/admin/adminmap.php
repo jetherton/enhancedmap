@@ -87,8 +87,8 @@ class adminmap_Controller extends Admin_Controller
 	{
 	
 		////////////////////////////////////////////////////////////////Map and Slider Blocks////////////////////////////////////////////////////////////////////////////
-		$div_map = new View('main_map');
-		$div_timeline = new View('main_timeline');
+		$div_map = new View('adminmap/main_map');
+		$div_timeline = new View('adminmap/main_timeline');
 			// Filter::map_main - Modify Main Map Block
 			Event::run('ushahidi_filter.map_main', $div_map);
 			// Filter::map_timeline - Modify Main Map Block

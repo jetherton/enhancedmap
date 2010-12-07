@@ -8,6 +8,13 @@
 	background-color: #dddddd;
 }
 
+div.slider-holder fieldset{
+	padding-bottom: 37px;
+	padding-left: 20px;
+	padding-right: 20px;
+	
+}
+
 
 /*right column*/
 div#right{
@@ -124,6 +131,49 @@ div.slider-holder {
 div.slider-holder label{
     color: #666666;
 }
+
+/*Status filtes*/
+div.stat-filters{
+    font-size: 85%;
+    text-transform: uppercase;
+    margin: 0 0 15px 0;
+}
+
+
+ul.status-filters{
+    background: #E7E3DA;
+    border-top: #C7C2BC 7px solid;
+    border-bottom: #C7C2BC 7px solid;
+    list-style: none;
+    padding: 12px 15px;
+}
+
+ul.status-filters li{
+    padding: 0;
+    margin-bottom: 4px;
+list-style-type:none;
+}
+
+ul.status-filters li a{
+    display: block;
+    padding-top:1px;
+    padding-bottom:1px;
+    font-size: 10px;
+    text-transform: uppercase;
+    font-weight: bold;
+    text-decoration: none;
+    color: #3F3F3F;
+    border: #E7E3DA 1px solid;
+    position: relative;
+    overflow: hidden;
+}
+
+ul.status-filters li a:hover, ul.status-filters li a.active {
+    color: #FFFFFF;
+    background-color: #3484AC;
+    border: #3484AC 1px solid;
+}
+
 
 /* category filters */
 div.cat-filters{

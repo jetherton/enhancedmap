@@ -23,6 +23,8 @@
 		var currentCat;
 		// Selected Status
 		var currentStatus;
+		// color the reports who's status is unapproved black?
+		var colorCurrentStatus;
 		// Selected Layer
 		var thisLayer;
 		// WGS84 Datum
@@ -66,8 +68,10 @@
 			mediaType, thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor)
 		{
 		
-			// Get Current Status
+			// Get Current Status, and if we should color these reports black
 			currStatus = $("#currentStatus").val();
+			currColorStatus = $("#colorCurrentStatus").val();
+		
 				
 			return $.timeline({categoryId: catID,
 			                   startTime: new Date(startDate * 1000),
@@ -76,7 +80,7 @@
 							  }).addMarkers(
 								startDate, endDate, gMap.getZoom(),
 								gMap.getCenter(), thisLayerID, thisLayerType, 
-								thisLayerUrl, thisLayerColor, json_url, currStatus);
+								thisLayerUrl, thisLayerColor, json_url, currStatus, currColorStatus);
 		}
 
 		/*
@@ -564,7 +568,82 @@
 				return false;
 			});
 			
-			
+
+
+
+
+
+
+			//////////////////////////////////////////////////////
+			//Color status switcher
+			//////////////////////////////////////////////////////
+			$("#color_status_1").click(function()
+			{
+				//switch the status
+				if( $("#color_status_1").hasClass("active"))
+				{
+					//we have it so remove it
+					$("#color_status_1").removeClass("active"); // make it not active
+					colorCurrentStatus = 1;
+				}
+				else
+				{
+					$("#color_status_1").addClass("active"); // make it active
+					colorCurrentStatus = 2;
+				}
+				$("#colorCurrentStatus").val(colorCurrentStatus);
+
+	
+				
+				// Destroy any open popups
+				onPopupClose();
+				
+				// Get Current Zoom
+				currZoom = map.getZoom();
+				
+				// Get Current Center
+				currCenter = map.getCenter();
+				
+				currentStatus  = $("#currentStatus").val();
+
+				// Get Current Category
+				gCategoryId = currentCat;
+				var catID = currentCat;
+				
+				var startTime = new Date($("#startDate").val() * 1000);
+				var endTime = new Date($("#endDate").val() * 1000);
+				addMarkers(catID, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
+								
+				graphData = "";
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID + "?u=" + currentStatus, function(data) {
+					graphData = data[0];
+
+					gTimeline = $.timeline({categoryId: catID, startTime: startTime, endTime: endTime,
+						graphData: graphData,
+						mediaType: gMediaType
+					});
+					gTimeline.plot();
+				});
+				
+				dailyGraphData = "";
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day&u=" + currentStatus, function(data) {dailyGraphData = data[0];});
+		
+				allGraphData = "";
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u=" + currentStatus, function(data) {
+					allGraphData = data[0];
+				});
+
+				return false;
+			});
+
+
+
+
+
+
+
+
+
 			
 			
 			// Sharing Layer[s] Switch Action
