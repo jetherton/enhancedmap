@@ -81,7 +81,7 @@ class Adminmap_json_Controller extends Admin_Controller
 	}
 	else if ($show_unapproved == 3)
 	{
-		$approved_text = "incident.incident_active = 0 OR incident.incident_active = 1";
+		$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
 	}
 	//figure out if we're showing unapproved stuff or what.
         if (isset($_GET['u']) AND !empty($_GET['u']))
@@ -266,7 +266,7 @@ class Adminmap_json_Controller extends Admin_Controller
 	}
 	else if ($show_unapproved == 3)
 	{
-		$approved_text = "i.incident_active = 0 OR i.incident_active = 1";
+		$approved_text = " (i.incident_active = 0 OR i.incident_active = 1) ";
 	}
 	
 	
