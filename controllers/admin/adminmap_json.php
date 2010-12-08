@@ -482,7 +482,7 @@ class Adminmap_json_Controller extends Admin_Controller
             $json_item = "{";
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ',   "Number of Reports: ".$cluster_count )) . "\",";
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "admin/adminmap_reports/index/?c=".$category_id."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " Reports</a>")) . "\",";
             $json_item .= "\"category\":[0], ";
 	    if($contains_nonactive && $color_unapproved==2)
 	    {
