@@ -817,8 +817,8 @@ class Adminmap_json_Controller extends Admin_Controller
                         // $pixels = $this->_pixelDistance($marker['latitude'], $marker['longitude'], 
                         // $target['latitude'], $target['longitude'], $zoomLevel);
 
-                        $pixels = abs($marker['longitude']-$target['longitude']) + 
-                            abs($marker['latitude']-$target['latitude']);
+                        $pixels = sqrt(pow($marker['longitude']-$target['longitude'],2) + 
+                            pow($marker['latitude']-$target['latitude'],2));
                         // echo $pixels."<BR>";
                         // If two markers are closer than defined distance, remove compareMarker from array and add to cluster.
                         if ($pixels < $distance)
