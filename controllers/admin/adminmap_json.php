@@ -55,16 +55,23 @@ class Adminmap_json_Controller extends Admin_Controller
         $color = Kohana::config('settings.default_map_all');
         $icon = "";
 
-        $category_id = "";
+        $category_ids = array();
         $incident_id = "";
         $neighboring = "";
         $media_type = "";
 	$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
+	$logical_operator = "or";
 
-        $category_id = ( isset($_GET['c']) AND ! empty($_GET['c']) ) ?
-			(int) $_GET['c'] : 0;
-			
-			
+        if( isset($_GET['c']) AND ! empty($_GET['c']) )
+	{
+		$category_ids = explode(",", $_GET['c'],-1); //get rid of that trailing ";"
+	}
+	else
+	{
+		$category_ids = array("0");
+	}
+	
+	
 	//figure out if we're showing unapproved stuff or what.
         if (isset($_GET['u']) AND !empty($_GET['u']))
         {
@@ -83,18 +90,19 @@ class Adminmap_json_Controller extends Admin_Controller
 	{
 		$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
 	}
-	//figure out if we're showing unapproved stuff or what.
-        if (isset($_GET['u']) AND !empty($_GET['u']))
-        {
-            $show_unapproved = (int) $_GET['u'];
-        }
+
 	
 	
 	//should we color unapproved reports a different color?
-	$color_unapproved = true;
+	$color_unapproved = 2;
         if (isset($_GET['uc']) AND !empty($_GET['uc']))
         {
-            $color_unapproved = false;
+	    $color_unapproved = (int) $_GET['uc'];
+        }
+	
+	if (isset($_GET['lo']) AND !empty($_GET['lo']))
+        {
+	    $logical_operator =  $_GET['lo'];
         }
 	
 	
@@ -131,53 +139,14 @@ class Adminmap_json_Controller extends Admin_Controller
             $where_text .= " AND UNIX_TIMESTAMP(".$this->table_prefix."incident.incident_date) <= '" . $end_date . "'";
         }
 
-        // Do we have a category id to filter by?
-        if (is_numeric($category_id) AND $category_id != '0')
-        {
-            // Retrieve children categories and category color
-            $category = ORM::factory('category', $category_id);
-            $color = $category->category_color;
-            $icon = $category->category_image;
-            
-            if ($icon)
-            {
-                $icon = Kohana::config('upload.relative_directory').'/'.$icon;
-            }
-            
-            $where_child = "";
-            $children = ORM::factory('category')
-                ->where('parent_id', $category_id)
-                ->find_all();
-            foreach ($children as $child)
-            {
-                $where_child .= " OR incident_category.category_id = ".$child->id." ";
-            }
+        
+	//get our new custom color based on the categories we're working with
+	$color = $this->_merge_colors($category_ids);
 
-            // Retrieve markers by category
-            // XXX: Might need to replace magic numbers
-            $markers = ORM::factory('incident')
-                                    ->select('DISTINCT incident.*')
-                                    ->with('location')
-                                    ->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
-                                    ->join('media', 'incident.id', 'media.incident_id','LEFT')
-                                    ->where($approved_text.' AND ('.$this->table_prefix.'incident_category.category_id = ' . $category_id . ' ' . $where_child . ')' . $where_text)
-                                    ->find_all();
-
-
-        }
-        else
-        {
-            // Retrieve all markers
-            $markers = ORM::factory('incident')
-                                    ->select('DISTINCT incident.*')
-                                    ->with('location')
-                                    ->join('media', 'incident.id', 'media.incident_id','LEFT')
-                                    ->where($approved_text.$where_text)
-                                    ->find_all();
-        }
-
+	$incidents = $this->_get_incidents($category_ids, $approved_text, $where_text, $logical_operator);
+	    
         $json_item_first = "";  // Variable to store individual item for report detail page
-        foreach ($markers as $marker)
+        foreach ($incidents as $marker)
         {
             $json_item = "{";
             $json_item .= "\"type\":\"Feature\",";
@@ -192,7 +161,7 @@ class Adminmap_json_Controller extends Admin_Controller
             }
 	    
 	    //check if it's a unapproved/unactive report
-	    if($marker->incident_active == 0 && $color_unapproved)
+	    if($marker->incident_active == 0 && $color_unapproved==2)
 	    {
 	        $json_item .= "\"color\": \"000000\", \n";
 		$json_item .= "\"icon\": \"".$icon."\", \n";
@@ -231,8 +200,144 @@ class Adminmap_json_Controller extends Admin_Controller
         $this->template->json = $json;
     }
 
+	/************************************************************************************************
+	* Function, this'll merge colors. Given an array of category IDs it'll return a hex string
+	* of all the colors merged together
+	*/
+	private function _merge_colors($category_ids)
+	{
+		//check if we're looking at category 0
+		if(count($category_ids) == 0 || $category_ids[0] == '0')
+		{
+			return Kohana::config('settings.default_map_all');
+		}
+		//first lets figure out the composite color that we're gonna usehere
+		$where_str_color = ""; //to get the colors we're gonna use
+		$i = 0;
+		foreach($category_ids as $id)
+		{
+			$i++;
+			if($i > 1)
+			{
+				$where_str_color = $where_str_color . " OR ";
+			}
+			$where_str_color = $where_str_color . "id = ".$id;
+		}
 
-    /**
+
+		// Retrieve all the categories with their colors
+		$categories = ORM::factory('category')
+		    ->where($where_str_color)
+		    ->find_all();
+
+		//now for each color break it into RGB, add them up, then normalize
+		$red = 0;
+		$green = 0;
+		$blue = 0;
+		foreach($categories as $category)
+		{
+			$color = $category->category_color;
+			$numeric_colors = $this->_hex2RGB($color);
+			$red = $red + $numeric_colors['red'];
+			$green = $green + $numeric_colors['green'];
+			$blue = $blue + $numeric_colors['blue'];
+		}
+		//now normalize
+		$color_length = sqrt( ($red*$red) + ($green*$green) + ($blue*$blue));
+	
+		$red = ($red / $color_length) * 255;
+		$green = ($green / $color_length) * 255;
+		$blue = ($blue / $color_length) * 255;
+	
+		
+		//pad with zeros if there's too much space
+		$red = dechex($red);
+		if(strlen($red) < 2)
+		{
+			$red = "0".$red;
+		}
+		$green = dechex($green);
+		if(strlen($green) < 2)
+		{
+			$green = "0".$green;
+		}
+		$blue = dechex($blue);
+		if(strlen($blue) < 2)
+		{
+			$blue = "0".$blue;
+		}
+		//now put the color back together and return it
+		return $red.$green.$blue;
+		
+	}
+
+
+
+     /**************************************************************************************************************
+      * Given all the parameters returns a list of incidents that meet the search criteria
+      */
+	private function _get_incidents($category_ids, $approved_text, $where_text, $logical_operator)
+	{
+	
+		//check if we're showing all categories, or if no category info was selected then return everything
+		If(count($category_ids) == 0 || $category_ids[0] == '0')
+		{
+			// Retrieve all markers
+			$incidents = ORM::factory('incident')
+			    ->select('DISTINCT incident.*')
+			    ->with('location')
+			    ->join('media', 'incident.id', 'media.incident_id','LEFT')
+			    ->where($approved_text.$where_text)
+			    ->find_all();
+			    
+			return $incidents;
+		}
+		
+		// or up allthe categories we're interested in
+		$where_category = "";
+		$i = 0;
+		foreach($category_ids as $id)
+		{
+			$i++;
+			$where_category = ($i > 1) ? $where_category . " OR " : $where_category;
+			$where_category = $where_category . $this->table_prefix.'incident_category.category_id = ' . $id;
+		}
+
+		
+		//if we're using OR
+		if($logical_operator == "or")
+		{
+		
+			// Retrieve incidents by category			
+			$incidents = ORM::factory('incident')
+				->select('DISTINCT incident.*')
+				->with('location')
+				->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
+				->join('media', 'incident.id', 'media.incident_id','LEFT')
+				->where($approved_text.' AND ('.$where_category. ')' . $where_text)
+				->find_all();
+				
+			return $incidents;
+		}
+		else //if we're using AND
+		{
+			// Retrieve incidents by category			
+			$incidents = ORM::factory('incident')
+				->select('incident.*, COUNT(incident.id) as category_count')
+				->with('location')
+				->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
+				->join('media', 'incident.id', 'media.incident_id','LEFT')
+				->where($approved_text.' AND ('.$where_category. ')' . $where_text)
+				->groupby('incident.id')
+				->having('category_count', count($category_ids))
+				->find_all();
+				
+			return $incidents;
+		}
+
+	}//end method
+    
+    /***************************************************************************************************************
      * Generate JSON in CLUSTER mode
      */
     public function cluster()
@@ -248,6 +353,7 @@ class Adminmap_json_Controller extends Admin_Controller
 
         $color = Kohana::config('settings.default_map_all');
         $icon = "";
+	$logical_operator = "or";
 	
 	$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
 	//figure out if we're showing unapproved stuff or what.
@@ -258,17 +364,16 @@ class Adminmap_json_Controller extends Admin_Controller
 	$approved_text = "";
 	if($show_unapproved == 1)
 	{
-		$approved_text = "i.incident_active = 1 ";
+		$approved_text = "incident.incident_active = 1 ";
 	}
 	else if ($show_unapproved == 2)
 	{
-		$approved_text = "i.incident_active = 0 ";
+		$approved_text = "incident.incident_active = 0 ";
 	}
 	else if ($show_unapproved == 3)
 	{
-		$approved_text = " (i.incident_active = 0 OR i.incident_active = 1) ";
-	}
-	
+		$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
+	}	
 	
 	
 	//should we color unapproved reports a different color?
@@ -278,7 +383,12 @@ class Adminmap_json_Controller extends Admin_Controller
 	    $color_unapproved = (int) $_GET['uc'];
         }
 	
-	
+
+	if (isset($_GET['lo']) AND !empty($_GET['lo']))
+        {
+	    $logical_operator =  $_GET['lo'];
+        }
+
 
         // Get Zoom Level
         $zoomLevel = (isset($_GET['z']) AND !empty($_GET['z'])) ?
@@ -288,9 +398,15 @@ class Adminmap_json_Controller extends Admin_Controller
         $distance = (10000000 >> $zoomLevel) / 100000;
 
         // Category ID
-        $category_id = (isset($_GET['c']) AND !empty($_GET['c']) &&
-            is_numeric($_GET['c']) AND $_GET['c'] != 0) ?
-            (int) $_GET['c'] : 0;
+	$category_ids=array();
+        if( isset($_GET['c']) AND ! empty($_GET['c']) )
+	{
+		$category_ids = explode(",", $_GET['c'],-1); //get rid of that trailing ";"
+	}
+	else
+	{
+		$category_ids = array("0");
+	}
 
         // Start Date
         $start_date = (isset($_GET['s']) AND !empty($_GET['s'])) ?
@@ -309,101 +425,32 @@ class Adminmap_json_Controller extends Admin_Controller
 
         $filter = "";
         $filter .= ($start_date) ?
-            " AND i.incident_date >= '" . date("Y-m-d H:i:s", $start_date) . "'" : "";
+            " AND incident.incident_date >= '" . date("Y-m-d H:i:s", $start_date) . "'" : "";
         $filter .= ($end_date) ?
-            " AND i.incident_date <= '" . date("Y-m-d H:i:s", $end_date) . "'" : "";
+            " AND incident.incident_date <= '" . date("Y-m-d H:i:s", $end_date) . "'" : "";
 
         if ($southwest AND $northeast)
         {
             list($latitude_min, $longitude_min) = explode(',', $southwest);
             list($latitude_max, $longitude_max) = explode(',', $northeast);
 
-            $filter .= " AND l.latitude >=".(float) $latitude_min.
-                " AND l.latitude <=".(float) $latitude_max;
-            $filter .= " AND l.longitude >=".(float) $longitude_min.
-                " AND l.longitude <=".(float) $longitude_max;
+            $filter .= " AND location.latitude >=".(float) $latitude_min.
+                " AND location.latitude <=".(float) $latitude_max;
+            $filter .= " AND location.longitude >=".(float) $longitude_min.
+                " AND location.longitude <=".(float) $longitude_max;
         }
 
-        if ($category_id > 0)
-        {
-            $query_cat = $db->query("SELECT `category_color`, `category_image` FROM `".$this->table_prefix."category` WHERE id=$category_id");
-            foreach ($query_cat as $cat)
-            {
-                $color = $cat->category_color;
-                $icon = $cat->category_image;
-                if ($icon)
-                {
-                    $icon = Kohana::config('upload.relative_directory').'/'.$icon;
-                }
-            }
-        }
-
-        // Get incidents
-        $incidents_result = $db->query('SELECT i.id AS id, i.incident_title AS incident_title, i.location_id as location_id, i.incident_active AS incident_active FROM '.$this->table_prefix.'incident AS i WHERE '.$approved_text . $filter.' ORDER BY i.id ASC');
-        $incidents_result = $incidents_result->result_array(FALSE);
-
-        $location_ids = array();
-        $incidents = array();
-        $allowed_ids = array();
-        while (count($incidents_result))
-        {
-            foreach ($incidents_result as $key => $incident)
-            {
-                $location_ids[] = $incident['location_id'];
-                $incidents[$incident['id']] = array(
-			'title'=>$incident['incident_title'],
-			'location_id'=>$incident['location_id'], 
-			'incident_active'=>$incident['incident_active']);
-                unset($incidents_result[$key]);
-                $allowed_ids[$incident['id']] = 1;
-            }
-        }
-
-        // Get categories if we need to
-        if ($category_id != 0)
-        {
-            $query = 'SELECT ic.incident_id AS incident_id FROM '.$this->table_prefix.'incident_category AS ic INNER JOIN '.$this->table_prefix.'category AS c ON (ic.category_id = c.id)  WHERE c.id='.$category_id.' OR c.parent_id='.$category_id.';';
-            $categories_result = $db->query($query);
-
-            // Find the allowed incident ids
-            $allowed_ids = array();
-            foreach ($categories_result as $cat)
-            {
-                $allowed_ids[$cat->incident_id] = 1;
-            }
-        }
-
-        // Get locations
-
-        if (count($location_ids) > 0)
-        {
-            $locations_result = ORM::factory('location')->in('id',implode(',',$location_ids))->find_all();
-        }else{
-            $locations_result = ORM::factory('location')->find_all();
-        }
-
-        $locations = array();
-        foreach ($locations_result as $loc)
-        {
-            $locations[$loc->id]['lat'] = $loc->latitude;
-            $locations[$loc->id]['lon'] = $loc->longitude;
-        }
-
-        // Create markers by marrying the locations and incidents
+	//stuff john just added
+	$color = $this->_merge_colors($category_ids);
+	$incidents = $this->_get_incidents($category_ids, $approved_text, $filter, $logical_operator);
+        
+	
+	// Create markers by marrying the locations and incidents
         $markers = array();
-        foreach ($incidents as $id => $incident)
-        {
-            if (isset($allowed_ids[$id]))
-            {
-                $markers[] = array(
-                    'id' => $id,
-                    'incident_title' => $incident['title'],
-		    'active' => $incident['incident_active'],
-                    'latitude' => $locations[$incident['location_id']]['lat'],
-                    'longitude' => $locations[$incident['location_id']]['lon']
-                    );
-            }
-        }
+	foreach($incidents as $incident)
+	{
+		array_push($markers, $incident);
+	}
 
         $clusters = array();    // Clustered
         $singles = array();     // Non Clustered
@@ -420,18 +467,17 @@ class Adminmap_json_Controller extends Admin_Controller
                 // This function returns the distance between two markers, at a defined zoom level.
                 // $pixels = $this->_pixelDistance($marker['latitude'], $marker['longitude'],
                 // $target['latitude'], $target['longitude'], $zoomLevel);
-
-                $pixels = abs($marker['longitude']-$target['longitude']) +
-                    abs($marker['latitude']-$target['latitude']);
+		
+                //$pixels = abs($marker['longitude']-$target['longitude']) + abs($marker['latitude']-$target['latitude']);
+		$pixels = abs($marker->location->longitude - $target->location->longitude) + abs($marker->location->latitude - $target->location->latitude);
                 // echo $pixels."<BR>";
                 // If two markers are closer than defined distance, remove compareMarker from array and add to cluster.
                 if ($pixels < $distance)
                 {
                     unset($markers[$key]);
-                    $target['distance'] = $pixels;
                     $cluster[] = $target;
 		    //check if this is a unapproved report
-		    if($target['active'] == 0)
+		    if($target->incident_active == 0)
 		    {
 			$contains_nonactive = true;
 		    }
@@ -444,7 +490,7 @@ class Adminmap_json_Controller extends Admin_Controller
                 $cluster[] = $marker;
                 //$clusters[] = $cluster;
 		//check if this is a unapproved report
-		    if($marker['active'] == 0)
+		    if($marker->incident_active == 0)
 		    {
 			$contains_nonactive = true;
 		    }
@@ -482,7 +528,8 @@ class Adminmap_json_Controller extends Admin_Controller
             $json_item = "{";
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "admin/adminmap_reports/index/?c=".$category_id."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " Reports</a>")) . "\",";
+	    $categories_str = implode(",", $category_ids);
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "admin/adminmap_reports/index/?c=".$categories_str."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " Reports</a>")) . "\",";
             $json_item .= "\"category\":[0], ";
 	    if($contains_nonactive && $color_unapproved==2)
 	    {
@@ -511,10 +558,10 @@ class Adminmap_json_Controller extends Admin_Controller
             $json_item = "{";
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "admin/reports/edit/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "\",";   
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "admin/reports/edit/" . $single->id . "/>".str_replace('"','\"',$single->incident_title)."</a>")) . "\",";   
             $json_item .= "\"category\":[0], ";
 	    //check if it's a unapproved/unactive report
-	    if($single['active'] == 0 && $color_unapproved==2)
+	    if($single->incident_active == 0 && $color_unapproved==2)
 	    {
 	        $json_item .= "\"color\": \"000000\", \n";
 		$json_item .= "\"icon\": \"".$icon."\", \n";
@@ -529,7 +576,7 @@ class Adminmap_json_Controller extends Admin_Controller
             $json_item .= "},";
             $json_item .= "\"geometry\": {";
             $json_item .= "\"type\":\"Point\", ";
-            $json_item .= "\"coordinates\":[" . $single['longitude'] . ", " . $single['latitude'] . "]";
+            $json_item .= "\"coordinates\":[" . $single->location->longitude . ", " . $single->location->latitude . "]";
             $json_item .= "}";
             $json_item .= "}";
 
@@ -543,92 +590,13 @@ class Adminmap_json_Controller extends Admin_Controller
 
     }
 
-    /**
-     * Retrieve Single Marker
-     * ETHERTON: Not sure we need this for this particular plugin.
-     */
-    public function single($incident_id = 0)
-    {
-        $json = "";
-        $json_item = "";
-        $json_array = array();
 
-
-        $marker = ORM::factory('incident')
-            ->where('id', $incident_id)
-            ->find();
-
-        if ($marker->loaded)
-        {
-            /* First We'll get all neighboring reports */
-            $incident_date = date('Y-m', strtotime($marker->incident_date));
-            $latitude = $marker->location->latitude;
-            $longitude = $marker->location->longitude;
-
-            $filter = "";
-            // Uncomment this to display markers from this month alone
-            // $filter .= " AND i.incident_date LIKE '$incident_date%' ";
-            $filter .= " AND i.id <>".$marker->id;
-
-            // Database
-            $db = new Database();
-
-            // Get Neighboring Markers Within 50 Kms (31 Miles)
-            $query = $db->query("SELECT DISTINCT i.*, l.`latitude`, l.`longitude`,
-            ((ACOS(SIN($latitude * PI() / 180) * SIN(l.`latitude` * PI() / 180) + COS($latitude * PI() / 180) * COS(l.`latitude` * PI() / 180) * COS(($longitude - l.`longitude`) * PI() / 180)) * 180 / PI()) * 60 * 1.1515) AS distance
-             FROM `".$this->table_prefix."incident` AS i INNER JOIN `".$this->table_prefix."location` AS l ON (l.`id` = i.`location_id`) INNER JOIN `".$this->table_prefix."incident_category` AS ic ON (i.`id` = ic.`incident_id`) INNER JOIN `".$this->table_prefix."category` AS c ON (ic.`category_id` = c.`id`) WHERE i.incident_active=1 $filter
-            HAVING distance<='20'
-             ORDER BY i.`id` ASC ");
-
-            foreach ($query as $row)
-            {
-                $json_item = "{";
-                $json_item .= "\"type\":\"Feature\",";
-                $json_item .= "\"properties\": {";
-                $json_item .= "\"id\": \"".$row->id."\", ";
-                $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . "reports/view/" . $row->id . "'>" . htmlentities($row->incident_title) . "</a>")) . "\",";
-                $json_item .= "\"category\":[0], ";
-                $json_item .= "\"timestamp\": \"" . strtotime($row->incident_date) . "\"";
-                $json_item .= "},";
-                $json_item .= "\"geometry\": {";
-                $json_item .= "\"type\":\"Point\", ";
-                $json_item .= "\"coordinates\":[" . $row->longitude . ", " . $row->latitude . "]";
-                $json_item .= "}";
-                $json_item .= "}";
-
-                array_push($json_array, $json_item);
-            }
-
-            $json_item = "{";
-            $json_item .= "\"type\":\"Feature\",";
-            $json_item .= "\"properties\": {";
-            $json_item .= "\"id\": \"".$marker->id."\", ";
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . "reports/view/" . $marker->id . "'>" . htmlentities($marker->incident_title) . "</a>")) . "\",";
-            $json_item .= "\"category\":[0], ";
-            $json_item .= "\"timestamp\": \"" . strtotime($marker->incident_date) . "\"";
-            $json_item .= "},";
-            $json_item .= "\"geometry\": {";
-            $json_item .= "\"type\":\"Point\", ";
-            $json_item .= "\"coordinates\":[" . $marker->location->longitude . ", " . $marker->location->latitude . "]";
-            $json_item .= "}";
-            $json_item .= "}";
-
-            array_push($json_array, $json_item);
-        }
-
-
-        $json = implode(",", $json_array);
-
-        header('Content-type: application/json');
-        $this->template->json = $json;
-    }
-
-    /**
+     /**************************************************************
      * Retrieve timeline JSON
      */
-    public function timeline( $category_id = 0 )
+    public function timeline( $category_ids = "0," )
     {
-        $category_id = (int) $category_id;
+	$category_ids = explode(",", $category_ids,-1); //get rid of that trailing ","
 
         $this->auto_render = FALSE;
         $db = new Database();
@@ -655,30 +623,16 @@ class Adminmap_json_Controller extends Admin_Controller
 		$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
 	}
 	
-	
+	$logical_operator = "or";
+	if (isset($_GET['lo']) AND !empty($_GET['lo']))
+        {
+	    $logical_operator =  $_GET['lo'];
+        }
+
 
         $interval = (isset($_GET["i"]) AND !empty($_GET["i"])) ?
             $_GET["i"] : "month";
 
-        // Get Category Info
-        if ($category_id > 0)
-        {
-            $category = ORM::factory("category", $category_id);
-            if ($category->loaded)
-            {
-                $category_title = $category->category_title;
-                $category_color = "#".$category->category_color;
-            }
-            else
-            {
-                break;
-            }
-        }
-        else
-        {
-            $category_title = "All Categories";
-            $category_color = "#990000";
-        }
 
         // Get the Counts
         $select_date_text = "DATE_FORMAT(incident_date, '%Y-%m-01')";
@@ -701,39 +655,27 @@ class Adminmap_json_Controller extends Admin_Controller
 
         $graph_data = array();
         $graph_data[0] = array();
-        $graph_data[0]['label'] = $category_title;
-        $graph_data[0]['color'] = $category_color;
+        $graph_data[0]['label'] = "Category Title"; //is this used for anything?
+        $graph_data[0]['color'] = '#'. $this->_merge_colors($category_ids);
         $graph_data[0]['data'] = array();
-
-        // Gather allowed ids if we are looking at a specific category
-
-        $allowed_ids = array();
-	$incident_id_in = '';
-        if($category_id != 0)
-        {
-		$query = 'SELECT ic.incident_id AS incident_id FROM '.$this->table_prefix.'incident_category AS ic INNER JOIN '.$this->table_prefix.'category AS c ON (ic.category_id = c.id)  WHERE c.id='.$category_id.' OR c.parent_id='.$category_id.';';
-		$query = $db->query($query);
-
-		foreach ( $query as $items )
-		{
-			$allowed_ids[] = $items->incident_id;
-		}
-
-		// Add aditional filter here to only allow for incidents that are in the requested category
-		if(count($allowed_ids) > 0 )
-		{
-			$incident_id_in = ' AND id IN ('.implode(',',$allowed_ids).')';
-		}
-		else //don't return anything
-		{
-			$incident_id_in = ' AND (id = 1 AND id = 2) '; //impossible since id is a unqiue, key column.
-		}
-        }
-
-        	
 	
+	$incidents = $this->_get_incidents($category_ids, $approved_text, "", $logical_operator);
+	
+	$approved_IDs_str = "('-1')";
+	if(count($incidents) > 0)
+	{
+		$i = 0;
+		$approved_IDs_str = "(";
+		foreach($incidents as $incident)
+		{
+			$i++;
+			$approved_IDs_str = ($i > 1) ? $approved_IDs_str.', ' : $approved_IDs_str;
+			$approved_IDs_str = $approved_IDs_str."'".$incident->id."'";
+		}
+		$approved_IDs_str = $approved_IDs_str.") ";
+	}
 
-        $query = 'SELECT UNIX_TIMESTAMP('.$select_date_text.') AS time, COUNT(id) AS number FROM '.$this->table_prefix.'incident WHERE '.$approved_text. $incident_id_in.' GROUP BY '.$groupby_date_text;
+        $query = 'SELECT UNIX_TIMESTAMP('.$select_date_text.') AS time, COUNT(id) AS number FROM '.$this->table_prefix.'incident WHERE incident.id in'.$approved_IDs_str.' GROUP BY '.$groupby_date_text;
 	//echo $query;
 	$query = $db->query($query);
 
@@ -1050,42 +992,42 @@ class Adminmap_json_Controller extends Admin_Controller
         {
             if (!$south)
             {
-                $south = $marker['latitude'];
+                $south = $marker->location->latitude;
             }
-            elseif ($marker['latitude'] < $south)
+            elseif ($marker->location->latitude < $south)
             {
-                $south = $marker['latitude'];
+                $south = $marker->location->latitude;
             }
 
             if (!$west)
             {
-                $west = $marker['longitude'];
+                $west = $marker->location->longitude;
             }
-            elseif ($marker['longitude'] < $west)
+            elseif ($marker->location->longitude < $west)
             {
-                $west = $marker['longitude'];
+                $west = $marker->location->longitude;
             }
 
             if (!$north)
             {
-                $north = $marker['latitude'];
+                $north = $marker->location->latitude;
             }
-            elseif ($marker['latitude'] > $north)
+            elseif ($marker->location->latitude > $north)
             {
-                $north = $marker['latitude'];
+                $north = $marker->location->latitude;
             }
 
             if (!$east)
             {
-                $east = $marker['longitude'];
+                $east = $marker->location->longitude;
             }
-            elseif ($marker['longitude'] > $east)
+            elseif ($marker->location->longitude > $east)
             {
-                $east = $marker['longitude'];
+                $east = $marker->location->longitude;
             }
 
-            $lat_sum += $marker['latitude'];
-            $lon_sum += $marker['longitude'];
+            $lat_sum += $marker->location->latitude;
+            $lon_sum += $marker->location->longitude;
         }
         $lat_avg = $lat_sum / count($cluster);
         $lon_avg = $lon_sum / count($cluster);
@@ -1099,6 +1041,33 @@ class Adminmap_json_Controller extends Admin_Controller
             "sw"=>$sw,
             "ne"=>$ne
         );
-    }
-
+    }//end function
+    
+    
+	private function _hex2RGB($hexStr, $returnAsString = false, $seperator = ',') 
+	{
+		$hexStr = preg_replace("/[^0-9A-Fa-f]/", '', $hexStr); // Gets a proper hex string
+		$rgbArray = array();
+		if (strlen($hexStr) == 6) 
+		{ //If a proper hex code, convert using bitwise operation. No overhead... faster
+			$colorVal = hexdec($hexStr);
+			$rgbArray['red'] = 0xFF & ($colorVal >> 0x10);
+			$rgbArray['green'] = 0xFF & ($colorVal >> 0x8);
+			$rgbArray['blue'] = 0xFF & $colorVal;
+		} 
+		elseif (strlen($hexStr) == 3) 
+		{ //if shorthand notation, need some string manipulations
+			$rgbArray['red'] = hexdec(str_repeat(substr($hexStr, 0, 1), 2));
+			$rgbArray['green'] = hexdec(str_repeat(substr($hexStr, 1, 1), 2));
+			$rgbArray['blue'] = hexdec(str_repeat(substr($hexStr, 2, 1), 2));
+		} 
+		else 
+		{
+			return false; //Invalid hex color code
+		}
+		return $returnAsString ? implode($seperator, $rgbArray) : $rgbArray; // returns the rgb string or the associative array
+	}
+    
+    
+    
 }

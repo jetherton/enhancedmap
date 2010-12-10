@@ -25,6 +25,8 @@
 		var currentStatus;
 		// color the reports who's status is unapproved black?
 		var colorCurrentStatus;
+		//logical operator to use
+		var currentLogicalOperator;
 		// Selected Layer
 		var thisLayer;
 		// WGS84 Datum
@@ -71,6 +73,7 @@
 			// Get Current Status, and if we should color these reports black
 			currStatus = $("#currentStatus").val();
 			currColorStatus = $("#colorCurrentStatus").val();
+			currLogicalOperator=$("#currentLogicalOperator").val();
 		
 				
 			return $.timeline({categoryId: catID,
@@ -80,8 +83,33 @@
 							  }).addMarkers(
 								startDate, endDate, gMap.getZoom(),
 								gMap.getCenter(), thisLayerID, thisLayerType, 
-								thisLayerUrl, thisLayerColor, json_url, currStatus, currColorStatus);
+								thisLayerUrl, thisLayerColor, json_url, currStatus, currColorStatus,
+								currLogicalOperator);
 		}
+
+
+
+		/******
+		* Removes the category ID from the string currentCat
+		*******/
+		function removeCategoryFilter(idToRemove, currentCat)
+		{
+			var toRemove = idToRemove+","; //we use , as the delimiter bewteen categories
+			var startPos = currentCat.indexOf(toRemove);
+			//if the substring isn't here,bounce
+			if (startPos == -1)
+			{
+				return currentCat;
+			}
+			var testStr1 = currentCat.substring(0,startPos);
+			var testStr2 = currentCat.substring(startPos + toRemove.length, currentCat.length);
+			currentCat = testStr1+testStr2;
+			//deactivate
+			$("#cat_"+idToRemove).removeClass("active");
+			
+			return currentCat;
+		}
+
 
 		/*
 		Display loader as Map Loads
@@ -232,6 +260,9 @@
 			var currentCat = gCategoryId;
 			// Get Current Status
 			var currStatus = $("#currentStatus").val();
+			
+			//Get currentl logical operator
+			var currLogicalOperator = $("#currentLogicalOperator").val();
 
 			// refresh graph
 			if (!currentCat || currentCat == '0')
@@ -248,7 +279,8 @@
 			// plot hourly incidents when period is within 2 days
 			if ((endTime - startTime) / (1000 * 60 * 60 * 24) <= 3)
 			{
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=hour&u="+currStatus, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=hour&u="+currStatus + 
+				"&lo="+ currLogicalOperator, function(data) {
 					graphData = data[0];
 
 					gTimeline = $.timeline({categoryId: currentCat,
@@ -263,7 +295,8 @@
 			else if ((endTime - startTime) / (1000 * 60 * 60 * 24) <= 124)
 			{
 			    // weekly if period > 2 months
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=day&u="+currStatus, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=day&u="+currStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {
 					graphData = data[0];
 
 					gTimeline = $.timeline({categoryId: currentCat,
@@ -278,7 +311,8 @@
 			else if ((endTime - startTime) / (1000 * 60 * 60 * 24) > 124)
 			{
 				// monthly if period > 4 months
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?u="+currStatus, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?u="+currStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {
 					graphData = data[0];
 
 					gTimeline = $.timeline({categoryId: currentCat,
@@ -292,12 +326,14 @@
 			}
 
 			// Get dailyGraphData for All Categories
-			$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=day&u="+currStatus, function(data) {
+			$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=day&u="+currStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {
 				dailyGraphData = data[0];
 			});
 
 			// Get allGraphData for All Categories
-			$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u="+currStatus, function(data) {
+			$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u="+currStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {
 				allGraphData = data[0];
 			});
 
@@ -418,22 +454,88 @@
 				
 			gMap = map;
 			
+			
+			//////////////////////////////////////////////////////////////////////////////////////
 			// Category Switch Action
 			$("a[id^='cat_']").click(function()
 			{
+			
+				//the id of the category that just changed
 				var catID = this.id.substring(4);
-				var catSet = 'cat_' + this.id.substring(4);
-				$("a[id^='cat_']").removeClass("active"); // Remove All active
-				$("[id^='child_']").hide(); // Hide All Children DIV
-				$("#cat_" + catID).addClass("active"); // Add Highlight
-				$("#child_" + catID).show(); // Show children DIV
-				$(this).parents("div").show();
 				
-				currentCat = catID;
-				$("#currentCat").val(catID);
+				//the list of categories we're currently showing
+				currentCat = $("#currentCat").val();
+				//First we check if the "All Categories" button was pressed. If so unselect everything else
+				if( catID == 0)
+				{
+					if( !$("#cat_0").hasClass("active")) //it's being activated so unselect everything else
+					{
+						//unselect all other selected categories
+						var activeIDs = currentCat.split(",");
+						for (var i=0; i < activeIDs.length; i++)
+						{
+							currentCat = removeCategoryFilter(activeIDs[i], currentCat);
+						}
+					}
+				}
 
-				// setUrl not supported with Cluster Strategy
-				//markers.setUrl("<?php echo url::site(); ?>" json_url + '/?c=' + catID);
+				//first check and see if we're dealing with a parent category
+				else if( $("#child_"+catID).find('a').length > 0)
+				{
+					//if the kids aren't currenlty shown, show them
+					if( !$("#child_"+catID).is(":visible"))
+					{
+						$("#child_"+catID).show();
+						//since all we're doing is showing things we don't need to update the map
+						// so just bounce
+						return false;
+					}
+					else //kids are shown, deactivate them.
+					{
+						var kids = $("#child_"+catID).find('a');
+						kids.each(function(){
+							if($(this).hasClass("active"))
+							{
+								//remove this category ID from the list of IDs to show
+								var idNum = $(this).attr("id").substring(4);
+								currentCat = removeCategoryFilter(idNum, currentCat);
+							}
+						});
+						$("#child_"+catID).hide();
+					}
+				}//end of if for dealing with parents
+				else
+				{ //we're dealing wtih single categories
+					
+					//first check and see if we're adding or removing this category
+					if($("#cat_"+catID).hasClass("active")) //it is active so make it unactive and remove this category from the list of categories we're looking at.
+					{ 
+						currentCat = removeCategoryFilter(catID, currentCat);
+					}
+					else //it isn't active so make it active
+					{ 
+						$("#cat_"+catID).addClass("active");
+						
+						//make sure the "all categories" button isn't active
+						currentCat = removeCategoryFilter("0", currentCat);
+						
+						//add this category ID from the list of IDs to show
+						var toAdd = catID+","; //we use , as the delimiter bewteen categories
+
+						currentCat = currentCat + toAdd;
+					}
+				}
+				
+				
+				//check to make sure something is selected. If nothing is selected then select "all gategories"
+				if( currentCat.length == 0)
+				{
+					$("#cat_0").addClass("active");
+					currentCat = currentCat + "0,";
+
+				}
+				$("#currentCat").val(currentCat);
+				
 				
 				// Destroy any open popups
 				onPopupClose();
@@ -447,13 +549,17 @@
 				// Get Current Status
 				currStatus = $("#currentStatus").val();
 				
-				gCategoryId = catID;
+				//Get Current Logical Operator
+				currLogicalOperator = $("#currentLogicalOperator").val();
+				
+				gCategoryId = currentCat;
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
-				addMarkers(catID, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
+				addMarkers(currentCat, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 								
 				graphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID + "?u="+currStatus, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u="+currStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {
 					graphData = data[0];
 
 					gTimeline = $.timeline({categoryId: catID, startTime: startTime, endTime: endTime,
@@ -464,14 +570,15 @@
 				});
 				
 				dailyGraphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day&u="+currStatus, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat+"?i=day&u="+currStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {
 					dailyGraphData = data[0];
 				});
 				allGraphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u="+currStatus, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u="+currStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {
 					allGraphData = data[0];
 				});
-				
 				return false;
 			});
 			
@@ -526,6 +633,9 @@
 				}
 				
 				$("#currentStatus").val(currentStatus);
+				
+				//Get Logical Operator
+				currLogicalOperator = $("#currentLogicalOperator").val();
 
 	
 				
@@ -547,7 +657,8 @@
 				addMarkers(catID, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 								
 				graphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID + "?u=" + currentStatus, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID + "?u=" + currentStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {
 					graphData = data[0];
 
 					gTimeline = $.timeline({categoryId: catID, startTime: startTime, endTime: endTime,
@@ -558,10 +669,12 @@
 				});
 				
 				dailyGraphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day&u=" + currentStatus, function(data) {dailyGraphData = data[0];});
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day&u=" + currentStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {dailyGraphData = data[0];});
 		
 				allGraphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u=" + currentStatus, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u=" + currentStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {
 					allGraphData = data[0];
 				});
 
@@ -606,6 +719,8 @@
 				
 				currentStatus  = $("#currentStatus").val();
 
+				currLogicalOperator = $("#currentLogicalOperator").val();
+
 				// Get Current Category
 				gCategoryId = currentCat;
 				var catID = currentCat;
@@ -615,7 +730,8 @@
 				addMarkers(catID, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 								
 				graphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID + "?u=" + currentStatus, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID + "?u=" + currentStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {
 					graphData = data[0];
 
 					gTimeline = $.timeline({categoryId: catID, startTime: startTime, endTime: endTime,
@@ -626,13 +742,85 @@
 				});
 				
 				dailyGraphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day&u=" + currentStatus, function(data) {dailyGraphData = data[0];});
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day&u=" + currentStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {dailyGraphData = data[0];});
 		
 				allGraphData = "";
-				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u=" + currentStatus, function(data) {
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u=" + currentStatus+ 
+				"&lo="+ currLogicalOperator, function(data) {
 					allGraphData = data[0];
 				});
 
+				return false;
+			});
+			
+			
+			
+			currentLogicalOperator
+			//////////////////////////////////////////////////////
+			//Logical Operator switcher
+			//////////////////////////////////////////////////////
+			$("a[id^='logicalOperator_']").click(function()
+			{
+				
+				//switch whatever the current setting is. 
+				if( $("#logicalOperator_1").hasClass("active")) //was OR, now make it AND
+				{
+					$("#logicalOperator_1").removeClass("active"); // not OR
+					$("#logicalOperator_2").addClass("active"); // is AND
+					currentLogicalOperator = "and";
+				}
+				else //was AND, now make it OR
+				{
+					$("#logicalOperator_2").removeClass("active"); // not AND
+					$("#logicalOperator_1").addClass("active"); // is OR
+					currentLogicalOperator = "or";
+				}
+
+
+				$("#currentLogicalOperator").val(currentLogicalOperator);
+
+				// Destroy any open popups
+				onPopupClose();
+				
+				// Get Current Zoom
+				currZoom = map.getZoom();
+				
+				// Get Current Center
+				currCenter = map.getCenter();
+				
+				currentStatus  = $("#currentStatus").val();
+
+				// Get Current Category
+				gCategoryId = currentCat;
+				var catID = currentCat;
+
+				
+				var startTime = new Date($("#startDate").val() * 1000);
+				var endTime = new Date($("#endDate").val() * 1000);
+				addMarkers(catID, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
+								
+				graphData = "";
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID + "?u=" + currentStatus+ 
+				"&lo="+ currentLogicalOperator, function(data) {
+					graphData = data[0];
+
+					gTimeline = $.timeline({categoryId: catID, startTime: startTime, endTime: endTime,
+						graphData: graphData,
+						mediaType: gMediaType
+					});
+					gTimeline.plot();
+				});
+				
+				dailyGraphData = "";
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+catID+"?i=day&u=" + currentStatus+ 
+				"&lo="+ currentLogicalOperator, function(data) {dailyGraphData = data[0];});
+		
+				allGraphData = "";
+				$.getJSON("<?php echo url::site()."admin/adminmap_json/timeline/"?>"+currentCat + "?u=" + currentStatus+ 
+				"&lo="+ currentLogicalOperator, function(data) {
+					allGraphData = data[0];
+				});
 				return false;
 			});
 

@@ -168,11 +168,24 @@ ul.status-filters li a{
     overflow: hidden;
 }
 
-ul.status-filters li a:hover, ul.status-filters li a.active {
+ul.status-filters li a.active{
     color: #FFFFFF;
     background-color: #3484AC;
     border: #3484AC 1px solid;
 }
+
+ul.status-filters li a:hover{
+    color: #FFFFFF;
+    background-color: #c7c3DA;
+    border: #3484AC 1px solid;
+}
+
+ul.status-filters li a.active:hover {
+    color: #FFFFFF;
+    background-color: #34c4DC;
+    border: #3484AC 1px solid;
+}
+
 
 
 /* category filters */
@@ -216,7 +229,6 @@ ul.category-filters li{
 ul.category-filters li a{
     display: block;
     padding: 8px 10px 8px 5px;
-/*    padding: 8px 10px 8px 35px; maxf change */
     font-size: 15px;
     text-transform: uppercase;
     font-weight: bold;
@@ -228,11 +240,25 @@ ul.category-filters li a{
     overflow: hidden;
 }
 
-ul.category-filters li a:hover, ul.category-filters li a.active {
+
+ul.category-filters li a.active{
     color: #FFFFFF;
     background-color: #3484AC;
     border: #3484AC 1px solid;
 }
+
+ul.category-filters li a:hover{
+    color: #FFFFFF;
+    background-color: #c7c3DA;
+    border: #3484AC 1px solid;
+}
+
+ul.category-filters li a.active:hover {
+    color: #FFFFFF;
+    background-color: #34c4DC;
+    border: #3484AC 1px solid;
+}
+
 
 ul.category-filters li.child{
 	display:none;

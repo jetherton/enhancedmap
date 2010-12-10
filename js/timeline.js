@@ -627,7 +627,7 @@
 		Create the Markers Layer
 		*/
 		this.addMarkers = function(startDate,endDate, currZoom, currCenter,
-			thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor, json_url, currStatus, currColorStatus)
+			thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor, json_url, currStatus, currColorStatus, currLogicalOperator)
 		{
 
 			var	protocolUrl = baseUrl + json_url + "/"; // Default Json
@@ -700,7 +700,8 @@
 
 			//markers = new OpenLayers.Layer.GML(thisLayer, protocolUrl + '?z='+ myZoom +'&sw='+ southwest +'&ne='+ northeast +'&' + params.join('&'),
 			markers = new OpenLayers.Layer.GML(thisLayer, protocolUrl + '?z=' +
-				myZoom + '&' + this.markerUrlParams(startDate, endDate).join('&') + "&u="+currStatus + "&uc="+currColorStatus,
+				myZoom + '&' + this.markerUrlParams(startDate, endDate).join('&') + "&u="+currStatus + "&uc="+currColorStatus
+				+ "&lo="+currLogicalOperator,
 				{
 					preFeatureInsert:preFeatureInsert,
 					format: protocolFormat,

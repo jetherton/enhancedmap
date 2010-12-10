@@ -31,13 +31,38 @@ This maps shows you all of the reports you are authorized to see. This includes 
 					<li>
 						<a class="active" id="color_status_1" href="#">
 							<div class="swatch" style="background-color:#000000"></div>
-							<div class="status-title">Color Unapproved Reports Black</div>
+							<div class="status-title">Show unapproved reports as black</div>
 						</a>
 					</li>
 				</ul>
 			</div>		       
 		       <!-- /status filters -->
 		
+
+
+		       <!-- logic filters -->
+			<div class="stat-filters clearingfix">
+				<strong>Logical Operators:</strong>
+				<!-- keep track of what status we're looking at -->
+				<form action="">
+					<input type = "hidden" value="or" name="currentLogicalOperator" id="currentLogicalOperator">
+				</form>
+				<ul id="status_switch" class="status-filters">
+					<li>
+						<a class="active" id="logicalOperator_1" href="#">							
+							<div class="status-title">OR - <span style="text-transform:none; font-size:85%;">Show all reports that fall under at least one of the categories selected below</span> </div>
+						</a>
+					</li>
+					<li>
+						<a  id="logicalOperator_2" href="#">
+							<div class="status-title">AND - <span style="text-transform:none; font-size:85%;">Show all reports that fall under all of the categories selected below</span></div>
+						</a>
+					</li>
+				</ul>
+			</div>		       
+		       <!-- /logic filters -->
+
+
 
 			<!-- category filters -->
 			<div class="cat-filters clearingfix">

@@ -1,6 +1,6 @@
 <div class="slider-holder">
 	<form action="">
-		<input type="hidden" value="0" name="currentCat" id="currentCat">
+		<input type="hidden" value="0," name="currentCat" id="currentCat">
 		<fieldset>
 			<div class="play"><a href="#" id="playTimeline">PLAY</a></div>
 			<label for="startDate">From:</label>
