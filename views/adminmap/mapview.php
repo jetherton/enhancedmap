@@ -70,7 +70,7 @@ This maps shows you all of the reports you are authorized to see. This includes 
 			</div>
 		
 			<ul id="category_switch" class="category-filters">
-				<li><a class="active" id="cat_0" href="#"><div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div><div class="category-title"><?php echo Kohana::lang('ui_main.all_categories');?></div></a></li>
+				<li><a class="active" id="cat_0" href="#"><div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div><div class="category-title">Show All Reports</div></a></li>
 				<?php
 					foreach ($categories as $category => $category_info)
 					{
