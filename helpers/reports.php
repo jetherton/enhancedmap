@@ -152,24 +152,12 @@ class reports_Core {
 		{
 			// Retrieve all markers
 			
-			    if($limit != -1 && $offset != -1)
-			    {
-				$incidents_count = ORM::factory('incident')
-					->select('DISTINCT incident.*')
-					->with('location')
-					->join('media', 'incident.id', 'media.incident_id','LEFT')
-					->where($approved_text.$where_text)
-					->count_all();
-			    }
-			    else
-			    {
-				$incidents_count = ORM::factory('incident')
-					->select('DISTINCT incident.*')
-					->with('location')
-					->join('media', 'incident.id', 'media.incident_id','LEFT')
-					->where($approved_text.$where_text)
-					->count_all();
-			    }
+			$incidents_count = ORM::factory('incident')
+				->select('DISTINCT incident.*')
+				->with('location')
+				->join('media', 'incident.id', 'media.incident_id','LEFT')
+				->where($approved_text.$where_text)
+				->count_all();
 			    
 			return $incidents_count;
 		}
