@@ -143,7 +143,7 @@ class Adminmap_json_Controller extends Admin_Controller
 	//get our new custom color based on the categories we're working with
 	$color = $this->_merge_colors($category_ids);
 
-	$incidents = $this->_get_incidents($category_ids, $approved_text, $where_text, $logical_operator);
+	$incidents = reports::get_reports($category_ids, $approved_text, $filter, $logical_operator);
 	    
         $json_item_first = "";  // Variable to store individual item for report detail page
         foreach ($incidents as $marker)
@@ -272,72 +272,7 @@ class Adminmap_json_Controller extends Admin_Controller
 	}
 
 
-
-     /**************************************************************************************************************
-      * Given all the parameters returns a list of incidents that meet the search criteria
-      */
-	private function _get_incidents($category_ids, $approved_text, $where_text, $logical_operator)
-	{
-	
-		//check if we're showing all categories, or if no category info was selected then return everything
-		If(count($category_ids) == 0 || $category_ids[0] == '0')
-		{
-			// Retrieve all markers
-			$incidents = ORM::factory('incident')
-			    ->select('DISTINCT incident.*')
-			    ->with('location')
-			    ->join('media', 'incident.id', 'media.incident_id','LEFT')
-			    ->where($approved_text.$where_text)
-			    ->find_all();
-			    
-			return $incidents;
-		}
-		
-		// or up allthe categories we're interested in
-		$where_category = "";
-		$i = 0;
-		foreach($category_ids as $id)
-		{
-			$i++;
-			$where_category = ($i > 1) ? $where_category . " OR " : $where_category;
-			$where_category = $where_category . $this->table_prefix.'incident_category.category_id = ' . $id;
-		}
-
-		
-		//if we're using OR
-		if($logical_operator == "or")
-		{
-		
-			// Retrieve incidents by category			
-			$incidents = ORM::factory('incident')
-				->select('DISTINCT incident.*')
-				->with('location')
-				->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
-				->join('media', 'incident.id', 'media.incident_id','LEFT')
-				->where($approved_text.' AND ('.$where_category. ')' . $where_text)
-				->find_all();
-				
-			return $incidents;
-		}
-		else //if we're using AND
-		{
-			// Retrieve incidents by category			
-			$incidents = ORM::factory('incident')
-				->select('incident.*, COUNT(incident.id) as category_count')
-				->with('location')
-				->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
-				->join('media', 'incident.id', 'media.incident_id','LEFT')
-				->where($approved_text.' AND ('.$where_category. ')' . $where_text)
-				->groupby('incident.id')
-				->having('category_count', count($category_ids))
-				->find_all();
-				
-			return $incidents;
-		}
-
-	}//end method
-    
-    /***************************************************************************************************************
+/***************************************************************************************************************
      * Generate JSON in CLUSTER mode
      */
     public function cluster()
@@ -395,7 +330,7 @@ class Adminmap_json_Controller extends Admin_Controller
             (int) $_GET['z'] : 8;
 
         //$distance = 60;
-        $distance = (10000000 >> $zoomLevel) / 100000;
+        $distance = ((10000000 >> $zoomLevel) / 100000) / 2;
 
         // Category ID
 	$category_ids=array();
@@ -442,7 +377,7 @@ class Adminmap_json_Controller extends Admin_Controller
 
 	//stuff john just added
 	$color = $this->_merge_colors($category_ids);
-	$incidents = $this->_get_incidents($category_ids, $approved_text, $filter, $logical_operator);
+	$incidents = reports::get_reports($category_ids, $approved_text, $filter, $logical_operator);
         
 	
 	// Create markers by marrying the locations and incidents
@@ -529,7 +464,7 @@ class Adminmap_json_Controller extends Admin_Controller
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
 	    $categories_str = implode(",", $category_ids);
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "admin/adminmap_reports/index/?c=".$categories_str."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " Reports</a>")) . "\",";
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . "admin/adminmap_reports/index/?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$approved_text.">" . $cluster_count . " Reports</a>")) . "\",";
             $json_item .= "\"category\":[0], ";
 	    if($contains_nonactive && $color_unapproved==2)
 	    {
@@ -659,7 +594,7 @@ class Adminmap_json_Controller extends Admin_Controller
         $graph_data[0]['color'] = '#'. $this->_merge_colors($category_ids);
         $graph_data[0]['data'] = array();
 	
-	$incidents = $this->_get_incidents($category_ids, $approved_text, "", $logical_operator);
+	$incidents = reports::get_reports($category_ids, $approved_text, "", $logical_operator);
 	
 	$approved_IDs_str = "('-1')";
 	if(count($incidents) > 0)

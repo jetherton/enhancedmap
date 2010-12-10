@@ -15,6 +15,8 @@ This maps shows you all of the reports you are authorized to see. This includes 
 					<input type = "hidden" value="2" name="colorCurrentStatus" id="colorCurrentStatus">
 				</form>
 				<ul id="status_switch" class="status-filters">
+					<!-- This was commented out to keep things simple for our users. I hate to cut out functionality,
+					       but we need to be aware of  overloading those who may not be tech savy
 					<li>
 						<a class="active" id="status_1" href="#">
 							<div class="swatch" style="background-color:#000000"></div>
@@ -27,13 +29,14 @@ This maps shows you all of the reports you are authorized to see. This includes 
 							<div class="status-title">Approved Reports</div>
 						</a>
 					</li>
-
+					-->
 					<li>
 						<a class="active" id="color_status_1" href="#">
 							<div class="swatch" style="background-color:#000000"></div>
 							<div class="status-title">Show unapproved reports as black</div>
 						</a>
 					</li>
+					
 				</ul>
 			</div>		       
 		       <!-- /status filters -->

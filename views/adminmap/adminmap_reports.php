@@ -140,13 +140,13 @@
 										$submit_by = $incident->message->message_from;
 									}
 
-									$incident_location = $locations[$incident->location_id];
+									$incident_location = $incident->location;
 
 									// Retrieve Incident Categories
 									$incident_category = "";
 									foreach($incident->incident_category as $category)
 									{
-										$incident_category .= "<a href=\"#\">" . $category->category->category_title . "</a>&nbsp;&nbsp;";
+										$incident_category .= "<span style=\"color:#9b0000\">" . $category->category->category_title . "</span>&nbsp;&nbsp;";
 									}
 
 									// Incident Status

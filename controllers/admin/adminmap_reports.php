@@ -46,11 +46,11 @@ class Adminmap_reports_Controller extends Admin_Controller
 
             if (strtolower($status) == 'a')
             {
-                $filter = 'incident_active = 0';
+                $filter = 'incident.incident_active = 0';
             }
             elseif (strtolower($status) == 'v')
             {
-                $filter = 'incident_verified = 0';
+                $filter = 'incident.incident_verified = 0';
             }
             else
             {
@@ -231,134 +231,90 @@ class Adminmap_reports_Controller extends Admin_Controller
         }
 
         
-	/******* Stuff from frontend reports.php*****/
 	$db = new Database;
-			// Get incident_ids if we are to filter by category
-		$allowed_ids = array();
-		if (isset($_GET['c']) AND !empty($_GET['c']) AND $_GET['c']!=0)
-		{
-			$category_id = $db->escape($_GET['c']);
-			$query = 'SELECT ic.incident_id AS incident_id FROM '.$this->table_prefix.'incident_category AS ic INNER JOIN '.$this->table_prefix.'category AS c ON (ic.category_id = c.id)  WHERE c.id='.$category_id.' OR c.parent_id='.$category_id.';';
-			$query = $db->query($query);
-
-			foreach ( $query as $items )
-			{
-				$allowed_ids[] = $items->incident_id;
-			}
-		}
-
-		// Get location_ids if we are to filter by location
-		$location_ids = array();
-
-		// Break apart location variables, if necessary
-		$southwest = array();
-		if (isset($_GET['sw']))
-		{
-			$southwest = explode(",",$_GET['sw']);
-		}
-
-		$northeast = array();
-		if (isset($_GET['ne']))
-		{
-			$northeast = explode(",",$_GET['ne']);
-		}
-
-		if ( count($southwest) == 2 AND count($northeast) == 2 )
-		{
-			$lon_min = (float) $southwest[0];
-			$lon_max = (float) $northeast[0];
-			$lat_min = (float) $southwest[1];
-			$lat_max = (float) $northeast[1];
-
-			$query = 'SELECT id FROM '.$this->table_prefix.'location WHERE latitude >='.$lat_min.' AND latitude <='.$lat_max.' AND longitude >='.$lon_min.' AND longitude <='.$lon_max;
-
-			$query = $db->query($query);
-
-			foreach ( $query as $items )
-			{
-				$location_ids[] =  $items->id;
-			}
-		}
-		elseif (isset($_GET['l']) AND !empty($_GET['l']) AND $_GET['l']!=0)
-		{
-			$location_ids[] = (int) $_GET['l'];
-		}
-
-		// Get the count
-		$incident_id_in = '1=1';
-		if (count($allowed_ids) > 0)
-		{
-			$incident_id_in = 'id IN ('.implode(',',$allowed_ids).')';
-		}
-
-		$location_id_in = '1=1';
-		if (count($location_ids) > 0)
-		{
-			$location_id_in = 'location_id IN ('.implode(',',$location_ids).')';
-		}
-
-		// Pagination
-		$pagination = new Pagination(array(
-				'query_string' => 'page',
-				'items_per_page' => (int) Kohana::config('settings.items_per_page'),
-				'total_items' => ORM::factory("incident")
-					->where($filter)
-					->where($location_id_in)
-					->where($incident_id_in)
-					->count_all()
-				));
-
-		// Reports
-		$incidents = ORM::factory("incident")
-			->where($filter)
-			->where($location_id_in)
-			->where($incident_id_in)
-			->orderby("incident_date", "desc")
-			->find_all((int) Kohana::config('settings.items_per_page_admin'), $pagination->sql_offset);
 
 
-	/******* End of stuff from frontend reports.php****/
+	// Category ID
+	$category_ids=array();
+        if( isset($_GET['c']) AND ! empty($_GET['c']) )
+	{
+		$category_ids = explode(",", $_GET['c']); //get rid of that trailing ","
+	}
+	else
+	{
+		$category_ids = array("0");
+	}
+	
+	// logical operator
+	$logical_operator = "or";
+        if( isset($_GET['lo']) AND ! empty($_GET['lo']) )
+	{
+		$logical_operator = $_GET['lo'];
+	}
+
+	$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
+	//figure out if we're showing unapproved stuff or what.
+        if (isset($_GET['u']) AND !empty($_GET['u']))
+        {
+            $show_unapproved = (int) $_GET['u'];
+        }
+	$approved_text = "";
+	if($show_unapproved == 1)
+	{
+		$approved_text = "incident.incident_active = 1 ";
+	}
+	else if ($show_unapproved == 2)
+	{
+		$approved_text = "incident.incident_active = 0 ";
+	}
+	else if ($show_unapproved == 3)
+	{
+		$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
+	}
 	
 	
-	/* old stuff
+	
+	$location_where = "";
+	// Break apart location variables, if necessary
+	$southwest = array();
+	if (isset($_GET['sw']))
+	{
+		$southwest = explode(",",$_GET['sw']);
+	}
+
+	$northeast = array();
+	if (isset($_GET['ne']))
+	{
+		$northeast = explode(",",$_GET['ne']);
+	}
+
+	if ( count($southwest) == 2 AND count($northeast) == 2 )
+	{
+		$lon_min = (float) $southwest[0];
+		$lon_max = (float) $northeast[0];
+		$lat_min = (float) $southwest[1];
+		$lat_max = (float) $northeast[1];
+
+		$location_where = ' AND (location.latitude >='.$lat_min.' AND location.latitude <='.$lat_max.' AND location.longitude >='.$lon_min.' AND location.longitude <='.$lon_max.') ';
+
+	}
+	
+	
+	$reports_count = reports::get_reports_count($category_ids, $approved_text, $location_where. " AND ". $filter, $logical_operator);
+
+	
 	// Pagination
-        $pagination = new Pagination(array(
-            'query_string'   => 'page',
-            'items_per_page' => (int) Kohana::config('settings.items_per_page_admin'),
-            'total_items'    => ORM::factory('incident')
-				->join('location', 'incident.location_id', 'location.id','INNER')
-				->where($filter)
-				->count_all()
-            ));
+	$pagination = new Pagination(array(
+			'query_string' => 'page',
+			'items_per_page' => (int) Kohana::config('settings.items_per_page'),
+			'total_items' => $reports_count
+			));
 
-        $incidents = ORM::factory('incident')
-			->join('location', 'incident.location_id', 'location.id','INNER')
-			->where($filter)
-			->orderby('incident_dateadd', 'desc')
-			->find_all((int) Kohana::config('settings.items_per_page_admin'), $pagination->sql_offset);
-         /end old stuff */
-        $location_ids = array();
-        foreach ($incidents as $incident)
-        {
-            $location_ids[] = $incident->location_id;
-        }
-        
-        //check if location_ids is not empty
-        if( count($location_ids ) > 0 ) 
-        {
-            $locations_result = ORM::factory('location')->in('id',implode(',',$location_ids))->find_all();
-            $locations = array();
-            foreach ($locations_result as $loc)
-            {
-                $locations[$loc->id] = $loc->location_name;
-            }
-        }
-        else
-        {
-            $locations = array();
-        }
+	$incidents = reports::get_reports($category_ids,  $approved_text, $location_where. " AND ". $filter, $logical_operator, 
+		"incident.incident_date", "asc",
+		(int) Kohana::config('settings.items_per_page_admin'), $pagination->sql_offset );
 
-        $this->template->content->locations = $locations;
+
 
         //GET countries
         $countries = array();
