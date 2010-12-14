@@ -237,6 +237,8 @@ class adminmap_Controller extends Admin_Controller
 	private function set_categories()
 	{
 	
+	// Check for localization of parent category
+	// Get locale
 	$l = Kohana::config('locale.language.0');
 
         // Get all active top level categories
@@ -281,9 +283,7 @@ class adminmap_Controller extends Admin_Controller
 				}
 			}
 
-			// Check for localization of parent category
-			// Get locale
-			$l = Kohana::config('locale.language.0');
+			
 
 			$translated_title = Category_Lang_Model::category_title($category->id,$l);
 
