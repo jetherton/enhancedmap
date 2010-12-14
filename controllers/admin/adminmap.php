@@ -236,7 +236,9 @@ class adminmap_Controller extends Admin_Controller
 	
 	private function set_categories()
 	{
-		
+	
+	$l = Kohana::config('locale.language.0');
+
         // Get all active top level categories
 		$parent_categories = array();
 		foreach (ORM::factory('category')
