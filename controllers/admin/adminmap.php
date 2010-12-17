@@ -12,13 +12,15 @@ class adminmap_Controller extends Admin_Controller
 	function __construct()
 	{
 		parent::__construct();
+		
 		$this->template->this_page = 'adminmap';
-
+		
 		// If this is not a super-user account, redirect to dashboard
-		if(!$this->auth->logged_in('admin') && !$this->auth->logged_in('superadmin'))
+		if(!$this->auth->logged_in('admin') && !$this->auth->logged_in('superadmin') )
 		{
 			url::redirect('admin/dashboard');
 		}
+		
 	}
 	
 	public function index()

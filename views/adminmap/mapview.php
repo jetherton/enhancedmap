@@ -8,12 +8,13 @@ This maps shows you all of the reports you are authorized to see. This includes 
 		<div id="right">
 		       <!-- status filters -->
 			<div class="stat-filters clearingfix">
-				<strong>Status Filters:</strong>
 				<!-- keep track of what status we're looking at -->
 				<form action="">
 					<input type = "hidden" value="3" name="currentStatus" id="currentStatus">
 					<input type = "hidden" value="2" name="colorCurrentStatus" id="colorCurrentStatus">
 				</form>
+
+				<strong>Status Filters:</strong>
 				<ul id="status_switch" class="status-filters">
 					<!-- This was commented out to keep things simple for our users. I hate to cut out functionality,
 					       but we need to be aware of  overloading those who may not be tech savy
@@ -68,9 +69,7 @@ This maps shows you all of the reports you are authorized to see. This includes 
 
 
 			<!-- category filters -->
-			<div class="cat-filters clearingfix">
-				<strong><?php echo Kohana::lang('ui_main.category_filter');?> <span>[<a href="javascript:toggleLayer('category_switch_link', 'category_switch')" id="category_switch_link"><?php echo Kohana::lang('ui_main.hide'); ?></a>]</span></strong>
-			</div>
+				<strong><?php echo strtoupper(Kohana::lang('ui_main.category_filter'));?>: </strong>
 		
 			<ul id="category_switch" class="category-filters">
 				<li><a class="active" id="cat_0" href="#"><div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div><div class="category-title">Show All Reports</div></a></li>

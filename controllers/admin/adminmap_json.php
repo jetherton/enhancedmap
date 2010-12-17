@@ -245,6 +245,11 @@ class Adminmap_json_Controller extends Admin_Controller
 		//now normalize
 		$color_length = sqrt( ($red*$red) + ($green*$green) + ($blue*$blue));
 	
+		//make sure there's no divide by zero
+		if($color_length == 0)
+		{
+			$color_length = 255;
+		}
 		$red = ($red / $color_length) * 255;
 		$green = ($green / $color_length) * 255;
 		$blue = ($blue / $color_length) * 255;

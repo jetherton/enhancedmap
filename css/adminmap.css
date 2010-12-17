@@ -49,6 +49,7 @@ div.filters strong{
 
 div.filters ul{
     list-style: none;
+	margin-left: 0px;
 }
 
 div.filters li{
@@ -95,7 +96,7 @@ div.map {
 	border-right: solid 1px #999;
 	border-bottom: solid 1px #999;
 	font-size: 10px;
-	width: 100%;
+	width: 99%;
 }
 #mapStatus div
 {
@@ -146,6 +147,9 @@ ul.status-filters{
     border-bottom: #C7C2BC 7px solid;
     list-style: none;
     padding: 12px 15px;
+	margin-left: 0px;
+	margin-top: 0px;
+
 }
 
 ul.status-filters li{
@@ -218,6 +222,8 @@ ul.category-filters{
     border-bottom: #C7C2BC 7px solid;
     list-style: none;
     padding: 12px 15px;
+	margin-top:0px;
+	margin-left:0px;
 }
 
 ul.category-filters li{
