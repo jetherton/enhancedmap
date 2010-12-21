@@ -3,7 +3,7 @@
  * Time Span - sets up the hooks
  *
  * @author	   John Etherton
- * @package	   Time Span
+ * @package	   Admin Map
  */
 
 class adminmap {
@@ -11,11 +11,11 @@ class adminmap {
 	/**
 	 * Registers the main event add method
 	 */
-	 
-	 
 	public function __construct()
 	{
-
+	
+		// Hook into routing
+		Event::add('system.pre_controller', array($this, 'add'));
 		
 	}
 	
@@ -24,6 +24,9 @@ class adminmap {
 	 */
 	public function add()
 	{
+		//Just in case we need this
+		//Event::add('ushahidi_action.EVENT_NAME', array($this, '_METHOD_TO_CALL'));	
+
 	}
 	
 

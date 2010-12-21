@@ -488,6 +488,10 @@
 						$("#child_"+catID).show();
 						//since all we're doing is showing things we don't need to update the map
 						// so just bounce
+						
+						$("a[id^='cat_']").addClass("forceRefresh"); //have to do this because IE sucks
+						$("a[id^='cat_']").removeClass("forceRefresh"); //have to do this because IE sucks
+						
 						return false;
 					}
 					else //kids are shown, deactivate them.

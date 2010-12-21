@@ -1,11 +1,9 @@
 <?php
 /**
- * Plugins helper
+ * Reports helper for the Admin Map plugin
  * 
- * @package    Plugin
- * @author     Ushahidi Team
- * @copyright  (c) 2008 Ushahidi Team
- * @license    http://www.ushahidi.com/license.html
+ * @package    Admin Map
+ * @author     John Etherton
  */
 class reports_Core {
 
