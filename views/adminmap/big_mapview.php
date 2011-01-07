@@ -1,6 +1,3 @@
-<!-- main body -->
-<div id="main" class="clearingfix">
-	<div id="mainmiddle" class="floatbox withright">
 		<!-- keep track of what status we're looking at -->
 		<form action="">
 			<input type = "hidden" value="1" name="currentStatus" id="currentStatus">
@@ -8,8 +5,7 @@
 		</form>
 
 		<!-- right column -->
-		<div id="right" class="clearingfix">
-		
+		<div id="right" class="clearingfix">	
 		
 		
 				       <!-- logic filters -->
@@ -138,22 +134,17 @@
 
 		</div>
 		<!-- / right column -->
-	
-		<!-- content column -->
-		<div id="content" class="clearingfix">
-			<div class="floatbox">
-			
-				
+
+				<?php								
+				// Map and Timeline Blocks
+				echo '<div id="timeline_holder">'. $div_timeline;
+				echo '</div>';
+				?>
+
+
+
 				<?php								
 				// Map and Timeline Blocks
 				echo $div_map;
-				echo $div_timeline;
 				?>
-			</div>
-		</div>
-		<!-- / content column -->
-
-	</div>
-</div>
-<!-- / main body -->
 

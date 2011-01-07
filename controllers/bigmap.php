@@ -45,8 +45,8 @@ class Bigmap_Controller extends Template_Controller {
 		$this->session = Session::instance();
 
         // Load Header & Footer
-		$this->template->header  = new View('header');
-		$this->template->footer  = new View('footer');
+		$this->template->header  = new View('adminmap/big_map_header');
+		$this->template->footer  = new View('adminmap/big_map_footer');
 
 		// Themes Helper
 		$this->themes = new Themes();
@@ -98,7 +98,7 @@ class Bigmap_Controller extends Template_Controller {
         $this->template->content = new View('adminmap/big_mapview');
 	
 	//set the CSS for this
-	plugin::add_stylesheet("adminmap/css/adminmap");
+	plugin::add_stylesheet("adminmap/css/big_adminmap");
 
 	//make sure the right java script files are used.
 	plugin::add_javascript("adminmap/js/jquery.flot");

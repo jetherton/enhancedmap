@@ -1,5 +1,12 @@
 /*Stuff for the big map*/
 
+
+body{
+	width: 100%;
+	height: 100%;
+	overflow:hidden;
+}
+
 div.big_wrapper{
 	background-color:white;
 }
@@ -25,8 +32,12 @@ div.slider-holder fieldset{
 
 /*right column*/
 div#right{
+	right: 20px;
+	position: absolute;
+	top: 100px;
 	width:250px;
-	float:right;
+	z-index: 50;
+	background-color: rgba(155,155,155,0.5);
 }
 
 #mapcontent{
@@ -92,18 +103,23 @@ a.share{
 /* map */
 div.map {
     border: #999 1px solid;
-    height: 500px;
-    position:relative;
+    height: 100%;
+	width: 100%;
+    position:absolute;
 }
 #mapStatus
 {
+	position: absolute;
+	z-index: 50;
 	float: left;
 	background-color: #e1e1e1;
 	border-left: solid 1px #999;
 	border-right: solid 1px #999;
 	border-bottom: solid 1px #999;
 	font-size: 10px;
-	width: 99%;
+	width: 325px;
+	bottom: 1px;
+	right: 1px;
 }
 #mapStatus div
 {
@@ -128,12 +144,28 @@ div.graph-holder {
     width:600px;
 }
 
+
+div#timeline_holder
+{
+	background-color: rgba(255,255,255,0.5);
+	height: 210px;
+	width: 610px;
+	z-index: 50;
+	position: absolute;
+	float: right;
+	bottom: 1px;
+	left: 1px;
+	border: 1px solid grey;
+	
+}
+
+
 div.slider-holder {
     font-size:70%;
-    height:70px;
-    margin-top:15px;
+    height:60px;
     width: 600px;
     padding-left: 11px;
+	margin-top: 0px;
 }
 
 div.slider-holder label{
@@ -149,7 +181,7 @@ div.stat-filters{
 
 
 ul.status-filters{
-    background: #E7E3DA;
+    background-color: rgba(231,227, 218, 0.5);
     border-top: #C7C2BC 7px solid;
     border-bottom: #C7C2BC 7px solid;
     list-style: none;
@@ -224,13 +256,15 @@ div.cat-filters span a{
 }
 
 ul.category-filters{
-    background: #E7E3DA;
+    background-color: rgba(231,227, 218, 0.5);
     border-top: #C7C2BC 7px solid;
     border-bottom: #C7C2BC 7px solid;
     list-style: none;
     padding: 12px 15px;
 	margin-top:0px;
 	margin-left:0px;
+	height: 200px;
+	overflow: auto;
 }
 
 ul.category-filters li{
@@ -384,8 +418,9 @@ ul.category-filters li.child{
 	margin-top: 20px;
 }
 .ui-slider dt span {
-	background: #fff;
+	background: #0f0;
 	padding: 0 .5em;
+	visibility: hidden;
 }
 .ui-slider li, .ui-slider dd {
 	position: absolute;

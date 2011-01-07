@@ -1,4 +1,3 @@
-<br/>
 <div class="slider-holder">
 	<form action="">
 		<input type="hidden" value="0," name="currentCat" id="currentCat">
