@@ -14,13 +14,22 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
  */
 
-class Adminmap_reports_Controller extends Admin_Controller
+class Bigmap_reports_Controller extends Main_Controller
 {
+
+     var $logged_in;
+
     function __construct()
     {
-        parent::__construct();
+		parent::__construct();
 
-        $this->template->this_page = 'reports';
+		$this->themes->validator_enabled = TRUE;
+
+		// Is the Admin Logged In?
+
+		$this->logged_in = Auth::instance()->logged_in()
+			? TRUE
+			: FALSE;
     }
 
 
@@ -30,14 +39,18 @@ class Adminmap_reports_Controller extends Admin_Controller
     */
     function index($page = 1)
     {
-        // If user doesn't have access, redirect to dashboard
-        if ( ! admin::permissions($this->user, "reports_view"))
-        {
-            url::redirect(url::site().'admin/dashboard');
-        }
 
-        $this->template->content = new View('adminmap/adminmap_reports');
-        $this->template->content->title = Kohana::lang('ui_admin.reports');
+		// Cacheable Controller
+		$this->is_cachable = TRUE;
+		
+		$this->template->header->this_page = 'reports';
+		$this->template->content = new View('reports');
+		$this->themes->js = new View('reports_js');
+
+		// Get locale
+		$l = Kohana::config('locale.language.0');
+
+		$db = new Database;
 
 
         if (!empty($_GET['status']))
@@ -70,168 +83,7 @@ class Adminmap_reports_Controller extends Admin_Controller
         $form_saved = FALSE;
         $form_action = "";
         
-        if ($_POST)
-        {
-            $post = Validation::factory($_POST);
-
-             //  Add some filters
-            $post->pre_filter('trim', TRUE);
-
-            // Add some rules, the input field, followed by a list of checks, carried out in order
-            $post->add_rules('action','required', 'alpha', 'length[1,1]');
-            $post->add_rules('incident_id.*','required','numeric');
-
-            if ($post->validate())
-            {
-                if ($post->action == 'a')       // Approve Action
-                {
-                    foreach($post->incident_id as $item)
-                    {
-                        $update = new Incident_Model($item);
-                        if ($update->loaded == true) 
-                        {
-                            if( $update->incident_active == 0 ) 
-                            {
-                                $update->incident_active = '1';
-                            } 
-                            else {
-                                $update->incident_active = '0';
-                            }
-
-                            // Tag this as a report that needs to be sent out as an alert
-                            if ($update->incident_alert_status != '2')
-                            { // 2 = report that has had an alert sent
-                                $update->incident_alert_status = '1';
-                            }
-
-                            $update->save();
-
-                            $verify = new Verify_Model();
-                            $verify->incident_id = $item;
-                            $verify->verified_status = '1';
-                            $verify->user_id = $_SESSION['auth_user']->id;          // Record 'Verified By' Action
-                            $verify->verified_date = date("Y-m-d H:i:s",time());
-                            $verify->save();
-
-                            // Action::report_approve - Approve a Report
-                            Event::run('ushahidi_action.report_approve', $update);
-                        }
-                    }
-                    $form_action = strtoupper(Kohana::lang('ui_admin.approved'));
-                }
-                elseif ($post->action == 'u')   // Unapprove Action
-                {
-                    foreach($post->incident_id as $item)
-                    {
-                        $update = new Incident_Model($item);
-                        if ($update->loaded == true) {
-                            $update->incident_active = '0';
-
-                            // If Alert hasn't been sent yet, disable it
-                            if ($update->incident_alert_status == '1')
-                            {
-                                $update->incident_alert_status = '0';
-                            }
-
-                            $update->save();
-
-                            $verify = new Verify_Model();
-                            $verify->incident_id = $item;
-                            $verify->verified_status = '0';
-                            $verify->user_id = $_SESSION['auth_user']->id;          // Record 'Verified By' Action
-                            $verify->verified_date = date("Y-m-d H:i:s",time());
-                            $verify->save();
-
-                            // Action::report_unapprove - Unapprove a Report
-                            Event::run('ushahidi_action.report_unapprove', $update);
-                        }
-                    }
-                    $form_action = strtoupper(Kohana::lang('ui_admin.unapproved'));
-                }
-                elseif ($post->action == 'v')   // Verify Action
-                {
-                    foreach($post->incident_id as $item)
-                    {
-                        $update = new Incident_Model($item);
-                        $verify = new Verify_Model();
-                        if ($update->loaded == true) {
-                            if ($update->incident_verified == '1')
-                            {
-                                $update->incident_verified = '0';
-                                $verify->verified_status = '0';
-                            }
-                            else {
-                                $update->incident_verified = '1';
-                                $verify->verified_status = '2';
-                            }
-                            $update->save();
-
-                            $verify->incident_id = $item;
-                            $verify->user_id = $_SESSION['auth_user']->id;          // Record 'Verified By' Action
-                            $verify->verified_date = date("Y-m-d H:i:s",time());
-                            $verify->save();
-                        }
-                    }
-                    $form_action = "VERIFIED";
-                }
-                elseif ($post->action == 'd')   //Delete Action
-                {
-                    foreach($post->incident_id as $item)
-                    {
-                        $update = new Incident_Model($item);
-                        if ($update->loaded == true)
-                        {
-                            $incident_id = $update->id;
-                            $location_id = $update->location_id;
-                            $update->delete();
-
-                            // Delete Location
-                            ORM::factory('location')->where('id',$location_id)->delete_all();
-
-                            // Delete Categories
-                            ORM::factory('incident_category')->where('incident_id',$incident_id)->delete_all();
-
-                            // Delete Translations
-                            ORM::factory('incident_lang')->where('incident_id',$incident_id)->delete_all();
-
-                            // Delete Photos From Directory
-                            foreach (ORM::factory('media')->where('incident_id',$incident_id)->where('media_type', 1) as $photo) {
-                                deletePhoto($photo->id);
-                            }
-
-                            // Delete Media
-                            ORM::factory('media')->where('incident_id',$incident_id)->delete_all();
-
-                            // Delete Sender
-                            ORM::factory('incident_person')->where('incident_id',$incident_id)->delete_all();
-
-                            // Delete relationship to SMS message
-                            $updatemessage = ORM::factory('message')->where('incident_id',$incident_id)->find();
-                            if ($updatemessage->loaded == true) {
-                                $updatemessage->incident_id = 0;
-                                $updatemessage->save();
-                            }
-
-                            // Delete Comments
-                            ORM::factory('comment')->where('incident_id',$incident_id)->delete_all();
-
-                            // Action::report_delete - Deleted a Report
-                            Event::run('ushahidi_action.report_delete', $update);
-                        }
-                    }
-                    $form_action = strtoupper(Kohana::lang('ui_admin.deleted'));
-                }
-                $form_saved = TRUE;
-            }
-            else
-            {
-                $form_error = TRUE;
-            }
-
-        }
-
-        
-	$db = new Database;
+        $db = new Database;
 
 
 	// Category ID
@@ -252,25 +104,7 @@ class Adminmap_reports_Controller extends Admin_Controller
 		$logical_operator = $_GET['lo'];
 	}
 
-	$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
-	//figure out if we're showing unapproved stuff or what.
-        if (isset($_GET['u']) AND !empty($_GET['u']))
-        {
-            $show_unapproved = (int) $_GET['u'];
-        }
-	$approved_text = "";
-	if($show_unapproved == 1)
-	{
-		$approved_text = "incident.incident_active = 1 ";
-	}
-	else if ($show_unapproved == 2)
-	{
-		$approved_text = "incident.incident_active = 0 ";
-	}
-	else if ($show_unapproved == 3)
-	{
-		$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
-	}
+	$approved_text = " incident.incident_active = 1 ";
 	
 	
 	
@@ -313,6 +147,113 @@ class Adminmap_reports_Controller extends Admin_Controller
 	$incidents = reports::get_reports($category_ids,  $approved_text, $location_where. " AND ". $filter, $logical_operator, 
 		"incident.incident_date", "asc",
 		(int) Kohana::config('settings.items_per_page_admin'), $pagination->sql_offset );
+		
+		
+	
+		//Set default as not showing pagination. Will change below if necessary.
+		$this->template->content->pagination = "";
+
+		// Pagination and Total Num of Report Stats
+		if ($pagination->total_items == 1)
+		{
+			$plural = "";
+		}
+		else
+		{
+			$plural = "s";
+		}
+
+		if ($pagination->total_items > 0)
+		{
+			$current_page = ($pagination->sql_offset/ (int) Kohana::config('settings.items_per_page')) + 1;
+			$total_pages = ceil($pagination->total_items/ (int) Kohana::config('settings.items_per_page'));
+
+			if ($total_pages > 1)
+			{ // If we want to show pagination
+				$this->template->content->pagination_stats = Kohana::lang('ui_admin.showing_page').' '.$current_page.' '.Kohana::lang('ui_admin.of').' '.$total_pages.' '.Kohana::lang('ui_admin.pages');
+
+				$this->template->content->pagination = $pagination;
+			}
+			else
+			{ // If we don't want to show pagination
+				$this->template->content->pagination_stats = $pagination->total_items.' '.Kohana::lang('ui_admin.reports');
+			}
+		}
+		else
+		{
+			$this->template->content->pagination_stats = '('.$pagination->total_items.' report'.$plural.')';
+		}
+
+
+		//locations
+			$location_in = array();
+		foreach ($incidents as $incident)
+		{
+			$location_in[] = $incident->location_id;
+		}
+
+		//check if location_in is not empty
+		if( count($location_in ) > 0 )
+		{
+			    // Get location names
+			    $query = 'SELECT id, location_name FROM '.$this->table_prefix.'location WHERE id IN ('.implode(',',$location_in).')';
+			    $locations_query = $db->query($query);
+
+			    $locations = array();
+			    foreach ($locations_query as $loc)
+			    {
+				    $locations[$loc->id] = $loc->location_name;
+			    }
+		}
+		else
+		{
+		    $locations = array();
+		}
+		
+		$this->template->content->locations = $locations;
+
+		
+		//categories
+		$localized_categories = array();
+		foreach ($incidents as $incident)
+		{
+			foreach ($incident->category AS $category)
+			{
+				$ct = (string)$category->category_title;
+				if( ! isset($localized_categories[$ct]))
+				{
+					$translated_title = Category_Lang_Model::category_title($category->id,$l);
+					$localized_categories[$ct] = $category->category_title;
+					if($translated_title)
+					{
+						$localized_categories[$ct] = $translated_title;
+					}
+				}
+			}
+		}
+
+		$this->template->content->localized_categories = $localized_categories;
+
+
+
+	// Category Title, if Category ID available
+	$category_title = "";
+	$count = 0;
+	foreach($category_ids as $cat_id)
+	{
+		$category = ORM::factory('category')
+			->find($cat_id);
+		if($category->loaded)
+		{
+			$count++;
+			if($count > 1)
+			{
+				$category_title = $category_title . " ". strtoupper($logical_operator). " ";
+			}
+			$category_title = $category_title . $category->category_title;
+		}
+	}
+	$this->template->content->category_title = $category_title . ": ";
 
 
 
@@ -342,8 +283,7 @@ class Adminmap_reports_Controller extends Admin_Controller
         // Status Tab
         $this->template->content->status = $status;
 
-        // Javascript Header
-        $this->template->js = new View('admin/reports_js');
+	$this->template->header->header_block = $this->themes->header_block();
     }//end of index()
 
 

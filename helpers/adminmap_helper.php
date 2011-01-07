@@ -638,6 +638,7 @@ class adminmap_helper_Core {
 	else
 	{
 		$approved_text = "incident.incident_active = 1 ";
+		$show_unapproved = 1;
 	}
 	
 	
@@ -794,7 +795,7 @@ class adminmap_helper_Core {
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
 	    $categories_str = implode(",", $category_ids);
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . $list_reports_path."?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$approved_text.">" . $cluster_count . " Reports</a>")) . "\",";
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . $list_reports_path."?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.">" . $cluster_count . " Reports</a>")) . "\",";
             $json_item .= "\"category\":[0], ";
 	    if($contains_nonactive && $color_unapproved==2)
 	    {

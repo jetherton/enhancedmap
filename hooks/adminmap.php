@@ -25,8 +25,20 @@ class adminmap {
 	public function add()
 	{
 		//Just in case we need this
-		//Event::add('ushahidi_action.EVENT_NAME', array($this, '_METHOD_TO_CALL'));	
-
+		Event::add('ushahidi_action.nav_main_top', array($this, '_add_big_map_tab'));	 //adds the big map  tab
+	}
+	
+	
+	//adds a tab for the big map on the front end
+	public function _add_big_map_tab()
+	{
+		$this_page = Event::$data;
+		
+		$menu = "";
+		$menu .= "<li><a href=\"".url::site()."bigmap\" ";
+		$menu .= ($this_page == 'bigmap') ? " class=\"active\"" : "";
+		$menu .= ">Big Map</a></li>";
+		echo $menu;
 	}
 	
 

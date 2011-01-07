@@ -194,12 +194,13 @@ class reports_Core {
 			if($logical_operator == "or")
 			{
 				$incidents_count = ORM::factory('incident')
-					->select('DISTINCT incident.*')
+					->select('DISTINCT incident.*, COUNT(DISTINCT incident.id) as incidents_found' )
 					->with('location')
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					->join('media', 'incident.id', 'media.incident_id','LEFT')
 					->where($approved_text.' AND ('.$where_category. ')' . $where_text)
-					->count_all();
+					->find();
+				$incidents_count = $incidents_count->incidents_found;
 			}
 			else //if we're using AND
 			{
@@ -215,6 +216,7 @@ class reports_Core {
 					->count_all();
 				
 			}
+			
 		}//end else we are using category IDs
 
 		//run a filter just in case someone wants to mess with this:
