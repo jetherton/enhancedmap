@@ -19,7 +19,7 @@ class adminmap_helper_Core {
       */
 	public static function setup_adminmap($map_controller)
 	{
-			//set the CSS for this
+		//set the CSS for this
 		plugin::add_stylesheet("adminmap/css/adminmap");
 		
 		plugin::add_javascript("adminmap/js/jquery.flot");
@@ -313,8 +313,10 @@ class adminmap_helper_Core {
 	
 	/**
 	* Generate JSON in NON-CLUSTER mode
+	* $edit_report_path is used to set where the link to edit/view a report should be set to
+	* $on_the_back_end sets whether or not this user is viewing this data from the backend
 	*/
-	public static function json_index($json_controller, $edit_report_path = 'admin/reports/edit/')
+	public static function json_index($json_controller, $edit_report_path = 'admin/reports/edit/', $on_the_back_end = true)
 	{
 		$json = "";
 		$json_item = "";
@@ -339,25 +341,32 @@ class adminmap_helper_Core {
 			$category_ids = array("0");
 		}
 		
-		
-		//figure out if we're showing unapproved stuff or what.
-		if (isset($_GET['u']) AND !empty($_GET['u']))
-		{
-		    $show_unapproved = (int) $_GET['u'];
-		}
 		$approved_text = "";
-		if($show_unapproved == 1)
+		if( $on_the_back_end)
+		{
+			//figure out if we're showing unapproved stuff or what.
+			if (isset($_GET['u']) AND !empty($_GET['u']))
+			{
+			    $show_unapproved = (int) $_GET['u'];
+			}		
+			if($show_unapproved == 1)
+			{
+				$approved_text = "incident.incident_active = 1 ";
+			}
+			else if ($show_unapproved == 2)
+			{
+				$approved_text = "incident.incident_active = 0 ";
+			}
+			else if ($show_unapproved == 3)
+			{
+				$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
+			}
+		}
+		else
 		{
 			$approved_text = "incident.incident_active = 1 ";
 		}
-		else if ($show_unapproved == 2)
-		{
-			$approved_text = "incident.incident_active = 0 ";
-		}
-		else if ($show_unapproved == 3)
-		{
-			$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
-		}
+		
 
 		
 		
@@ -582,8 +591,14 @@ class adminmap_helper_Core {
 
 /***************************************************************************************************************
      * Generate JSON in CLUSTER mode
+     * $edit_report_path sets the path to the link to edit/view a report
+     * $list_report_path sets the path to view a cluster of reports
+     * $on_the_back_end sets whether or not this user is looking at this from the front end or back end
      */
-    public static function json_cluster($controller, $edit_report_path = 'admin/reports/edit/', $list_reports_path = "admin/adminmap_reports/index/")
+    public static function json_cluster($controller, 
+	$edit_report_path = 'admin/reports/edit/', 
+	$list_reports_path = "admin/adminmap_reports/index/",
+	$on_the_back_end = true)
     {
         //$profiler = new Profiler;
 
@@ -599,24 +614,31 @@ class adminmap_helper_Core {
 	$logical_operator = "or";
 	
 	$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
-	//figure out if we're showing unapproved stuff or what.
-        if (isset($_GET['u']) AND !empty($_GET['u']))
-        {
-            $show_unapproved = (int) $_GET['u'];
-        }
-	$approved_text = "";
-	if($show_unapproved == 1)
+	if($on_the_back_end)
+	{
+		//figure out if we're showing unapproved stuff or what.
+		if (isset($_GET['u']) AND !empty($_GET['u']))
+		{
+		    $show_unapproved = (int) $_GET['u'];
+		}
+		$approved_text = "";
+		if($show_unapproved == 1)
+		{
+			$approved_text = "incident.incident_active = 1 ";
+		}
+		else if ($show_unapproved == 2)
+		{
+			$approved_text = "incident.incident_active = 0 ";
+		}
+		else if ($show_unapproved == 3)
+		{
+			$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
+		}	
+	}
+	else
 	{
 		$approved_text = "incident.incident_active = 1 ";
 	}
-	else if ($show_unapproved == 2)
-	{
-		$approved_text = "incident.incident_active = 0 ";
-	}
-	else if ($show_unapproved == 3)
-	{
-		$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
-	}	
 	
 	
 	//should we color unapproved reports a different color?
@@ -844,8 +866,9 @@ class adminmap_helper_Core {
   
      /**************************************************************
      * Retrieve timeline JSON
+     * $on_the_back_end is used to set if the user is looking at this on the backend or not
      */
-    public static function json_timeline( $controller, $category_ids)
+    public static function json_timeline( $controller, $category_ids, $on_the_back_end = true)
     {
 	$category_ids = explode(",", $category_ids,-1); //get rid of that trailing ","
 
@@ -855,23 +878,31 @@ class adminmap_helper_Core {
 	
 	
 	$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
-	//figure out if we're showing unapproved stuff or what.
-        if (isset($_GET['u']) AND !empty($_GET['u']))
-        {
-            $show_unapproved = (int) $_GET['u'];
-        }
-	$approved_text = "";
-	if($show_unapproved == 1)
+	$approved_text = " (1=1) ";
+	if($on_the_back_end)
+	{
+		//figure out if we're showing unapproved stuff or what.
+		if (isset($_GET['u']) AND !empty($_GET['u']))
+		{
+		    $show_unapproved = (int) $_GET['u'];
+		}
+		$approved_text = "";
+		if($show_unapproved == 1)
+		{
+			$approved_text = "incident.incident_active = 1 ";
+		}
+		else if ($show_unapproved == 2)
+		{
+			$approved_text = "incident.incident_active = 0 ";
+		}
+		else if ($show_unapproved == 3)
+		{
+			$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
+		}
+	}
+	else
 	{
 		$approved_text = "incident.incident_active = 1 ";
-	}
-	else if ($show_unapproved == 2)
-	{
-		$approved_text = "incident.incident_active = 0 ";
-	}
-	else if ($show_unapproved == 3)
-	{
-		$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
 	}
 	
 	$logical_operator = "or";
@@ -910,7 +941,8 @@ class adminmap_helper_Core {
         $graph_data[0]['color'] = '#'. self::merge_colors($category_ids);
         $graph_data[0]['data'] = array();
 	
-	$incidents = reports::get_reports($category_ids, $approved_text, "", $logical_operator);
+
+	$incidents = reports::get_reports($category_ids, $approved_text, " ", $logical_operator);
 	
 	$approved_IDs_str = "('-1')";
 	if(count($incidents) > 0)
