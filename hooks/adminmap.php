@@ -26,8 +26,15 @@ class adminmap {
 	{
 		//Just in case we need this
 		Event::add('ushahidi_action.nav_main_top', array($this, '_add_big_map_tab'));	 //adds the big map  tab
+		Event::add('ushahidi_action.map_main_filters', array($this, '_add_big_map_main_button'));	 //adds the big map  tab
 	}
 	
+	
+	//adds the "Full Screen Map" button on the main page
+	public function _add_big_map_main_button()
+	{
+		echo '<div ><a class="bigmapbutton" style="border:2px solid grey; padding: 2px;" href="'.url::site().'bigmap"> VIEW FULL MAP </a></div>';
+	}
 	
 	//adds a tab for the big map on the front end
 	public function _add_big_map_tab()
