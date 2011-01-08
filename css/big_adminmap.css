@@ -32,12 +32,21 @@ div.slider-holder fieldset{
 
 /*right column*/
 div#right{
-	right: 20px;
+	display: none;
 	position: absolute;
-	top: 100px;
 	width:250px;
 	z-index: 50;
 	background-color: rgba(155,155,155,0.5);
+	border:1px solid black;
+}
+
+div#right_colapse{
+	
+}
+
+div#timeline_drag{
+	background-color: rgba(155,155,155,0.5);
+	border:1px solid black;
 }
 
 #mapcontent{
@@ -148,15 +157,17 @@ div.graph-holder {
 div#timeline_holder
 {
 	background-color: rgba(255,255,255,0.5);
-	height: 210px;
-	width: 610px;
+	width: 620px;
 	z-index: 50;
 	position: absolute;
 	float: right;
-	bottom: 1px;
-	left: 1px;
 	border: 1px solid grey;
 	
+}
+
+div#timeline_colapse
+{
+	height:220px;
 }
 
 

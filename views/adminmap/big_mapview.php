@@ -4,18 +4,27 @@
 			<input type = "hidden" value="2" name="colorCurrentStatus" id="colorCurrentStatus">
 		</form>
 
-		<!-- right column -->
-		<div id="right" class="clearingfix">	
 		
+		
+
+		<!-- right column -->
+		<div id="right" class="clearingfix" >	
+		<div id="right_move" style="border:1px black solid;" onmousedown="mD(this,event)">
+			<strong style="margin-left:10px;" >FILTERS:</strong>
+			<a id="toggleright" onclick="togglelayer('right_colapse', 'toggleright'); return false;" style="border: solid 1px black; marging: 1px; padding: 0px 10px; position:relative; left:160px;" href="#" > 
+				<strong>-</strong> 
+			</a>
+		</div>
+		<div id="right_colapse">
 		
 				       <!-- logic filters -->
 			<div class="stat-filters clearingfix">
-				<strong>Logical Operators:</strong>
 				<!-- keep track of what status we're looking at -->
 				<form action="">
 					<input type = "hidden" value="or" name="currentLogicalOperator" id="currentLogicalOperator">
 				</form>
 				<ul id="status_switch" class="status-filters">
+				Logical Operators:
 					<li>
 						<a class="active" id="logicalOperator_1" href="#">							
 							<div class="status-title">OR - <span style="text-transform:none; font-size:85%;">Show all reports that fall under at least one of the categories selected below</span> </div>
@@ -133,12 +142,19 @@
 			
 
 		</div>
+		</div>
 		<!-- / right column -->
 
 				<?php								
 				// Map and Timeline Blocks
-				echo '<div id="timeline_holder">'. $div_timeline;
-				echo '</div>';
+				echo '<div id="timeline_holder">
+				<div id="timeline_drag" onmousedown="mD(this,event)"> 
+				<strong style="margin-left:10px">TIME LINE</strong> 
+				<a id="toggletimeline" onclick="togglelayer(\'timeline_colapse\', \'toggletimeline\'); return false;" style="border: solid 1px black; marging: 1px; padding: 0px 10px; position:relative; left:525px;" href="#" > <strong>-</strong> </a>
+				</div>
+				<div id="timeline_colapse">';
+				echo $div_timeline;
+				echo '</div></div>';
 				?>
 
 

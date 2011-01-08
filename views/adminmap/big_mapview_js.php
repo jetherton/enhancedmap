@@ -15,6 +15,116 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 ?>
+
+//for toggling the windows on and off
+function togglelayer(objectID, changeID) {
+    var theElementStyle = document.getElementById(objectID);
+    var theChangedElement = document.getElementById(changeID);
+
+    if(theElementStyle.style.display == "none") {
+        theElementStyle.style.display = "block";
+        theChangedElement.innerHTML = "-";
+        //history.go();
+    }
+    else {
+        theElementStyle.style.display = "none";
+        theChangedElement.innerHTML = "+";
+    }
+}
+
+
+
+var dragObject, offsetX, offsetY, isDragging=false;
+window.onload = init;
+document.onmousemove = mM;
+document.onmouseup = mU;
+
+//init things so we can drag things on screen
+function init() {
+
+	
+	var myWidth = 0, myHeight = 0;
+	if( typeof( window.innerWidth ) == 'number' ) {
+		//Non-IE
+		myWidth = window.innerWidth;
+		myHeight = window.innerHeight;
+	} else if( document.documentElement && ( document.documentElement.clientWidth || document.documentElement.clientHeight ) ) {
+		//IE 6+ in 'standards compliant mode'
+		myWidth = document.documentElement.clientWidth;
+		myHeight = document.documentElement.clientHeight;
+	} else if( document.body && ( document.body.clientWidth || document.body.clientHeight ) ) {
+	//IE 4 compatible
+		myWidth = document.body.clientWidth;
+		myHeight = document.body.clientHeight;
+	}
+	
+	
+	
+	
+	
+	
+	
+	
+	ob = document.getElementById("right");
+	ob.style.display="block";
+	ob.style.left=(myWidth - (250 + 10)) + "px";
+	ob.style.top="150px";
+	ob.ondrag=function(){return false;};
+	ob.onselectstart=function(){return false;};
+	
+	ob = document.getElementById("timeline_holder");
+	ob.style.left="1px";
+	ob.style.top= myHeight - (230 + 1) + "px";
+	ob.style.display="block";
+	ob.ondrag=function(){return false;};
+	ob.onselectstart=function(){return false;};
+	
+}
+
+function mD(ob,e) {
+	dragObject = ob.parentNode;
+	if (window.event) e=window.event;
+	
+	var dragX = parseInt(dragObject.style.left);
+	var dragY = parseInt(dragObject.style.top);
+	
+	var mouseX = e.clientX;
+	var mouseY = e.clientY;
+	
+	offsetX = mouseX - dragX;
+	offsetY = mouseY - dragY;
+	
+	isDragging = true;
+	
+	return false;
+}
+
+function mM(e) {
+	if (!isDragging) return;
+	
+	if (window.event) e=window.event;
+	
+	var newX = e.clientX - offsetX;
+	var newY = e.clientY - offsetY;
+	
+	dragObject.style.left = newX + "px";
+	dragObject.style.top = newY + "px";
+	return false;
+}
+
+function mU() {
+	if (!isDragging) return;
+	
+	isDragging = false;
+	
+	return false;
+}
+
+
+
+
+
+
 		// Map JS
 		
 		// Map Object
