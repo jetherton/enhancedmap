@@ -36,7 +36,7 @@ div#right{
 	position: absolute;
 	width:250px;
 	z-index: 50;
-	background-color: rgba(155,155,155,0.5);
+	background-image: url('../images/opacity60.png');
 	border:1px solid black;
 }
 
@@ -45,8 +45,12 @@ div#right_colapse{
 }
 
 div#timeline_drag{
-	background-color: rgba(155,155,155,0.5);
+	background-image: url('../images/opacitygrey60.png');
 	border:1px solid black;
+}
+
+div#right_move{
+	background-image: url('../images/opacitygrey60.png');
 }
 
 #mapcontent{
@@ -156,7 +160,7 @@ div.graph-holder {
 
 div#timeline_holder
 {
-	background-color: rgba(255,255,255,0.5);
+	background-image: url('../images/opacity60.png');
 	width: 620px;
 	z-index: 50;
 	position: absolute;
@@ -193,7 +197,7 @@ div.stat-filters{
 
 ul.status-filters{
     background-color: rgba(231,227, 218, 0.5);
-    border-top: #C7C2BC 7px solid;
+    border-top: none;
     border-bottom: #C7C2BC 7px solid;
     list-style: none;
     padding: 12px 15px;
@@ -267,13 +271,12 @@ div.cat-filters span a{
 }
 
 ul.category-filters{
-    background-color: rgba(231,227, 218, 0.5);
-    border-top: #C7C2BC 7px solid;
-    border-bottom: #C7C2BC 7px solid;
+    background: none;
     list-style: none;
-    padding: 12px 15px;
-	margin-top:0px;
-	margin-left:0px;
+    padding: 0xp;
+	border: none;
+	margin: 0px;
+	margin: 0px;
 	height: 200px;
 	overflow: auto;
 }
