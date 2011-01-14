@@ -99,11 +99,13 @@ class Bigmap_Controller extends Template_Controller {
 	
 	//set the CSS for this
 	plugin::add_stylesheet("adminmap/css/big_adminmap");
+	plugin::add_stylesheet("adminmap/css/jquery.hovertip-1.0");
 
 	//make sure the right java script files are used.
 	plugin::add_javascript("adminmap/js/jquery.flot");
 	plugin::add_javascript("adminmap/js/excanvas.min");
 	plugin::add_javascript("adminmap/js/timeline");
+	plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
 
 		// Cacheable Main Controller
 		$this->is_cachable = TRUE;

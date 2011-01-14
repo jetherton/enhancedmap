@@ -16,6 +16,12 @@
  */
 ?>
 
+
+            $(function() {
+                $('span[title]').hovertip();
+            });
+
+
 //for toggling the windows on and off
 function togglelayer(objectID, changeID) {
     var theElementStyle = document.getElementById(objectID);
@@ -78,7 +84,6 @@ function init() {
 	ob.style.display="block";
 	ob.ondrag=function(){return false;};
 	ob.onselectstart=function(){return false;};
-	
 }
 
 function mD(ob,e) {

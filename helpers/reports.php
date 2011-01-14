@@ -22,6 +22,157 @@ class reports_Core {
 	/**************************************************************************************************************
       * Given all the parameters returns a list of incidents that meet the search criteria
       */
+	public static function get_reports_list_by_cat($category_ids, $approved_text, $where_text, $logical_operator, 
+		$order_by = "incident.incident_date",
+		$order_by_direction = "asc",
+		$limit = -1, $offset = -1)
+	{
+		$incidents = null;
+		//check if we're showing all categories, or if no category info was selected then return everything
+		If(count($category_ids) == 0 || $category_ids[0] == '0')
+		{
+			// Retrieve all markers
+			
+			if($limit != -1 && $offset != -1)
+			{
+				$incidents = ORM::factory('incident')
+					->select('incident.*, category.category_color as color, category.category_title as category_title, category.id as cat_id')
+					->with('location')
+					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
+					->join('media', 'incident.id', 'media.incident_id','LEFT')
+					->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
+					->where($approved_text.$where_text)
+					->orderby($order_by, $order_by_direction)
+					->find_all($limit, $offset);
+			}
+			else
+			{
+				$incidents = ORM::factory('incident')
+					->select('incident.*, category.category_color as color, category.category_title as category_title, category.id as cat_id')
+					->with('location')
+					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
+					->join('media', 'incident.id', 'media.incident_id','LEFT')
+					->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
+					->where($approved_text.$where_text)
+					->orderby($order_by, $order_by_direction)
+					->find_all();
+			}
+			    
+			
+		}//end if there are no category filters
+		else
+		{
+			// or up all the categories we're interested in
+			$where_category = "";
+			$i = 0;
+			foreach($category_ids as $id)
+			{
+				$i++;
+				$where_category = ($i > 1) ? $where_category . " OR " : $where_category;
+				$where_category = $where_category . reports_Core::$table_prefix.'incident_category.category_id = ' . $id;
+			}
+
+			
+			//if we're using OR
+			if($logical_operator == "or")
+			{
+				// Retrieve incidents by category			
+				if($limit != -1 && $offset != -1)
+				{
+					$incidents = ORM::factory('incident')
+						->select('incident.*, category.category_color as color, category.category_title as category_title, category.id as cat_id')
+						->with('location')
+						->join('incident_category', 'incident.id', 'incident_category.incident_id','RIGHT')
+						->join('media', 'incident.id', 'media.incident_id','LEFT')
+						->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
+						->where($approved_text.' AND ('.$where_category. ')' )
+						->orderby($order_by, $order_by_direction)
+						->find_all($limit, $offset);
+				}
+				else
+				{
+				
+				
+					$incidents = ORM::factory('incident')
+						->select('incident.*, category.category_color as color, category.category_title as category_title, category.id as cat_id')
+						->with('location')
+						->join('incident_category', 'incident.id', 'incident_category.incident_id','RIGHT')
+						->join('media', 'incident.id', 'media.incident_id','LEFT')
+						->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
+						->where($approved_text.' AND ('.$where_category. ')' . $where_text)
+						->orderby($order_by, $order_by_direction)
+						->find_all();
+				}
+			} //end of if OR
+			else //if we're using AND
+			{
+			
+				if($limit != -1 && $offset != -1)
+				{
+					// Retrieve incidents by category			
+					$incidents = ORM::factory('incident')
+						->select('incident.*, COUNT(incident.id) as category_count, category.category_color as color, category.category_title as category_title, category.id as cat_id')
+						->with('location')
+						->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
+						->join('category', 'incident_category.category_id', 'category.id')
+						->join('media', 'incident.id', 'media.incident_id','LEFT')
+						->where($approved_text.' AND ('.$where_category. ')' . $where_text)
+						->groupby('incident.id')
+						->having('category_count', count($category_ids))
+						->orderby($order_by, $order_by_direction)
+						->find_all($limit, $offset);
+				}
+				else
+				{
+					// Retrieve incidents by category			
+					$incidents = ORM::factory('incident')
+						->select('incident.*, COUNT(incident.id) as category_count, category.category_color as color, category.category_title as category_title, category.id as cat_id')
+						->with('location')
+						->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
+						->join('category', 'incident_category.category_id', 'category.id')
+						->join('media', 'incident.id', 'media.incident_id','LEFT')
+						->where($approved_text.' AND ('.$where_category. ')' . $where_text)
+						->groupby('incident.id')
+						->having('category_count', count($category_ids))
+						->orderby($order_by, $order_by_direction)
+						->find_all();
+				}
+			}//end of  else AND
+		}//end of else we are using categories
+		
+		
+		//run a filter just in case someone wants to mess with this:
+		$data = array(
+					"incidents" => $incidents,
+					"category_ids" => $category_ids, 
+					"approved_text" => $approved_text, 
+					"where_text" => $where_text, 
+					"logical_operator" => $logical_operator, 
+					"order_by" => $order_by,
+					"order_by_direction" => $order_by_direction,
+					"limit" => $limit, 
+					"offset" => $offset
+					);
+		Event::run('ushahidi_filter.admin_map_get_reports', $data);
+		
+		//in case the filter changed the data, make sure it gets passed in
+		$incidents = $data["incidents"];
+		return $incidents;
+
+	}//end method	
+	
+	
+	
+	
+
+
+
+
+
+
+	/**************************************************************************************************************
+      * Given all the parameters returns a list of incidents that meet the search criteria
+      */
 	public static function get_reports($category_ids, $approved_text, $where_text, $logical_operator, 
 		$order_by = "incident.incident_date",
 		$order_by_direction = "asc",

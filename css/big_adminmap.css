@@ -30,10 +30,17 @@ div.slider-holder fieldset{
 }
 
 
+.infowindow ul
+{
+	font-weight: normal;
+}
+
+
 /*right column*/
 div#right{
 	display: none;
 	position: absolute;
+	float: none;
 	width:250px;
 	z-index: 50;
 	background-image: url('../images/opacity60.png');
@@ -191,7 +198,7 @@ div.slider-holder label{
 div.stat-filters{
     font-size: 85%;
     text-transform: uppercase;
-    margin: 0 0 15px 0;
+    margin: 0 0 0px 0;
 }
 
 
@@ -200,7 +207,7 @@ ul.status-filters{
     border-top: none;
     border-bottom: #C7C2BC 7px solid;
     list-style: none;
-    padding: 12px 15px;
+    padding: 12px 15px 0px 15px;
 	margin-left: 0px;
 	margin-top: 0px;
 
@@ -216,14 +223,15 @@ ul.status-filters li a{
     display: block;
     padding-top:1px;
     padding-bottom:1px;
-    font-size: 10px;
+    font-size: 15px;
     text-transform: uppercase;
     font-weight: bold;
     text-decoration: none;
     color: #3F3F3F;
-    border: #E7E3DA 1px solid;
+    border: #97938A 1px solid;
     position: relative;
     overflow: hidden;
+	text-align:center;
 }
 
 ul.status-filters li a.active{
@@ -283,19 +291,19 @@ ul.category-filters{
 
 ul.category-filters li{
     padding: 0;
-    margin-bottom: 2px;
+    margin-bottom: 10px;
 	list-style-type:none;
 }
 
 ul.category-filters li a{
     display: block;
-    padding: 8px 10px 8px 5px;
+    padding: 1px 10px 1px 5px;
     font-size: 15px;
     text-transform: uppercase;
     font-weight: bold;
     text-decoration: none;
     color: #3F3F3F;
-    border: #E7E3DA 1px solid;
+    border: #97938A 1px solid;
     position: relative;
     line-height: 17px;
     overflow: hidden;
