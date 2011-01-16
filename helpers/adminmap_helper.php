@@ -341,6 +341,12 @@ class adminmap_helper_Core {
 		{
 			$category_ids = array("0");
 		}
+		$is_all_categories = false;
+		If(count($category_ids) == 0 || $category_ids[0] == '0')
+		{
+			$is_all_categories = true;
+		}
+
 		
 		$approved_text = "";
 		if( $on_the_back_end)
@@ -423,13 +429,11 @@ class adminmap_helper_Core {
 
 		$incidents = reports::get_reports_list_by_cat($category_ids, $approved_text, $where_text, $logical_operator);
 
-
 		$curr_id = "not a number";
-		$cat_names = "";
+		$cat_names = array();
 		$colors = array();
 		$last_marker = null;
 		$isnt_first = false;
-		$count = 0;
 		    
 		$json_item_first = "";  // Variable to store individual item for report detail page
 		foreach ($incidents as $marker)
@@ -443,7 +447,23 @@ class adminmap_helper_Core {
 				$json_item .= "\"type\":\"Feature\",";
 				$json_item .= "\"properties\": {";
 				$json_item .= "\"id\": \"".$last_marker->id."\", \n";
-				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a><br/><br/>Falls under categories:<br/> ".$cat_names)) . "\",";
+				$cat_names_txt = "";
+				$count = 0;
+				If(!$is_all_categories && $logical_operator != "and")
+				{
+					$cat_names_txt = "<br/><br/>Falls under categories:<br/> ";
+					foreach($cat_names as $cat_name)
+					{
+						$count++;
+						if($count>1)
+						{
+							$cat_names_txt .= ", ";
+						}
+						$cat_names_txt .= $cat_name;
+						
+					}
+				}
+				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
 
 				if (isset($category)) 
 				{
@@ -499,33 +519,53 @@ class adminmap_helper_Core {
 				$cat_array = array();
 				
 				//reset the variables
-				$cat_names = "";
+				$cat_names = array();
 				$colors = array();
-				$count = 0;
 			}//end if
 			
 			//keep track how many categories we've found for this report
-			$count++;
 			$last_marker = $marker;
 			$curr_id = $marker->id;
 			$isnt_first = true;
-			if($count>1)
+			
+			if($marker->is_parent==0)
 			{
-				$cat_names .= ", ";
+				$cat_names[$marker->cat_id]= $marker->category_title;
+				$colors[$marker->cat_id] = $marker->color;
 			}
-			$cat_names .= $marker->category_title;
-			$colors[] = $marker->color;
+			else
+			{
+				$cat_names[$marker->parent_id]= $marker->parent_title;
+				$colors[$marker->parent_id] = $marker->parent_color;
+			}
 			
 		}//end loop
 		
 		//catch the last one
-		if(last_marker != null)
+		if($last_marker != null)
 		{
 				$json_item = "{";
 				$json_item .= "\"type\":\"Feature\",";
 				$json_item .= "\"properties\": {";
 				$json_item .= "\"id\": \"".$last_marker->id."\", \n";
-				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a><br/><br/>Falls under categories:<br/> ".$cat_names)) . "\",";
+				$cat_names_txt = "";
+				$count = 0;
+				If(!$is_all_categories && $logical_operator != "and")
+				{
+					$cat_names_txt = "<br/><br/>Falls under categories:<br/> ";
+					foreach($cat_names as $cat_name)
+					{
+						$count++;
+						if($count>1)
+						{
+							$cat_names_txt .= ", ";
+						}
+						$cat_names_txt .= $cat_name;
+						
+					}
+				}
+				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
+
 
 				if (isset($category)) 
 				{
@@ -682,6 +722,14 @@ class adminmap_helper_Core {
 	*/
 	public static function merge_colors_for_dots($colors)
 	{
+		//check if we're dealing with just one color
+		if(count($colors)==1)
+		{
+			foreach($colors as $color)
+			{
+				return $color;
+			}
+		}
 		//now for each color break it into RGB, add them up, then normalize
 		$red = 0;
 		$green = 0;
@@ -757,6 +805,13 @@ class adminmap_helper_Core {
 
 
 
+
+
+	
+	
+	
+
+
 /***************************************************************************************************************
      * Generate JSON in CLUSTER mode
      * $edit_report_path sets the path to the link to edit/view a report
@@ -830,7 +885,8 @@ class adminmap_helper_Core {
             (int) $_GET['z'] : 8;
 
         //$distance = 60;
-        $distance = ((10000000 >> $zoomLevel) / 100000) / 2;
+        $distance = ((10000000 >> $zoomLevel) / 100000) / 2.5;
+	
 
         // Category ID
 	$is_all_categories = false;
@@ -885,7 +941,9 @@ class adminmap_helper_Core {
 	//$incidents = reports::get_reports($category_ids, $approved_text, $filter, $logical_operator);
 	$incidents = reports::get_reports_list_by_cat($category_ids, $approved_text, $filter, $logical_operator);        
 	
-	// Create markers by marrying the locations and incidents
+
+	
+	// Create markers by marrying the the stuff together
         $markers = array();
 	$last_incident = null;
 	$curr_id = "no idea";
@@ -907,8 +965,18 @@ class adminmap_helper_Core {
 		$last_incident = $incident;
 		$curr_id = $incident->id;
 		$isnt_first = true;
-		$cat_names[$incident->cat_id] = $incident->category_title;
-		$colors[$incident->cat_id] = $incident->color;
+		if($incident->is_parent == 0) //matched on the category itself
+		{
+			//echo $incident->incident_title." kid matched\r\n";
+			$cat_names[$incident->cat_id] = $incident->category_title;
+			$colors[$incident->cat_id] = $incident->color;
+		}
+		else
+		{
+			//echo $incident->incident_title." parent matched\r\n";
+			$cat_names[$incident->parent_id] = $incident->parent_title;
+			$colors[$incident->parent_id] = $incident->parent_color;
+		}
 	}//end loop
 
 	//catch the last report
@@ -932,8 +1000,10 @@ class adminmap_helper_Core {
 	    $colors = $marker_info["colors"];
 	    $cat_names = $marker_info["cat_names"];
 	    $marker = $marker_info["incident"];
-	    //echo $marker->incident_title."\n\r".Kohana::debug($cat_names)."\r\n\r\n";
 	    
+	    
+		//echo "\r\nLooking for clusters around ". $marker->incident_title. "\r\n";
+		
 	    $cluster = array();
             
 	    $category_colors = array();	//all the colors that were seen while making a cluster
@@ -948,16 +1018,15 @@ class adminmap_helper_Core {
 		$target_cat_names = $target_info["cat_names"];
 		$target = $target_info["incident"];
 	    
-                // This function returns the distance between two markers, at a defined zoom level.
-                // $pixels = $this->_pixelDistance($marker['latitude'], $marker['longitude'],
-                // $target['latitude'], $target['longitude'], $zoomLevel);
 		
-                //$pixels = abs($marker['longitude']-$target['longitude']) + abs($marker['latitude']-$target['latitude']);
+		
+                
 		$pixels = abs($marker->location->longitude - $target->location->longitude) + abs($marker->location->latitude - $target->location->latitude);
 
                 // If two markers are closer than defined distance, remove compareMarker from array and add to cluster.
                 if ($pixels < $distance)
                 {
+			//echo "\tFound cluster match with ". $target->incident_title. "\r\n";
                     unset($markers[$key]);
                     $cluster[] = $target;
 		    //check if the colors and category names have been accounted for
@@ -965,16 +1034,11 @@ class adminmap_helper_Core {
 		    {
 			    foreach($target_colors as $cat_id => $target_color)
 			    {
+				//echo "\t\t".$target->incident_title. " has category: ".$target_cat_names[$cat_id]."\r\n";
 				//colors
-				if(!isset($category_colors[$cat_id]))
-				{
-						$category_colors[$cat_id] = $target_color;
-				}
+				$category_colors[$cat_id] = $target_color;
 				//name
-				if(!isset($category_names[$cat_id]))
-					{
-					$category_names[$cat_id] = $target_cat_names[$cat_id];
-				}
+				$category_names[$cat_id] = $target_cat_names[$cat_id];
 				//count
 				if(isset($category_count[$cat_id]))
 				{
@@ -994,36 +1058,29 @@ class adminmap_helper_Core {
 		    }
                 }
             }
-
             // If a marker was added to cluster, also add the marker we were comparing to.
             if (count($cluster) > 0)
             {
                 $cluster[] = $marker;
                 
-		
 		//check if the colors and category names have been accounted for
 		    if(!$is_all_categories)
 		    {
-			    foreach($colors as $cat_id2 => $marker_color)
+			foreach($colors as $cat_id2 => $marker_color)
 			    {
+				//echo "\t\t".$marker->incident_title. " has category: ".$cat_names[$cat_id2]."\r\n";
 				//colors
-				if(!isset($category_colors[$cat_id]))
-				{
-					$category_colors[$cat_id] = $marker_color;
-				}
+				$category_colors[$cat_id2] = $marker_color;
 				//name
-				if(!isset($category_names[$cat_id]))
-					{
-					$category_names[$cat_id] = $cat_names[$cat_id];
-				}
+				$category_names[$cat_id2] = $cat_names[$cat_id2];
 				//count
-				if(isset($category_count[$cat_id]))
+				if(isset($category_count[$cat_id2]))
 				{
-					$category_count[$cat_id] = $category_count[$cat_id] + 1;
+					$category_count[$cat_id2] = $category_count[$cat_id2] + 1;
 				}
 				else
 				{
-					$category_count[$cat_id] = 1;
+					$category_count[$cat_id2] = 1;
 				}
 			    }//end loop
 		    }//end if   
@@ -1229,6 +1286,12 @@ class adminmap_helper_Core {
     public static function json_timeline( $controller, $category_ids, $on_the_back_end = true)
     {
 	$category_ids = explode(",", $category_ids,-1); //get rid of that trailing ","
+	//a little flag to alert us to the presence of the "ALL CATEGORIES" category
+	$is_all_categories = false;
+	If(count($category_ids) == 0 || $category_ids[0] == '0')
+	{
+		$is_all_categories = true;
+	}
 
         $controller->auto_render = FALSE;
         $db = new Database();
@@ -1301,6 +1364,7 @@ class adminmap_helper_Core {
 	
 
 	$incidents = reports::get_reports($category_ids, $approved_text, " ", $logical_operator);
+	
 	
 	$approved_IDs_str = "('-1')";
 	if(count($incidents) > 0)

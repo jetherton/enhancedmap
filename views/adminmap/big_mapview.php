@@ -41,10 +41,7 @@
 				
 				
 					<li>
-						<a class="active" id="logicalOperator_1" href="#">							
-							OR
-						</a>
-						<div style="text-align:right;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
+						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
 							<h3>OR</h3>
 							The OR operator allows you to see all the reports that fall under any one of the categories you select.
 							<br/><br/>
@@ -59,12 +56,12 @@
 							blue dots. If a report falls under A and B the two colors, red and blue, will be merged, and that report will
 							be shown with a purple dot.
 						">What's this?</span></div>
+						<a class="active" id="logicalOperator_1" href="#">							
+							OR
+						</a>
 					</li>
 					<li>
-						<a  id="logicalOperator_2" href="#">
-							<div class="status-title">AND</div>
-						</a>
-						<div style="text-align:right;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
+						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
 							<h3>AND</h3>
 							The AND operator allows you to see all the reports that fall under all of the categories you select.
 							<br/><br/>
@@ -75,6 +72,10 @@
 							Since every report shown will fall under all of the categorizes selected, all of the colors of the categories
 							selected will be merged and the dots will have the merged color.
 						">What's this?</span></div>
+						
+						<a  id="logicalOperator_2" href="#">
+							<div class="status-title">AND</div>
+						</a>
 					</li>
 				</ul>
 			</div>		       
@@ -102,7 +103,18 @@
 								));
 							$color_css = '';
 						}
-						echo '<li><a href="#" id="cat_'. $category .'"><div '.$color_css.'>'.$category_image.'</div><div class="category-title">'.$category_title.'</div></a>';
+						//check if this category has kids
+						if(count($category_info[3]) > 0)
+						{
+							echo '<li>';
+							echo '<a style="float:right; text-align:center; width:15px; padding:2px 0px 1px 0px; border-left:none;" href="#" id="drop_cat_'.$category.'">+</a>';
+							echo '<a  href="#" id="cat_'. $category .'"><div '.$color_css.'>'.$category_image.'</div><div class="category-title">'.$category_title.'</div></a>';
+							
+						}
+						else
+						{
+							echo '<li><a href="#" id="cat_'. $category .'"><div '.$color_css.'>'.$category_image.'</div><div class="category-title">'.$category_title.'</div></a>';
+						}
 						// Get Children
 						echo '<div class="hide" id="child_'. $category .'"><ul>';
 						foreach ($category_info[3] as $child => $child_info)
@@ -118,7 +130,7 @@
 									));
 								$color_css = '';
 							}
-							echo '<li style="padding-left:20px;"><a href="#" id="cat_'. $child .'"><div '.$color_css.'>'.$child_image.'</div><div class="category-title">'.$child_title.'</div></a></li>';
+							echo '<li style="padding-left:20px;"><a href="#" id="cat_'. $child .'" cat_parent="'.$category.'"><div '.$color_css.'>'.$child_image.'</div><div class="category-title">'.$child_title.'</div></a></li>';
 						}
 						echo '</ul></div></li>';
 					}

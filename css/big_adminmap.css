@@ -223,7 +223,7 @@ ul.status-filters li a{
     display: block;
     padding-top:1px;
     padding-bottom:1px;
-    font-size: 15px;
+    font-size: 11px;
     text-transform: uppercase;
     font-weight: bold;
     text-decoration: none;
@@ -298,7 +298,7 @@ ul.category-filters li{
 ul.category-filters li a{
     display: block;
     padding: 1px 10px 1px 5px;
-    font-size: 15px;
+    font-size: 11px;
     text-transform: uppercase;
     font-weight: bold;
     text-decoration: none;
@@ -331,6 +331,10 @@ ul.category-filters li a.active:hover {
 
 ul.category-filters li.child{
 	display:none;
+}
+
+ul.category-filters li ul{
+    margin-top:10px;
 }
 
 /* media files */

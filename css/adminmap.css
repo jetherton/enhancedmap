@@ -231,6 +231,8 @@ ul.category-filters{
     padding: 12px 15px;
 	margin-top:0px;
 	margin-left:0px;
+	overflow:auto;
+	height: 250px;
 }
 
 ul.category-filters li{
@@ -242,14 +244,14 @@ ul.category-filters li{
 ul.category-filters li a{
     display: block;
     padding: 8px 10px 8px 5px;
-    font-size: 15px;
+    font-size: 13px;
     text-transform: uppercase;
     font-weight: bold;
     text-decoration: none;
     color: #3F3F3F;
     border: #E7E3DA 1px solid;
     position: relative;
-    line-height: 17px;
+    line-height: 15px;
     overflow: hidden;
 }
 
