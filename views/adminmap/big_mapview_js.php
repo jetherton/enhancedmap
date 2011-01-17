@@ -220,21 +220,23 @@ function mU() {
 		*******/
 		function removeCategoryFilter(idToRemove, currentCat)
 		{
-			var toRemove = idToRemove+","; //we use , as the delimiter bewteen categories
-			var startPos = currentCat.indexOf(toRemove);
-			//if the substring isn't here,bounce
-			if (startPos == -1)
+			
+			var cat_ids = currentCat.split(",");
+			var newCurrentCat = "";
+			//loop through the IDs
+			for( tempId in cat_ids)
 			{
-				return currentCat;
+				//take out blanks and the ID we're trying to remove
+				if(cat_ids[tempId] != idToRemove && cat_ids[tempId] != "")
+				{
+					newCurrentCat += cat_ids[tempId]+",";
+				}
 			}
-			var testStr1 = currentCat.substring(0,startPos);
-			var testStr2 = currentCat.substring(startPos + toRemove.length, currentCat.length);
-			currentCat = testStr1+testStr2;
 			//deactivate
 			$("#cat_"+idToRemove).removeClass("active");
 			
-			return currentCat;
-		}
+			return newCurrentCat;
+		}//end removeCategoryFilter()
 
 
 		/*
