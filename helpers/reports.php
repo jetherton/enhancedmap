@@ -24,14 +24,15 @@ class reports_Core {
       */
 	public static function get_reports_list_by_cat($category_ids, $approved_text, $where_text, $logical_operator, 
 		$order_by = "incident.incident_date",
-		$order_by_direction = "asc")
+		$order_by_direction = "asc",
+		$joins = array())
 	{
 		$incidents = null;
+		
 		//check if we're showing all categories, or if no category info was selected then return everything
 		If(count($category_ids) == 0 || $category_ids[0] == '0')
 		{
 			// Retrieve all markers
-			
 			$incidents = ORM::factory('incident')
 				->select('incident.*, category.category_color as color, category.category_title as category_title, category.id as cat_id, '.
 						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id, '.
@@ -40,8 +41,22 @@ class reports_Core {
 				->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 				->join('media', 'incident.id', 'media.incident_id','LEFT')
 				->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
-				->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT')
-				->where($approved_text.$where_text)
+				->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
+			//run code to add in extra joins
+			foreach($joins as $join)
+			{
+				if(count($join) < 4)
+				{
+					$incidents = $incidents->join($join[0], $join[1], $join[2]);
+				}
+				else
+				{
+					$incidents = $incidents->join($join[0], $join[1], $join[2], $join[3]);	
+				}
+					
+			}
+			
+			$incidents = $incidents->where($approved_text.$where_text)
 				->orderby($order_by, $order_by_direction)
 				->find_all();			    
 			
@@ -74,8 +89,21 @@ class reports_Core {
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','RIGHT')
 					->join('media', 'incident.id', 'media.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
-					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT')
-					->where($approved_text.' AND ('.$where_category. ')' . $where_text)
+					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
+				//run code to add in extra joins
+				foreach($joins as $join)
+				{
+					if(count($join) < 4)
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2]);
+					}
+					else
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2], $join[3]);	
+					}
+						
+				}
+				$incidents = $incidents->where($approved_text.' AND ('.$where_category. ')' . $where_text)
 					->orderby($order_by, $order_by_direction)
 					->orderby('incident.id')
 					->find_all();
@@ -91,8 +119,21 @@ class reports_Core {
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id')
 					->join('media', 'incident.id', 'media.incident_id','LEFT')
-					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT')
-					->where($approved_text.' AND ('.$where_category. ')' . $where_text)
+					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
+				//run code to add in extra joins
+				foreach($joins as $join)
+				{
+					if(count($join) < 4)
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2]);
+					}
+					else
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2], $join[3]);	
+					}
+						
+				}
+				$incidents = $incidents->where($approved_text.' AND ('.$where_category. ')' . $where_text)
 					->orderby($order_by, $order_by_direction)
 					->orderby('incident.id')
 					->find_all();
@@ -102,20 +143,6 @@ class reports_Core {
 		}//end of else we are using categories
 		
 		
-		//run a filter just in case someone wants to mess with this:
-		$data = array(
-					"incidents" => $incidents,
-					"category_ids" => $category_ids, 
-					"approved_text" => $approved_text, 
-					"where_text" => $where_text, 
-					"logical_operator" => $logical_operator, 
-					"order_by" => $order_by,
-					"order_by_direction" => $order_by_direction
-					);
-		Event::run('ushahidi_filter.admin_map_get_reports_by_cat', $data);
-		
-		//in case the filter changed the data, make sure it gets passed in
-		$incidents = $data["incidents"];
 		return $incidents;
 
 	}//end method	
@@ -135,39 +162,49 @@ class reports_Core {
 	public static function get_reports($category_ids, $approved_text, $where_text, $logical_operator, 
 		$order_by = "incident.incident_date",
 		$order_by_direction = "asc",
-		$limit = -1, $offset = -1)
+		$limit = -1, $offset = -1,
+		$joins = array())
 	{
+	
 		$incidents = null;
+	
+			
+		
 		//check if we're showing all categories, or if no category info was selected then return everything
 		If(count($category_ids) == 0 || $category_ids[0] == '0')
 		{
 			// Retrieve all markers
-			
+			$incidents = ORM::factory('incident')
+				->select('DISTINCT incident.*')
+				->with('location')
+				->join('media', 'incident.id', 'media.incident_id','LEFT');
+			//run code to add in extra joins
+			foreach($joins as $join)
+			{
+				if(count($join) < 4)
+				{
+					$incidents = $incidents->join($join[0], $join[1], $join[2]);
+				}
+				else
+				{
+					$incidents = $incidents->join($join[0], $join[1], $join[2], $join[3]);	
+				}
+					
+			}
+			$incidents = $incidents->where($approved_text.$where_text)
+				->orderby($order_by, $order_by_direction);
+			//are we gonna do offsets?
 			if($limit != -1 && $offset != -1)
 			{
-				$incidents = ORM::factory('incident')
-					->select('DISTINCT incident.*')
-					->with('location')
-					->join('media', 'incident.id', 'media.incident_id','LEFT')
-					->where($approved_text.$where_text)
-					->orderby($order_by, $order_by_direction)
-					->find_all($limit, $offset);
+				$incidents = $incidents->find_all($limit, $offset);
 			}
 			else
 			{
-				$incidents = ORM::factory('incident')
-					->select('DISTINCT incident.*')
-					->with('location')
-					->join('media', 'incident.id', 'media.incident_id','LEFT')
-					->where($approved_text.$where_text)
-					->orderby($order_by, $order_by_direction)
-					->find_all();
-			}
-			    
-			
+				$incidents = $incidents->find_all();
+			}			    
 		}//end if there are no category filters
 		else
-		{
+		{ //we're gonna use category filters
 		
 			// or up all the categories we're interested in
 			$where_category = "";
@@ -184,37 +221,40 @@ class reports_Core {
 			//if we're using OR
 			if($logical_operator == "or")
 			{
-				
-				// Retrieve incidents by category			
+			
+				$incidents = ORM::factory('incident')
+					->select('DISTINCT incident.*')
+					->with('location')
+					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
+					->join('media', 'incident.id', 'media.incident_id','LEFT')
+					->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
+					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
+				//run code to add in extra joins
+				foreach($joins as $join)
+				{
+					if(count($join) < 4)
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2]);
+					}
+					else
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2], $join[3]);	
+					}
+						
+				}
+				$incidents = $incidents->where($approved_text.' AND ('.$where_category. ')' . $where_text)
+					->orderby($order_by, $order_by_direction)
+					->orderby('incident.id');
+				//are we gonna do offsets?
 				if($limit != -1 && $offset != -1)
 				{
-					$incidents = ORM::factory('incident')
-						->select('DISTINCT incident.*')
-						->with('location')
-						->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
-						->join('media', 'incident.id', 'media.incident_id','LEFT')
-						->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
-						->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT')
-						->where($approved_text.' AND ('.$where_category. ')' . $where_text)
-						->orderby($order_by, $order_by_direction)
-						->orderby('incident.id')
-						->find_all($limit, $offset);
+					$incidents = $incidents->find_all($limit, $offset);
 				}
 				else
 				{
-					$incidents = ORM::factory('incident')
-						->select('DISTINCT incident.*')
-						->with('location')
-						->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
-						->join('media', 'incident.id', 'media.incident_id','LEFT')
-						->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
-						->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT')
-						->where($approved_text.' AND ('.$where_category. ')' . $where_text)
-						->orderby($order_by, $order_by_direction)
-						->orderby('incident.id')
-						->find_all();
+					$incidents = $incidents->find_all();
 				}
-			} //end of if OR
+			}
 			else //if we're using AND
 			{
 			
@@ -226,8 +266,22 @@ class reports_Core {
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id')
 					->join('media', 'incident.id', 'media.incident_id','LEFT')
-					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT')
-					->where($approved_text.' AND ('.$where_category. ')' . $where_text)
+					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
+					//run code to add in extra joins
+				foreach($joins as $join)
+				{
+					if(count($join) < 4)
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2]);
+					}
+					else
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2], $join[3]);	
+					}
+						
+				}
+
+				$incidents = $incidents->where($approved_text.' AND ('.$where_category. ')' . $where_text)
 					->orderby($order_by, $order_by_direction)
 					->orderby('incident.id')
 					->find_all();	
@@ -241,22 +295,6 @@ class reports_Core {
 		}//end of else we are using categories
 		
 		
-		//run a filter just in case someone wants to mess with this:
-		$data = array(
-					"incidents" => $incidents,
-					"category_ids" => $category_ids, 
-					"approved_text" => $approved_text, 
-					"where_text" => $where_text, 
-					"logical_operator" => $logical_operator, 
-					"order_by" => $order_by,
-					"order_by_direction" => $order_by_direction,
-					"limit" => $limit, 
-					"offset" => $offset
-					);
-		Event::run('ushahidi_filter.admin_map_get_reports', $data);
-		
-		//in case the filter changed the data, make sure it gets passed in
-		$incidents = $data["incidents"];
 		return $incidents;
 
 	}//end method	
@@ -267,9 +305,24 @@ class reports_Core {
 	/**************************************************************************************************************
       * Given all the parameters returns the count of incidents that meet the search criteria
       */
-	public static function get_reports_count($category_ids, $approved_text, $where_text, $logical_operator)
+	public static function get_reports_count($category_ids, $approved_text, $where_text, $logical_operator,
+		$joins = array())
 	{
 		$incidents_count = -1;
+		
+		
+		//run a filter just in case someone wants to mess with this:
+		$data = array(
+					"was_changed_by_plugin" => false,
+					"category_ids" => $category_ids, 
+					"approved_text" => $approved_text, 
+					"where_text" => $where_text, 
+					"logical_operator" => $logical_operator
+					);
+		Event::run('ushahidi_filter.admin_map_get_reports_count', $data);
+		//check if someone has changed this and see what we get
+		//in case the filter changed the data, make sure it gets passed in
+		$incidents_count = $data["incidents_count"];
 		
 		//check if we're showing all categories, or if no category info was selected then return everything
 		If(count($category_ids) == 0 || $category_ids[0] == '0')
@@ -279,8 +332,22 @@ class reports_Core {
 			$incidents_count = ORM::factory('incident')
 				->select('DISTINCT incident.*')
 				->with('location')
-				->join('media', 'incident.id', 'media.incident_id','LEFT')
-				->where($approved_text.$where_text)
+				->join('media', 'incident.id', 'media.incident_id','LEFT');
+			//run code to add in extra joins
+			foreach($joins as $join)
+			{
+				if(count($join) < 4)
+				{
+					$incidents = $incidents->join($join[0], $join[1], $join[2]);
+				}
+				else
+				{
+					$incidents = $incidents->join($join[0], $join[1], $join[2], $join[3]);	
+				}
+					
+			}
+
+			$incidents = $incidents->where($approved_text.$where_text)
 				->count_all();
 			    
 			
@@ -308,8 +375,22 @@ class reports_Core {
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					->join('media', 'incident.id', 'media.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
-					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT')
-					->where($approved_text.' AND ('.$where_category. ')' . $where_text)
+					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
+				//run code to add in extra joins
+				foreach($joins as $join)
+				{
+					if(count($join) < 4)
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2]);
+					}
+					else
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2], $join[3]);	
+					}
+						
+				}
+
+				$incidents = $incidents->where($approved_text.' AND ('.$where_category. ')' . $where_text)
 					->find();
 				$incidents_count = $incidents_count->incidents_found;
 			}
@@ -323,8 +404,22 @@ class reports_Core {
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id')
 					->join('media', 'incident.id', 'media.incident_id','LEFT')
-					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT')
-					->where($approved_text.' AND ('.$where_category. ')' . $where_text)
+					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
+				//run code to add in extra joins
+				foreach($joins as $join)
+				{
+					if(count($join) < 4)
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2]);
+					}
+					else
+					{
+						$incidents = $incidents->join($join[0], $join[1], $join[2], $join[3]);	
+					}
+						
+				}
+
+				$incidents = $incidents->where($approved_text.' AND ('.$where_category. ')' . $where_text)
 					->find_all();
 					
 				$incidents = self::post_process_and($category_ids, $incidents);
@@ -335,18 +430,7 @@ class reports_Core {
 			
 		}//end else we are using category IDs
 
-		//run a filter just in case someone wants to mess with this:
-		$data = array(
-					"incidents_count" => $incidents_count,
-					"category_ids" => $category_ids, 
-					"approved_text" => $approved_text, 
-					"where_text" => $where_text, 
-					"logical_operator" => $logical_operator
-					);
-		Event::run('ushahidi_filter.admin_map_get_reports_count', $data);
 		
-		//in case the filter changed the data, make sure it gets passed in
-		$incidents_count = $data["incidents_count"];
 		return $incidents_count;
 		
 	}//end method	

@@ -316,7 +316,9 @@ class adminmap_helper_Core {
 	* $edit_report_path is used to set where the link to edit/view a report should be set to
 	* $on_the_back_end sets whether or not this user is viewing this data from the backend
 	*/
-	public static function json_index($json_controller, $edit_report_path = 'admin/reports/edit/', $on_the_back_end = true)
+	public static function json_index($json_controller, $edit_report_path = 'admin/reports/edit/', $on_the_back_end = true,
+		$extra_where_text = "",
+		$joins = array())
 	{
 		$json = "";
 		$json_item = "";
@@ -427,7 +429,13 @@ class adminmap_helper_Core {
 		//get our new custom color based on the categories we're working with
 		$color = self::merge_colors($category_ids);
 
-		$incidents = reports::get_reports_list_by_cat($category_ids, $approved_text, $where_text, $logical_operator);
+		$incidents = reports::get_reports_list_by_cat($category_ids, 
+			$approved_text, 
+			$where_text. " ". $extra_where_text, 
+			$logical_operator,
+			"incident.incident_date",
+			"asc",
+			$joins);
 
 		$curr_id = "not a number";
 		$cat_names = array();
@@ -821,7 +829,9 @@ class adminmap_helper_Core {
     public static function json_cluster($controller, 
 	$edit_report_path = 'admin/reports/edit/', 
 	$list_reports_path = "admin/adminmap_reports/index/",
-	$on_the_back_end = true)
+	$on_the_back_end = true,
+	$extra_where_text = "",
+	$joins = array())
     {
         //$profiler = new Profiler;
 
@@ -939,7 +949,14 @@ class adminmap_helper_Core {
 	//stuff john just added
 	$color = self::merge_colors($category_ids);
 	//$incidents = reports::get_reports($category_ids, $approved_text, $filter, $logical_operator);
-	$incidents = reports::get_reports_list_by_cat($category_ids, $approved_text, $filter, $logical_operator);        
+
+	$incidents = reports::get_reports_list_by_cat($category_ids, 
+		$approved_text, 
+		$filter. " ". $extra_where_text, 
+		$logical_operator,
+		"incident.incident_date",
+		"asc",
+		$joins);        
 	
 
 	
@@ -1283,7 +1300,7 @@ class adminmap_helper_Core {
      * Retrieve timeline JSON
      * $on_the_back_end is used to set if the user is looking at this on the backend or not
      */
-    public static function json_timeline( $controller, $category_ids, $on_the_back_end = true)
+    public static function json_timeline( $controller, $category_ids, $on_the_back_end = true, $extra_where_text = "", $joins = array())
     {
 	$category_ids = explode(",", $category_ids,-1); //get rid of that trailing ","
 	//a little flag to alert us to the presence of the "ALL CATEGORIES" category
@@ -1363,7 +1380,15 @@ class adminmap_helper_Core {
         $graph_data[0]['data'] = array();
 	
 
-	$incidents = reports::get_reports($category_ids, $approved_text, " ", $logical_operator);
+	$incidents = reports::get_reports($category_ids, 
+		$approved_text, 
+		" ".$extra_where_text, 
+		$logical_operator,
+		"incident.incident_date",
+		"asc",
+		-1, 
+		-1,
+		$joins);
 	
 	
 	$approved_IDs_str = "('-1')";
