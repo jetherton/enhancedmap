@@ -22,23 +22,7 @@
 				</form>
 				<ul id="status_switch" class="status-filters">
 				
-				<strong>Boolean Operators: </strong>
-				<!--<div>
-					<span style="text-align:right;cursor:help; text-transform:none;color:#bb0000;" title="
-						<h3> Boolean Operators </h3>
-						Boolean operators are a way to filter the data you want to see. The one or more of the categories listed below can be selected
-						and then the reports you see on the map will be filtered either using the OR operator or the AND operator. You can use the OR
-						operator to see all the reports that fall under one category <strong>or</strong> another. You can use the AND operator to see all 
-						the reports that fall under one category <strong>and </strong>another.
-						<br/><br/>
-						If you want the map to work like the map on the home page you will need to make sure to select only one category at a time.
-						<br/><br/>
-						A category is selected by clicking on it. Click on the the category again to unselect it.
-						">
-						What's this?
-					</span>
-				</div>-->
-				
+				<strong>Boolean Operators: </strong>				
 				
 					<li>
 						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
@@ -50,11 +34,11 @@
 							shown may only fall under category A. Others may only fall under category C. Some may fall under both 
 							category A and B.
 							<br/><br/>
-							When the OR operator is selected dots will be colored by the categories they fall under out of the categories you
-							have selected. For example, if you have selected categories A and B, where A is red and B is blue, then those reports 
+							When the OR operator is selected, dots will be colored according to the categories they fall under.
+							For example, if you have selected categories A and B, where A is red and B is blue, then those reports 
 							that are only categorized as A will have red dots, and those reports that are only categorized as B will have 
-							blue dots. If a report falls under A and B the two colors, red and blue, will be merged, and that report will
-							be shown with a purple dot.
+							blue dots. If a report falls under A and B the two colors - red and blue - will be merged and that report will
+							be shown with a purple dot - the merged color.
 						">What's this?</span></div>
 						<a class="active" id="logicalOperator_1" href="#">							
 							OR
@@ -68,8 +52,8 @@
 							For example, if you had selected categories A, B, and C, then you would see all the reports that were
 							labeled as falling under category A <strong>and</strong> B <strong>and</strong> C. 
 							<br/><br/>
-							When the AND operator is selected dots will be colored according to the categories you have selected.
-							Since every report shown will fall under all of the categorizes selected, all of the colors of the categories
+							When the AND operator is selected, dots will be colored according to the categories you have selected.
+							Since every report shown will fall under all of the categories selected, all of the colors of the categories
 							selected will be merged and the dots will have the merged color.
 						">What's this?</span></div>
 						
