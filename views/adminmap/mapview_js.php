@@ -56,6 +56,7 @@
 		var defaultZoom = <?php echo $default_zoom; ?>;
 		var markerRadius = <?php echo $marker_radius; ?>;
 		var markerOpacity = "<?php echo $marker_opacity; ?>";
+		var selectedFeature;
 
 		var gMarkerOptions = {baseUrl: baseUrl, longitude: longitude,
 		                     latitude: latitude, defaultZoom: defaultZoom,
@@ -150,21 +151,17 @@
 		*/
 		function onPopupClose(evt)
 		{
-            // selectControl.unselect(selectedFeature);
-			for (var i=0; i<map.popups.length; ++i)
-			{
-				map.removePopup(map.popups[i]);
-			}
-        }
+			selectControl.unselect(selectedFeature);
+		}
 
 		/*
 		Display popup when feature selected
 		*/
-        function onFeatureSelect(event)
+		function onFeatureSelect(event)
 		{
-            selectedFeature = event;
-            // Since KML is user-generated, do naive protection against
-            // Javascript.
+			selectedFeature = event.feature;
+			// Since KML is user-generated, do naive protection against
+			// Javascript.
 
 			zoom_point = event.feature.geometry.getBounds().getCenterLonLat();
 			lon = zoom_point.lon;
@@ -176,16 +173,16 @@
 
 			if (content.search("<script") != -1)
 			{
-                content = "Content contained Javascript! Escaped content below.<br />" + content.replace(/</g, "&lt;");
-            }
-            popup = new OpenLayers.Popup.FramedCloud("chicken", 
-				event.feature.geometry.getBounds().getCenterLonLat(),
-				new OpenLayers.Size(100,100),
-				content,
-				null, true, onPopupClose);
-            event.feature.popup = popup;
-            map.addPopup(popup);
-        }
+				content = "Content contained Javascript! Escaped content below.<br />" + content.replace(/</g, "&lt;");
+			}
+			popup = new OpenLayers.Popup.FramedCloud("chicken", 
+					event.feature.geometry.getBounds().getCenterLonLat(),
+					new OpenLayers.Size(100,100),
+					content,
+					null, true, onPopupClose);
+			event.feature.popup = popup;
+			map.addPopup(popup);
+		}
 
 		/*
 		Destroy Popup Layer
