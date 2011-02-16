@@ -277,7 +277,11 @@ function mU() {
 		*/
 		function onPopupClose(evt)
 		{
-			selectControl.unselect(selectedFeature);			
+			if(selectedFeature != null)
+			{
+				selectControl.unselect(selectedFeature); //this seemed to change things.
+				selectedFeature = null;
+			}
 		}
 
 		/*
