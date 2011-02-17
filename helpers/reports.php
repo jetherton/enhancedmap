@@ -370,7 +370,7 @@ class reports_Core {
 			if($logical_operator == "or")
 			{
 				$incidents_count = ORM::factory('incident')
-					->select('DISTINCT incident.*, COUNT(DISTINCT incident.id) as incidents_found' )
+					->select('DISTINCT incident.*, COUNT(DISTINCT '.Kohana::config('database.default.table_prefix').'incident.id) as incidents_found' )
 					->with('location')
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					->join('media', 'incident.id', 'media.incident_id','LEFT')

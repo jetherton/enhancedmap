@@ -219,7 +219,7 @@ class adminmap_helper_Core {
 
 	}
 	
-	public static function set_categories($map_controller)
+	public static function set_categories($map_controller, $on_backend = false)
 	{
 	
 	// Check for localization of parent category
@@ -228,10 +228,14 @@ class adminmap_helper_Core {
 
         // Get all active top level categories
 		$parent_categories = array();
-		foreach (ORM::factory('category')
-				->where('category_visible', '1')
-				->where('parent_id', '0')
-				->find_all() as $category)
+		$cats = ORM::factory('category');
+		if(!$on_backend)
+		{	
+			$cats = $cats->where('category_visible', '1');
+		}
+		$cats = $cats->where('parent_id', '0')
+			->find_all() ;
+		foreach ($cats as $category)
 		{
 			// Get The Children
 			$children = array();
