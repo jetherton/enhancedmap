@@ -351,8 +351,14 @@ class reports_Core {
 					
 			}
 
-			$incidents_count = $incidents->where($approved_text.$where_text)
-				->count_all();
+			//I hate finding the count this way because it forces you to download all 
+			//the incidents and not just a number, but if i use count_all() it sometimes gives 
+			//erroneous numbers, but doing it this way seems to work. I imagine 
+			//it has to do with the way count and distinct work together.
+			$incidents_found = $incidents->where($approved_text.$where_text)->find_all();
+
+			$incidents_count = count($incidents_found);
+			
 			    
 			
 		}
