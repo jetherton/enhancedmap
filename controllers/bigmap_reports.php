@@ -237,7 +237,7 @@ class Bigmap_reports_Controller extends Main_Controller
 
 
 	// Category Title, if Category ID available
-	$category_title = "";
+	$category_title = "All Categories";
 	$count = 0;
 	foreach($category_ids as $cat_id)
 	{
