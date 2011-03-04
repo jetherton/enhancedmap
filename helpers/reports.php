@@ -317,19 +317,23 @@ class reports_Core {
 					"category_ids" => $category_ids, 
 					"approved_text" => $approved_text, 
 					"where_text" => $where_text, 
-					"logical_operator" => $logical_operator
+					"logical_operator" => $logical_operator,
+					"incidents_count" => $incidents_count
 					);
 		Event::run('ushahidi_filter.admin_map_get_reports_count', $data);
 		//check if someone has changed this and see what we get
 		//in case the filter changed the data, make sure it gets passed in
-		$incidents_count = $data["incidents_count"];
+		if($data["was_changed_by_plugin"])
+		{
+			return $incidents_count = $data["incidents_count"];
+		}
 		
 		//check if we're showing all categories, or if no category info was selected then return everything
 		If(count($category_ids) == 0 || $category_ids[0] == '0')
 		{
 			// Retrieve all markers
 			
-			$incidents_count = ORM::factory('incident')
+			$incidents = ORM::factory('incident')
 				->select('DISTINCT incident.*')
 				->with('location')
 				->join('media', 'incident.id', 'media.incident_id','LEFT');
@@ -347,7 +351,7 @@ class reports_Core {
 					
 			}
 
-			$incidents = $incidents->where($approved_text.$where_text)
+			$incidents_count = $incidents->where($approved_text.$where_text)
 				->count_all();
 			    
 			
@@ -369,7 +373,7 @@ class reports_Core {
 			//if we're using OR
 			if($logical_operator == "or")
 			{
-				$incidents_count = ORM::factory('incident')
+				$incidents = ORM::factory('incident')
 					->select('DISTINCT incident.*, COUNT(DISTINCT '.Kohana::config('database.default.table_prefix').'incident.id) as incidents_found' )
 					->with('location')
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
@@ -392,7 +396,7 @@ class reports_Core {
 
 				$incidents = $incidents->where($approved_text.' AND ('.$where_category. ')' . $where_text)
 					->find();
-				$incidents_count = $incidents_count->incidents_found;
+				$incidents_count = $incidents->incidents_found;
 			}
 			else //if we're using AND
 			{
