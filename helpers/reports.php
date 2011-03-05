@@ -10,7 +10,7 @@ class reports_Core {
 
 
 	// Table Prefix
-	protected static $table_prefix;
+	public static $table_prefix;
 
 	static function init()
 	{
@@ -158,13 +158,28 @@ class reports_Core {
 
 	/**************************************************************************************************************
       * Given all the parameters returns a list of incidents that meet the search criteria
-      */
-	public static function get_reports($category_ids, $approved_text, $where_text, $logical_operator, 
+      //custom_category_to_table_mapping --- This assumes that the custom category you're
+      mapping into this has the same basic setup as the core ushahidi table "category" that is that
+      you will be comparing <your category name>.id and <your category name>.parent_id. You are
+      responsible for including the necesary joins. Below is the category to table mapping used for the 
+      simple groups plugin as an example:
+      $custom_category_to_table_mapping = array("SG"=>array(
+											"child"=>"simplegroups_category", 
+											"parent"=>"simplegroups_parent_cat")
+										);
+      /**************************************************************************************************************/
+	public static function get_reports($category_ids, 
+		$approved_text, 
+		$where_text, 
+		$logical_operator, 
 		$order_by = "incident.incident_date",
 		$order_by_direction = "asc",
 		$limit = -1, $offset = -1,
-		$joins = array())
+		$joins = array(),
+		$custom_category_to_table_mapping = array())
 	{
+	
+		
 	
 		$incidents = null;
 	
@@ -206,18 +221,10 @@ class reports_Core {
 		else
 		{ //we're gonna use category filters
 		
-			// or up all the categories we're interested in
-			$where_category = "";
-			$i = 0;
-			foreach($category_ids as $id)
-			{
-				$i++;
-				$where_category = ($i > 1) ? $where_category . " OR " : $where_category;
-				$where_category = $where_category . "(".reports_Core::$table_prefix.'incident_category.category_id = ' . $id." OR parent_cat.id = " . $id.")";
-
-			}
-
+			// OR up all the categories we're interested in
+			$where_category = reports::or_up_categories($category_ids, $custom_category_to_table_mapping);
 			
+						
 			//if we're using OR
 			if($logical_operator == "or")
 			{
@@ -258,10 +265,24 @@ class reports_Core {
 			else //if we're using AND
 			{
 			
+				//based on what's in the custom cat mappings make some fancy selects
+				$custom_cat_selects = "";
+				foreach($custom_category_to_table_mapping as $name => $tables)
+				{
+					$custom_cat_selects .= ", ".$tables["child"].".category_color as ".$name."_color";
+					$custom_cat_selects .= ", ".$tables["child"].".category_title as ".$name."_title";
+					$custom_cat_selects .= ", ".$tables["child"].".id as ".$name."_cat_id";
+					
+					$custom_cat_selects .= ", ".$tables["parent"].".category_color as ".$name."_parent_color";
+					$custom_cat_selects .= ", ".$tables["parent"].".category_title as ".$name."_parent_title";
+					$custom_cat_selects .= ", ".$tables["parent"].".id as ".$name."_parent_cat_id";
+				}
+			
 				// Retrieve incidents by category			
 				$incidents = ORM::factory('incident')
 					->select('incident.*,  category.category_color as color, category.category_title as category_title, category.id as cat_id, '.
-						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id')
+						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id'.
+						$custom_cat_selects)
 					->with('location')
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id')
@@ -285,7 +306,8 @@ class reports_Core {
 					->orderby($order_by, $order_by_direction)
 					->orderby('incident.id')
 					->find_all();	
-				$incidents = self::post_process_and($category_ids, $incidents);
+				
+				$incidents = self::post_process_and($category_ids, $incidents, $custom_category_to_table_mapping);
 				
 				if($limit != -1 && $offset != -1)
 				{
@@ -304,9 +326,13 @@ class reports_Core {
 	
 	/**************************************************************************************************************
       * Given all the parameters returns the count of incidents that meet the search criteria
-      */
-	public static function get_reports_count($category_ids, $approved_text, $where_text, $logical_operator,
-		$joins = array())
+      /**************************************************************************************************************/
+	public static function get_reports_count($category_ids, 
+		$approved_text, 
+		$where_text, 
+		$logical_operator,
+		$joins = array(),
+		$custom_category_to_table_mapping = array())
 	{
 		$incidents_count = -1;
 		
@@ -318,7 +344,8 @@ class reports_Core {
 					"approved_text" => $approved_text, 
 					"where_text" => $where_text, 
 					"logical_operator" => $logical_operator,
-					"incidents_count" => $incidents_count
+					"incidents_count" => $incidents_count,
+					"custom_category_to_table_mapping" => $custom_category_to_table_mapping
 					);
 		Event::run('ushahidi_filter.admin_map_get_reports_count', $data);
 		//check if someone has changed this and see what we get
@@ -364,18 +391,10 @@ class reports_Core {
 		}
 		else //we are using category IDs, double the fun
 		{
-			// or up allthe categories we're interested in
-			$where_category = "";
-			$i = 0;
-			foreach($category_ids as $id)
-			{
-				$i++;
-				$where_category = ($i > 1) ? $where_category . " OR " : $where_category;
-				$where_category = $where_category . "(".reports_Core::$table_prefix.'incident_category.category_id = ' . $id." OR parent_cat.id = " . $id.")";
-
-			}
-
+			// OR up all the categories we're interested in
+			$where_category = reports::or_up_categories($category_ids, $custom_category_to_table_mapping);
 			
+						
 			//if we're using OR
 			if($logical_operator == "or")
 			{
@@ -406,10 +425,26 @@ class reports_Core {
 			}
 			else //if we're using AND
 			{
+			
+				//based on what's in the custom cat mappings make some fancy selects
+				$custom_cat_selects = "";
+				foreach($custom_category_to_table_mapping as $name => $tables)
+				{
+					$custom_cat_selects .= ", ".$tables["child"].".category_color as ".$name."_color";
+					$custom_cat_selects .= ", ".$tables["child"].".category_title as ".$name."_title";
+					$custom_cat_selects .= ", ".$tables["child"].".id as ".$name."_cat_id";
+					
+					$custom_cat_selects .= ", ".$tables["parent"].".category_color as ".$name."_parent_color";
+					$custom_cat_selects .= ", ".$tables["parent"].".category_title as ".$name."_parent_title";
+					$custom_cat_selects .= ", ".$tables["parent"].".id as ".$name."_parent_cat_id";
+				}
+			
+			
 				// Retrieve incidents by category			
 				$incidents = ORM::factory('incident')
 					->select('incident.*,  category.category_color as color, category.category_title as category_title, category.id as cat_id, '.
-						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id')
+						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id'.
+						$custom_cat_selects)
 					->with('location')
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id')
@@ -446,6 +481,50 @@ class reports_Core {
 	}//end method	
 	
 	
+	
+	
+	private static function or_up_categories($category_ids, $custom_category_to_table_mapping)
+	{
+		$where_category = "";
+		$i = 0;
+		foreach($category_ids as $id)
+		{
+			$i++;
+			//first we wana check and see if this is a site wide category or a custom category
+			$delimiter_pos = strpos($id, ":");
+			if($delimiter_pos !== false)
+			{
+				//get the custom category name
+				$custom_cat_name = substr($id, 0, $delimiter_pos);
+				//get the custom category's numeric id
+				$custom_cat_id = substr($id,$delimiter_pos + 1);
+				
+				//check to make sure an index is set in custom_category_to_table_mapping for this custom cateogry
+				//if not throw an error
+				if(!isset($custom_category_to_table_mapping[$custom_cat_name]))
+				{
+					throw new Exception("No custom category to table mapping was supplied for $custom_cat_name. Unable to determine which tables in the database to use to look up this category");
+				}
+				
+				$child_table = $custom_category_to_table_mapping[$custom_cat_name]["child"];
+				$parent_table = $custom_category_to_table_mapping[$custom_cat_name]["parent"];
+				
+				$where_category = ($i > 1) ? $where_category . " OR " : $where_category;
+				$where_category = $where_category . "(".reports_Core::$table_prefix.$child_table.".id = " . $custom_cat_id. " OR ".$parent_table.".id = " . $custom_cat_id.")";
+				
+			}
+			else
+			{	//this a normal, site wide, category, so treat it normally								
+				$where_category = ($i > 1) ? $where_category . " OR " : $where_category;
+				$where_category = $where_category . "(".reports_Core::$table_prefix.'incident_category.category_id = ' . $id." OR parent_cat.id = " . $id.")";
+			}
+
+		}
+		
+		return $where_category;
+	}
+	
+	
 	/**********************************************************
 	 * Does a shallow copy of an array
 	 * Both arrays need to be initialized before calling this
@@ -469,7 +548,7 @@ class reports_Core {
 	 * and child categories was to involved, and probably lost some of  its
 	 * SQL effeciency with the massively complex queries I was writing
 	 **********************************************************************/
-	public static function post_process_and($category_ids, $incidents)
+	public static function post_process_and($category_ids, $incidents, $custom_category_to_table_mapping=array())
 	{
 		$new_incidents = array();		
 		$cats = self::array_copy($category_ids);
@@ -477,6 +556,8 @@ class reports_Core {
 		
 		foreach($incidents as $incident)
 		{
+			
+			//end condtion
 			if($last_incident!=null && $last_incident->id != $incident->id)
 			{
 				//have all the categories been matched?
@@ -499,13 +580,35 @@ class reports_Core {
 			}
 			else
 			{
-				//check kids
+				//check parent
 				$parent_key = array_search($incident->parent_id, $cats);
 				if($parent_key !== false && $parent_key !== null)
 				{
 					unset($cats[$parent_key]);
 				}
 			}
+			
+			//now check custom categories
+			$incident_array = $incident->as_array();
+			foreach($custom_category_to_table_mapping as $name => $table)
+			{
+				$child_key = array_search($name.":".$incident_array[$name."_cat_id"], $cats);
+				if($child_key !== false && $child_key !== null)
+				{
+					unset($cats[$child_key]);
+				}
+				else
+				{
+					//check parent
+					$parent_key = array_search($name.":".$incident_array[$name."_parent_cat_id"], $cats);
+					if($parent_key !== false && $parent_key !== null)
+					{
+						unset($cats[$parent_key]);
+					}
+				}
+			}
+			
+			
 		}//end loop
 		
 		//catch the last one
