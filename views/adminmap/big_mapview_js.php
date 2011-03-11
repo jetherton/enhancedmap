@@ -297,7 +297,7 @@ function mU() {
 			lon = zoom_point.lon;
 			lat = zoom_point.lat;
 
-			var content = "<div class=\"infowindow\"><div class=\"infowindow_list\">"+event.feature.attributes.name + "<div style=\"clear:both;\"></div></div>";
+			var content = "<div class=\"infowindow\"><div class=\"infowindow_list\">"+event.feature.attributes.link + "<div style=\"clear:both;\"></div></div>";
 			content = content + "\n<div class=\"infowindow_meta\"><a href='javascript:zoomToSelectedFeature("+ lon + ","+ lat +", 1)'>Zoom&nbsp;In</a>&nbsp;&nbsp;|&nbsp;&nbsp;<a href='javascript:zoomToSelectedFeature("+ lon + ","+ lat +", -1)'>Zoom&nbsp;Out</a></div>";
 			content = content + "</div>";			
 

@@ -475,7 +475,10 @@ class adminmap_helper_Core {
 						
 					}
 				}
-				$json_item .= "\"name\":\"" .date("n/j/Y", strtotime($marker->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
+				
+				//$json_item .= "\"name\":\"" .date("n/j/Y", strtotime($marker->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
+				//for compatiblity with the InfoWindows plugin
+				$json_item .= "\"link\":\"" .date("n/j/Y", strtotime($marker->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
 
 				if (isset($category)) 
 				{
@@ -576,7 +579,8 @@ class adminmap_helper_Core {
 						
 					}
 				}
-				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
+				//$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
+				$json_item .= "\"link\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
 
 
 				if (isset($category)) 
@@ -1179,7 +1183,8 @@ class adminmap_helper_Core {
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
 	    $categories_str = implode(",", $category_ids);
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . $list_reports_path."?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.">" . $cluster_count . " Reports</a> ".$category_str)) . "\",";
+            //$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . $list_reports_path."?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.">" . $cluster_count . " Reports</a> ".$category_str)) . "\",";
+	    $json_item .= "\"link\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . $list_reports_path."?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.">" . $cluster_count . " Reports</a> ".$category_str)) . "\",";
             $json_item .= "\"category\":[0], ";
 		if($contains_nonactive && $color_unapproved==2)
 		{
@@ -1247,7 +1252,8 @@ class adminmap_helper_Core {
             $json_item = "{";
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
-            $json_item .= "\"name\":\"" .date("n/j/Y", strtotime($single->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . $edit_report_path . $single->id . "/>".str_replace('"','\"',$single->incident_title)."</a>".$category_description)) . "\",";   
+            //$json_item .= "\"name\":\"" .date("n/j/Y", strtotime($single->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . $edit_report_path . $single->id . "/>".str_replace('"','\"',$single->incident_title)."</a>".$category_description)) . "\",";   
+	    $json_item .= "\"link\":\"" .date("n/j/Y", strtotime($single->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . $edit_report_path . $single->id . "/>".str_replace('"','\"',$single->incident_title)."</a>".$category_description)) . "\",";   
             $json_item .= "\"category\":[0], ";
 	    //check if it's a unapproved/unactive report
 		if($single->incident_active == 0 && $color_unapproved==2)
