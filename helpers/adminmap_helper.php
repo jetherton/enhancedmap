@@ -219,14 +219,16 @@ class adminmap_helper_Core {
 
 	}
 	
-	public static function set_categories($map_controller, $on_backend = false)
+	public static function set_categories($map_controller, $on_backend = false, $group = false)
 	{
 	
 	// Check for localization of parent category
 	// Get locale
 	$l = Kohana::config('locale.language.0');
 
+	/////////////////////////////////////////////////////////////////////////////////////////////
         // Get all active top level categories
+	/////////////////////////////////////////////////////////////////////////////////////////////
 		$parent_categories = array();
 		$cats = ORM::factory('category');
 		if(!$on_backend)
@@ -237,7 +239,9 @@ class adminmap_helper_Core {
 			->find_all() ;
 		foreach ($cats as $category)
 		{
-			// Get The Children
+			/////////////////////////////////////////////////////////////////////////////////////////////
+			// Get the children
+			/////////////////////////////////////////////////////////////////////////////////////////////
 			$children = array();
 			foreach ($category->children as $child)
 			{
@@ -302,6 +306,83 @@ class adminmap_helper_Core {
 				}
 			}
 		}
+		
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Check to see if we're dealing with a group, and thus
+		//should show group specific categories
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		if($group != false)
+		{
+			//check and make sure the simpel groups category is installed
+			$plugin = ORM::factory('plugin')
+				->where('plugin_name', 'simplegroups')
+				->where('plugin_active', '1')
+				->find();
+			if(!$plugin)
+			{
+				throw new Exception("A group was set in adminmap_helper::set_categories() when the SimpleGroupl plugin is not installed");
+			}
+		
+			$cats = ORM::factory('simplegroups_category');
+			if(!$on_backend)
+			{	
+				$cats = $cats->where('category_visible', '1');
+			}
+			$cats = $cats->where('parent_id', '0');
+			$cats = $cats->where('applies_to_report', 1);
+			$cats = $cats->where('simplegroups_groups_id', $group->id)
+				->find_all() ;
+			foreach ($cats as $category)
+			{				
+				/////////////////////////////////////////////////////////////////////////////////////////////
+				// Get the children
+				/////////////////////////////////////////////////////////////////////////////////////////////
+				$children = array();
+				foreach ($category->children as $child)
+				{
+					// Check for localization of child category
+
+					$translated_title = Simplegroups_category_lang_Model::simplegroups_category_title($child->id,$l);
+
+					if($translated_title)
+					{
+						$display_title = $translated_title;
+					}
+					else
+					{
+						$display_title = $child->category_title;
+					}
+
+					$children["sg_".$child->id] = array(
+						$display_title,
+						$child->category_color,
+						$child->category_image
+					);
+					
+				}
+
+				
+
+				$translated_title = Simplegroups_category_lang_Model::simplegroups_category_title($category->id,$l);
+
+				if($translated_title)
+				{
+					$display_title = $translated_title;
+				}else{
+					$display_title = $category->category_title;
+				}
+
+				// Put it all together				
+				$parent_categories["sg_".$category->id] = array(
+					$display_title,
+					$category->category_color,
+					$category->category_image,
+					$children
+				);				
+			}
+		}
+		
+		
 		$map_controller->template->content->categories = $parent_categories;
 	}//end method
 	
@@ -322,7 +403,8 @@ class adminmap_helper_Core {
 	*/
 	public static function json_index($json_controller, $edit_report_path = 'admin/reports/edit/', $on_the_back_end = true,
 		$extra_where_text = "",
-		$joins = array())
+		$joins = array(),
+		$custom_category_to_table_mapping = array())
 	{
 		$json = "";
 		$json_item = "";
@@ -431,7 +513,7 @@ class adminmap_helper_Core {
 
 		
 		//get our new custom color based on the categories we're working with
-		$color = self::merge_colors($category_ids);
+		$color = self::merge_colors($category_ids, $custom_category_to_table_mapping);
 
 		$incidents = reports::get_reports_list_by_cat($category_ids, 
 			$approved_text, 
@@ -439,7 +521,8 @@ class adminmap_helper_Core {
 			$logical_operator,
 			"incident.incident_date",
 			"asc",
-			$joins);
+			$joins,
+			$custom_category_to_table_mapping);
 
 		$curr_id = "not a number";
 		$cat_names = array();
@@ -543,15 +626,38 @@ class adminmap_helper_Core {
 			$curr_id = $marker->id;
 			$isnt_first = true;
 			
-			if($marker->is_parent==0)
+			$incident_array = $marker->as_array();
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//Now we try and figure out which category this report was matched to
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			if(isset($incident_array["is_parent"]) && $incident_array["is_parent"] != 0) 
 			{
-				$cat_names[$marker->cat_id]= $marker->category_title;
-				$colors[$marker->cat_id] = $marker->color;
+				//echo $incident->incident_title." parent matched\r\n";
+				$cat_names[$incident_array["parent_id"]] = $incident_array["parent_title"];
+				$colors[$incident_array["parent_id"]] = $incident_array["parent_color"];
 			}
-			else
+			elseif(isset($incident_array["is_child"]) && $incident_array["is_child"] != 0) 
 			{
-				$cat_names[$marker->parent_id]= $marker->parent_title;
-				$colors[$marker->parent_id] = $marker->parent_color;
+				//echo $incident->incident_title." kid matched\r\n";			
+				$cat_names[$incident_array["cat_id"]] = $incident_array["category_title"];
+				$colors[$incident_array["cat_id"]] = $incident_array["color"];
+			}
+			//now the fun part, loop through all the custom categories
+			foreach($custom_category_to_table_mapping as $name=>$custom_cat)
+			{
+				if(isset($incident_array["is_".$name."_parent"]) && $incident_array["is_".$name."_parent"] != 0) 
+				{
+					//echo $incident->incident_title." $name parent matched\r\n";
+					$cat_names[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_title"];
+					$colors[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_color"];
+				}
+				elseif(isset($incident_array["is_".$name."_child"]) && $incident_array["is_".$name."_child"] != 0) 
+				{
+					//echo $incident->incident_title." $name kid matched. With color: ".$incident_array[$name."_color"]."\r\n";			
+					$cat_names[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_title"];
+					$colors[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_color"];
+				}
 			}
 			
 		}//end loop
@@ -658,44 +764,109 @@ class adminmap_helper_Core {
 	* Function, this'll merge colors. Given an array of category IDs it'll return a hex string
 	* of all the colors merged together
 	*/
-	public static function merge_colors($category_ids)
+	public static function merge_colors($category_ids_temp, $custom_category_to_table_mapping = array())
 	{
+		//because I might unset some of the values in the $category_ids array
+		$category_ids = reports::array_copy($category_ids_temp);
+		
 		//check if we're looking at category 0
 		if(count($category_ids) == 0 || $category_ids[0] == '0')
 		{
 			return Kohana::config('settings.default_map_all');
 		}
-		//first lets figure out the composite color that we're gonna usehere
-		$where_str_color = ""; //to get the colors we're gonna use
-		$i = 0;
-		foreach($category_ids as $id)
-		{
-			$i++;
-			if($i > 1)
-			{
-				$where_str_color = $where_str_color . " OR ";
-			}
-			$where_str_color = $where_str_color . "id = ".$id;
-		}
-
-
-		// Retrieve all the categories with their colors
-		$categories = ORM::factory('category')
-		    ->where($where_str_color)
-		    ->find_all();
-
-		//now for each color break it into RGB, add them up, then normalize
+		
 		$red = 0;
 		$green = 0;
 		$blue = 0;
-		foreach($categories as $category)
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Lets handle custom categories
+		foreach($custom_category_to_table_mapping as $cat_name=>$custom_cats)
 		{
-			$color = $category->category_color;
-			$numeric_colors = self::_hex2RGB($color);
-			$red = $red + $numeric_colors['red'];
-			$green = $green + $numeric_colors['green'];
-			$blue = $blue + $numeric_colors['blue'];
+			$where_str_color = ""; //to get the colors we're gonna use
+			$i = 0;
+			foreach($category_ids as $key=>$id)
+			{
+				//check if we have a custom cateogry ID
+				$delimiter_pos = strpos($id, "_");
+				if($delimiter_pos !== false)
+				{
+					//get the custom category name
+					$custom_cat_name = substr($id, 0, $delimiter_pos);
+					//get the custom category's numeric id
+					$custom_cat_id = substr($id,$delimiter_pos + 1);
+					
+					//does the custom_cat_name match our current custom cat
+					if($cat_name == $custom_cat_name)
+					{
+						$i++;
+						if($i > 1)
+						{
+							$where_str_color = $where_str_color . " OR ";
+						}
+						$where_str_color = $where_str_color . "id = ".$custom_cat_id;
+						
+						unset($category_ids[$key]);			
+					}
+				}
+			}
+			if($where_str_color != "")
+			{
+				//get the custom categories themselves and add up their colors:
+				// Retrieve all the categories with their colors
+				$categories = ORM::factory($custom_cats['child'])
+				    ->where($where_str_color)
+				    ->find_all();
+
+				//now for each color break it into RGB, add them up, then normalize
+				
+				foreach($categories as $category)
+				{
+					$color = $category->category_color;
+					$numeric_colors = self::_hex2RGB($color);
+					$red = $red + $numeric_colors['red'];
+					$green = $green + $numeric_colors['green'];
+					$blue = $blue + $numeric_colors['blue'];
+				}
+			}
+		}//end loop through all custom categorie sources
+		
+		
+
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Next lets handle regular categories		
+		//first lets figure out the composite color that we're gonna usehere
+		if(count($category_ids) > 0)
+		{
+			$where_str_color = ""; //to get the colors we're gonna use
+			$i = 0;
+			foreach($category_ids as $id)
+			{
+				$i++;
+				if($i > 1)
+				{
+					$where_str_color = $where_str_color . " OR ";
+				}
+				$where_str_color = $where_str_color . "id = ".$id;
+			}
+
+
+			// Retrieve all the categories with their colors
+			$categories = ORM::factory('category')
+			    ->where($where_str_color)
+			    ->find_all();
+
+			//now for each color break it into RGB, add them up, then normalize
+			
+			foreach($categories as $category)
+			{
+				$color = $category->category_color;
+				$numeric_colors = self::_hex2RGB($color);
+				$red = $red + $numeric_colors['red'];
+				$green = $green + $numeric_colors['green'];
+				$blue = $blue + $numeric_colors['blue'];
+			}
 		}
+		
 		//now normalize
 		$color_length = sqrt( ($red*$red) + ($green*$green) + ($blue*$blue));
 	
@@ -839,7 +1010,8 @@ class adminmap_helper_Core {
 	$list_reports_path = "admin/adminmap_reports/index/",
 	$on_the_back_end = true,
 	$extra_where_text = "",
-	$joins = array())
+	$joins = array(),
+	$custom_category_to_table_mapping = array())
     {
         //$profiler = new Profiler;
 
@@ -955,7 +1127,7 @@ class adminmap_helper_Core {
         }
 
 	//stuff john just added
-	$color = self::merge_colors($category_ids);
+	$color = self::merge_colors($category_ids, $custom_category_to_table_mapping);
 	//$incidents = reports::get_reports($category_ids, $approved_text, $filter, $logical_operator);
 
 	$incidents = reports::get_reports_list_by_cat($category_ids, 
@@ -964,7 +1136,8 @@ class adminmap_helper_Core {
 		$logical_operator,
 		"incident.incident_date",
 		"asc",
-		$joins);        
+		$joins,
+		$custom_category_to_table_mapping);        
 	
 
 	
@@ -992,18 +1165,40 @@ class adminmap_helper_Core {
 		$last_incident = $incident;
 		$curr_id = $incident->id;
 		$isnt_first = true;
-		if($incident->is_parent == 0) //matched on the category itself
-		{
-			//echo $incident->incident_title." kid matched\r\n";
-			$cat_names[$incident->cat_id] = $incident->category_title;
-			$colors[$incident->cat_id] = $incident->color;
-		}
-		else
+		$incident_array = $incident->as_array();
+		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Now we try and figure out which category this report was matched to
+		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		if(isset($incident_array["is_parent"]) && $incident_array["is_parent"] != 0) 
 		{
 			//echo $incident->incident_title." parent matched\r\n";
 			$cat_names[$incident->parent_id] = $incident->parent_title;
 			$colors[$incident->parent_id] = $incident->parent_color;
 		}
+		elseif(isset($incident_array["is_child"]) && $incident_array["is_child"] != 0) 
+		{
+			//echo $incident->incident_title." kid matched\r\n";			
+			$cat_names[$incident->cat_id] = $incident->category_title;
+			$colors[$incident->cat_id] = $incident->color;
+		}
+		//now the fun part, loop through all the custom categories
+		foreach($custom_category_to_table_mapping as $name=>$custom_cat)
+		{
+			if(isset($incident_array["is_".$name."_parent"]) && $incident_array["is_".$name."_parent"] != 0) 
+			{
+				//echo $incident->incident_title." $name parent matched\r\n";
+				$cat_names[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_title"];
+				$colors[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_color"];
+			}
+			elseif(isset($incident_array["is_".$name."_child"]) && $incident_array["is_".$name."_child"] != 0) 
+			{
+				//echo $incident->incident_title." $name kid matched. With color: ".$incident_array[$name."_color"]."\r\n";			
+				$cat_names[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_title"];
+				$colors[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_color"];
+			}
+		}
+		
 	}//end loop
 
 	//catch the last report
@@ -1312,7 +1507,12 @@ class adminmap_helper_Core {
      * Retrieve timeline JSON
      * $on_the_back_end is used to set if the user is looking at this on the backend or not
      */
-    public static function json_timeline( $controller, $category_ids, $on_the_back_end = true, $extra_where_text = "", $joins = array())
+    public static function json_timeline( $controller, 
+								$category_ids, 
+								$on_the_back_end = true, 
+								$extra_where_text = "", 
+								$joins = array(),
+								$custom_category_to_table_mapping = array())
     {
 	$category_ids = explode(",", $category_ids,-1); //get rid of that trailing ","
 	//a little flag to alert us to the presence of the "ALL CATEGORIES" category
@@ -1385,13 +1585,14 @@ class adminmap_helper_Core {
             $groupby_date_text = "YEARWEEK(incident_date)";
         }
 
+	
+	
         $graph_data = array();
         $graph_data[0] = array();
         $graph_data[0]['label'] = "Category Title"; //is this used for anything?
-        $graph_data[0]['color'] = '#'. self::merge_colors($category_ids);
+        $graph_data[0]['color'] = '#'. self::merge_colors($category_ids, $custom_category_to_table_mapping);
         $graph_data[0]['data'] = array();
 	
-
 	$incidents = reports::get_reports($category_ids, 
 		$approved_text, 
 		" ".$extra_where_text, 
@@ -1400,7 +1601,8 @@ class adminmap_helper_Core {
 		"asc",
 		-1, 
 		-1,
-		$joins);
+		$joins,
+		$custom_category_to_table_mapping);
 	
 	
 	$approved_IDs_str = "('-1')";
