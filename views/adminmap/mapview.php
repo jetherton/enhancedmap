@@ -130,6 +130,7 @@ This maps shows you all of the reports you are authorized to see. This includes 
 				<div class="cat-filters clearingfix" style="margin-top:20px;">
 					<strong><?php echo Kohana::lang('ui_main.layers_filter');?> <span>[<a href="javascript:toggleLayer('kml_switch_link', 'kml_switch')" id="kml_switch_link"><?php echo Kohana::lang('ui_main.show'); ?></a>]</span></strong>
 				</div>
+				<br/>
 				<ul id="kml_switch" class="category-filters" style="display:hidden;">
 					<?php
 					foreach ($layers as $layer => $layer_info)
