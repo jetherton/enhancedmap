@@ -232,6 +232,7 @@ class Bigmap_json_Controller extends Template_Controller
                     $json_item .= "\"type\":\"Feature\",";
                     $json_item .= "\"properties\": {";
                     $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='http://" . $sharing_url . "/reports/index/?c=0&sw=".$southwest."&ne=".$northeast."'>" . $cluster_count . " Reports</a>")) . "\",";          
+                    $json_item .= "\"link\":\"http://$sharing_url/reports/index/?c=0&sw=$southwest&ne=$northeast\",";
                     $json_item .= "\"category\":[0], ";
                     $json_item .= "\"icon\": \"\", ";
                     $json_item .= "\"color\": \"".$sharing_color."\", ";
@@ -253,6 +254,7 @@ class Bigmap_json_Controller extends Template_Controller
                     $json_item .= "\"type\":\"Feature\",";
                     $json_item .= "\"properties\": {";
                     $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='http://" . $sharing_url . "/reports/view/" . $single['id'] . "'>".$single['incident_title']."</a>")) . "\",";   
+                    $json_item .="\"name\":\"http://$sharing_url/reports/view/{$single["id"]}\",";
                     $json_item .= "\"category\":[0], ";
                     $json_item .= "\"icon\": \"\", ";
                     $json_item .= "\"color\": \"".$sharing_color."\", ";
@@ -285,6 +287,7 @@ class Bigmap_json_Controller extends Template_Controller
                     $json_item .= "\"properties\": {";
                     $json_item .= "\"id\": \"".$marker->incident_id."\", \n";
                     $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='http://" . $sharing_url . "/reports/view/" . $marker->incident_id . "'>" . htmlentities($marker->incident_title) . "</a>")) . "\",";
+                    $json_item .= "\"link\":\"http://$sharing_url/reports/view/{$marker->incident_id}\",";
 
                     $json_item .= "\"icon\": \"\", ";
                     $json_item .= "\"color\": \"".$sharing_color ."\", \n";

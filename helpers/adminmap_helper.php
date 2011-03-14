@@ -17,19 +17,21 @@ class adminmap_helper_Core {
 	/**************************************************************************************************************
       * Given all the parameters returns a list of incidents that meet the search criteria
       */
-	public static function setup_adminmap($map_controller)
+	public static function setup_adminmap($map_controller, $map_view = "adminmap/mapview", $map_css = "adminmap/css/adminmap")		
 	{
+	
 		//set the CSS for this
-		plugin::add_stylesheet("adminmap/css/adminmap");
+		plugin::add_stylesheet($map_css);
 		
 		plugin::add_javascript("adminmap/js/jquery.flot");
 		plugin::add_javascript("adminmap/js/excanvas.min");
 		plugin::add_javascript("adminmap/js/timeline");
+
 		
-		$map_controller->template->content = new View('adminmap/mapview');
+		$map_controller->template->content = new View($map_view);
+		
 		// Get Default Color
 		$map_controller->template->content->default_map_all = Kohana::config('settings.default_map_all');
-
 	}
 	
 	
@@ -69,18 +71,19 @@ class adminmap_helper_Core {
 	/*
 	* this makes the map for this plugin
 	*/
-	public static function set_map($map_controller, $json_url, $javascript_view = 'adminmap/mapview_js')
+	public static function set_map($template, $themes, $json_url, $json_timeline_url, $javascript_view = 'adminmap/mapview_js',
+							$div_map_view = 'adminmap/main_map', $div_timeline_view = 'adminmap/main_timeline')
 	{
 	
 		////////////////////////////////////////////////////////////////Map and Slider Blocks////////////////////////////////////////////////////////////////////////////
-		$div_map = new View('adminmap/main_map');
-		$div_timeline = new View('adminmap/main_timeline');
+		$div_map = new View($div_map_view);
+		$div_timeline = new View($div_timeline_view);
 			// Filter::map_main - Modify Main Map Block
 			Event::run('ushahidi_filter.map_main', $div_map);
 			// Filter::map_timeline - Modify Main Map Block
 			Event::run('ushahidi_filter.map_timeline', $div_timeline);
-		$map_controller->template->content->div_map = $div_map;
-		$map_controller->template->content->div_timeline = $div_timeline;
+		$template->content->div_map = $div_map;
+		$template->content->div_timeline = $div_timeline;
 
 	
 		///////////////////////////////////////////////////////////////SETUP THE DATES////////////////////////////////////////////////////////////////////////////
@@ -154,16 +157,25 @@ class adminmap_helper_Core {
 		Event::run('ushahidi_filter.startDate', $startDate);
 		Event::run('ushahidi_filter.endDate', $endDate);	
 		
-		$map_controller->template->content->div_timeline->startDate = $startDate;
-		$map_controller->template->content->div_timeline->endDate = $endDate;
+		$template->content->div_timeline->startDate = $startDate;
+		$template->content->div_timeline->endDate = $endDate;
 
 		///////////////////////////////////////////////////////////////MAP JAVA SCRIPT////////////////////////////////////////////////////////////////////////////
 		
 		//turn the map on, also turn on the timeline
-		//$map_controller->template->flot_enabled = TRUE; //this is done using our own custom .js files in the adminmap/js folder.
-		$map_controller->template->map_enabled = TRUE;
-		$map_controller->template->js->default_map = Kohana::config('settings.default_map');
-		$map_controller->template->js->default_zoom = Kohana::config('settings.default_zoom');
+		//$template->flot_enabled = TRUE; //this is done using our own custom .js files in the adminmap/js folder.
+		$themes->map_enabled = true;
+		
+		//check if we're on the front end, if we are then the template and themese will be different
+		if($themes != $template)
+		{
+			$themes->main_page = true;
+		}
+		
+		$themes->js = new View($javascript_view);
+		$themes->js->default_map = Kohana::config('settings.default_map');
+		$themes->js->default_zoom = Kohana::config('settings.default_zoom');
+		
 
 		// Map Settings
 		$clustering = Kohana::config('settings.allow_clustering');
@@ -183,37 +195,38 @@ class adminmap_helper_Core {
 		$lonTo = Kohana::config('map.lonTo');
 		$latTo = Kohana::config('map.latTo');
 
-		$map_controller->template->js = new View($javascript_view);
-		$map_controller->template->js->json_url = $json_url;
-		$map_controller->template->js->marker_radius =
+		
+		$themes->js->json_url = $json_url;
+		$themes->js->json_timeline_url  = $json_timeline_url;
+		$themes->js->marker_radius =
 			($marker_radius >=1 && $marker_radius <= 10 ) ? $marker_radius : 5;
-		$map_controller->template->js->marker_opacity =
+		$themes->js->marker_opacity =
 			($marker_opacity >=1 && $marker_opacity <= 10 )
 			? $marker_opacity * 0.1  : 0.9;
-		$map_controller->template->js->marker_stroke_width =
+		$themes->js->marker_stroke_width =
 			($marker_stroke_width >=1 && $marker_stroke_width <= 5 ) ? $marker_stroke_width : 2;
-		$map_controller->template->js->marker_stroke_opacity =
+		$themes->js->marker_stroke_opacity =
 			($marker_stroke_opacity >=1 && $marker_stroke_opacity <= 10 )
 			? $marker_stroke_opacity * 0.1  : 0.9;
 
 		// pdestefanis - allows to restrict the number of zoomlevels available
-		$map_controller->template->js->numZoomLevels = $numZoomLevels;
-		$map_controller->template->js->minZoomLevel = $minZoomLevel;
-		$map_controller->template->js->maxZoomLevel = $maxZoomLevel;
+		$themes->js->numZoomLevels = $numZoomLevels;
+		$themes->js->minZoomLevel = $minZoomLevel;
+		$themes->js->maxZoomLevel = $maxZoomLevel;
 
 		// pdestefanis - allows to limit the extents of the map
-		$map_controller->template->js->lonFrom = $lonFrom;
-		$map_controller->template->js->latFrom = $latFrom;
-		$map_controller->template->js->lonTo = $lonTo;
-		$map_controller->template->js->latTo = $latTo;
+		$themes->js->lonFrom = $lonFrom;
+		$themes->js->latFrom = $latFrom;
+		$themes->js->lonTo = $lonTo;
+		$themes->js->latTo = $latTo;
 
-		$map_controller->template->js->default_map = Kohana::config('settings.default_map');
-		$map_controller->template->js->default_zoom = Kohana::config('settings.default_zoom');
-		$map_controller->template->js->latitude = Kohana::config('settings.default_lat');
-		$map_controller->template->js->longitude = Kohana::config('settings.default_lon');
-		$map_controller->template->js->default_map_all = Kohana::config('settings.default_map_all');
-		$map_controller->template->js->active_startDate = $active_startDate;
-		$map_controller->template->js->active_endDate = $active_endDate;
+		$themes->js->default_map = Kohana::config('settings.default_map');
+		$themes->js->default_zoom = Kohana::config('settings.default_zoom');
+		$themes->js->latitude = Kohana::config('settings.default_lat');
+		$themes->js->longitude = Kohana::config('settings.default_lon');
+		$themes->js->default_map_all = Kohana::config('settings.default_map_all');
+		$themes->js->active_startDate = $active_startDate;
+		$themes->js->active_endDate = $active_endDate;
 		
 
 
@@ -559,9 +572,9 @@ class adminmap_helper_Core {
 					}
 				}
 				
-				//$json_item .= "\"name\":\"" .date("n/j/Y", strtotime($marker->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
+				$json_item .= "\"name\":\"" .date("n/j/Y", strtotime($marker->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
 				//for compatiblity with the InfoWindows plugin
-				$json_item .= "\"link\":\"" .date("n/j/Y", strtotime($marker->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
+				$json_item .= "\"link\":\"" .url::base(). "$edit_report_path{$last_marker->id}\",";
 
 				if (isset($category)) 
 				{
@@ -685,8 +698,9 @@ class adminmap_helper_Core {
 						
 					}
 				}
-				//$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
-				$json_item .= "\"link\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
+				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
+				//compatibility with the InfoWindow Plugin
+				$json_item .= "\"link\":\"" .url::base(). "$edit_report_path{$last_marker->id}\",";
 
 
 				if (isset($category)) 
