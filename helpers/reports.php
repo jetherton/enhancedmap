@@ -347,8 +347,8 @@ class reports_Core {
 			// Retrieve all markers
 			
 			$incidents = ORM::factory('incident')
-				->select('DISTINCT incident.*');
-				//->with('location')
+				->select('DISTINCT incident.*')
+				->with('location');
 				//->join('media', 'incident.id', 'media.incident_id','LEFT');
 			//run code to add in extra joins
 			foreach($joins as $join)
@@ -386,7 +386,7 @@ class reports_Core {
 			{
 				$incidents = ORM::factory('incident')
 					->select('DISTINCT incident.*, COUNT(DISTINCT '.Kohana::config('database.default.table_prefix').'incident.id) as incidents_found' )
-					//->with('location')
+					->with('location')
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					//->join('media', 'incident.id', 'media.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
@@ -422,7 +422,7 @@ class reports_Core {
 					->select('incident.*,  category.category_color as color, category.category_title as category_title, category.id as cat_id, '.
 						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id'.
 						$custom_cat_selects)
-					//->with('location')
+					->with('location')
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id')
 					//->join('media', 'incident.id', 'media.incident_id','LEFT')
