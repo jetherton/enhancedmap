@@ -146,7 +146,7 @@ class Bigmap_reports_Controller extends Main_Controller
 
 	$incidents = reports::get_reports($category_ids,  $approved_text, $location_where. " AND ". $filter, $logical_operator, 
 		"incident.incident_date", "asc",
-		(int) Kohana::config('settings.items_per_page_admin'), $pagination->sql_offset );
+		(int) Kohana::config('settings.items_per_page'), $pagination->sql_offset );
 		
 		
 	
