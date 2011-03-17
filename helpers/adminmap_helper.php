@@ -532,7 +532,7 @@ class adminmap_helper_Core {
 			$approved_text, 
 			$where_text. " ". $extra_where_text, 
 			$logical_operator,
-			"incident.incident_date",
+			"incident.id",
 			"asc",
 			$joins,
 			$custom_category_to_table_mapping);
@@ -1148,7 +1148,7 @@ class adminmap_helper_Core {
 		$approved_text, 
 		$filter. " ". $extra_where_text, 
 		$logical_operator,
-		"incident.incident_date",
+		"incident.id",
 		"asc",
 		$joins,
 		$custom_category_to_table_mapping);        
@@ -1184,34 +1184,39 @@ class adminmap_helper_Core {
 		//Now we try and figure out which category this report was matched to
 		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		if(isset($incident_array["is_parent"]) && $incident_array["is_parent"] != 0) 
+		//if we're looking at all categories don't bother doing all this crazyness
+		if(!$is_all_categories)
 		{
-			//echo $incident->incident_title." parent matched\r\n";
-			$cat_names[$incident->parent_id] = $incident->parent_title;
-			$colors[$incident->parent_id] = $incident->parent_color;
-		}
-		elseif(isset($incident_array["is_child"]) && $incident_array["is_child"] != 0) 
-		{
-			//echo $incident->incident_title." kid matched\r\n";			
-			$cat_names[$incident->cat_id] = $incident->category_title;
-			$colors[$incident->cat_id] = $incident->color;
-		}
-		//now the fun part, loop through all the custom categories
-		foreach($custom_category_to_table_mapping as $name=>$custom_cat)
-		{
-			if(isset($incident_array["is_".$name."_parent"]) && $incident_array["is_".$name."_parent"] != 0) 
+		
+			if(isset($incident_array["is_parent"]) && $incident_array["is_parent"] != 0) 
 			{
-				//echo $incident->incident_title." $name parent matched\r\n";
-				$cat_names[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_title"];
-				$colors[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_color"];
+				//echo $incident->incident_title." parent matched\r\n";
+				$cat_names[$incident->parent_id] = $incident->parent_title;
+				$colors[$incident->parent_id] = $incident->parent_color;
 			}
-			elseif(isset($incident_array["is_".$name."_child"]) && $incident_array["is_".$name."_child"] != 0) 
+			elseif(isset($incident_array["is_child"]) && $incident_array["is_child"] != 0) 
 			{
-				//echo $incident->incident_title." $name kid matched. With color: ".$incident_array[$name."_color"]."\r\n";			
-				$cat_names[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_title"];
-				$colors[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_color"];
+				//echo $incident->incident_title." kid matched\r\n";			
+				$cat_names[$incident->cat_id] = $incident->category_title;
+				$colors[$incident->cat_id] = $incident->color;
 			}
-		}
+			//now the fun part, loop through all the custom categories
+			foreach($custom_category_to_table_mapping as $name=>$custom_cat)
+			{
+				if(isset($incident_array["is_".$name."_parent"]) && $incident_array["is_".$name."_parent"] != 0) 
+				{
+					//echo $incident->incident_title." $name parent matched\r\n";
+					$cat_names[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_title"];
+					$colors[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_color"];
+				}
+				elseif(isset($incident_array["is_".$name."_child"]) && $incident_array["is_".$name."_child"] != 0) 
+				{
+					//echo $incident->incident_title." $name kid matched. With color: ".$incident_array[$name."_color"]."\r\n";			
+					$cat_names[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_title"];
+					$colors[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_color"];
+				}
+			}
+		}//end if not is_all_categories
 		
 	}//end loop
 
