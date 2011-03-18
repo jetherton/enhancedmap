@@ -16,6 +16,9 @@
  */
 ?>
 
+</script>
+
+<script type="text/javascript">
 
             $(function() {
                 $('span[title]').hovertip();
@@ -139,10 +142,13 @@ function mU() {
 
 
 
-
+		
 
 		// Map JS
-		
+		//number of categories selcted
+		var numOfCategoriesSelected = 0;
+		//Max number of categories to show at once, if you have more than 1000 reports with lots of categories you might want to turn this down
+		var maxCategories = 14;
 		// Map Object
 		var map;
 		// Selected Category
@@ -634,6 +640,9 @@ function mU() {
 				
 				//the list of categories we're currently showing
 				currentCat = $("#currentCat").val();
+				numOfCategoriesSelected = currentCat.split(",").length;
+				 
+				 
 				//First we check if the "All Categories" button was pressed. If so unselect everything else
 				if( catID == 0)
 				{
@@ -689,15 +698,23 @@ function mU() {
 					}
 					else //it isn't active so make it active
 					{ 
-						$("#cat_"+catID).addClass("active");
-						
-						//make sure the "all categories" button isn't active
-						currentCat = removeCategoryFilter("0", currentCat);
-						
-						//add this category ID from the list of IDs to show
-						var toAdd = catID+","; //we use , as the delimiter bewteen categories
+						//seems on really big maps with lots of reports we can't do more than 4 categories at a time.
+						if(numOfCategoriesSelected < (maxCategories+1))
+						{
+							$("#cat_"+catID).addClass("active");
+							
+							//make sure the "all categories" button isn't active
+							currentCat = removeCategoryFilter("0", currentCat);
+							
+							//add this category ID from the list of IDs to show
+							var toAdd = catID+","; //we use , as the delimiter bewteen categories
 
-						currentCat = currentCat + toAdd;
+							currentCat = currentCat + toAdd;
+						}
+						else
+						{
+							alert("Sorry, do to the size and complexity of the information on this site we cannot display more than "+maxCategories+" categories at once");
+						}
 					}
 				}
 				
