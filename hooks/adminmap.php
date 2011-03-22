@@ -44,7 +44,7 @@ class adminmap {
 		$menu = "";
 		$menu .= "<li><a href=\"".url::site()."bigmap\" ";
 		$menu .= ($this_page == 'bigmap') ? " class=\"active\"" : "";
-		$menu .= ">Big Map</a></li>";
+		$menu .= ">". Kohana::lang('adminmap.big_map_main_menu_tab')."</a></li>";
 		echo $menu;
 	}
 	
