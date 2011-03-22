@@ -287,7 +287,13 @@ ul.category-filters{
 	margin: 0px;
 	height: 200px;
 	overflow: auto;
+	position: relative;
 }
+
+ul#kml_switch{
+	height: 100px;
+}
+
 
 ul.category-filters li{
     padding: 0;

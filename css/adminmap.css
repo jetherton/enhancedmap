@@ -233,6 +233,7 @@ ul.category-filters{
 	margin-left:0px;
 	overflow:auto;
 	height: 250px;
+	position:relative;
 }
 
 ul.category-filters li{
