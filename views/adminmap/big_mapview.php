@@ -1,3 +1,4 @@
+
 <!-- keep track of what status we're looking at -->
 		<form action="">
 			<input type = "hidden" value="1" name="currentStatus" id="currentStatus">
@@ -7,8 +8,8 @@
 		<!-- right column -->
 		<div id="right" class="clearingfix" >	
 		<div id="right_move" style="border:1px black solid;" onmousedown="mD(this,event)">
-			<strong style="margin-left:10px;" >FILTERS:</strong>
-			<a id="toggleright" onclick="togglelayer('right_colapse', 'toggleright'); return false;" style="border: solid 1px black; marging: 1px; padding: 0px 10px; position:relative; left:160px;" href="#" > 
+			<strong style="margin-left:10px;" ><?php echo Kohana::lang("adminmap.FILTERS"); ?></strong>
+			<a id="toggleright" onclick="togglelayer('right_colapse', 'toggleright'); return false;" style="border: solid 1px black; marging: 1px; padding: 0px 10px; position:relative; float:right;" href="#" > 
 				<strong>-</strong> 
 			</a>
 		</div>
@@ -22,43 +23,25 @@
 				</form>
 				<ul id="status_switch" class="status-filters">
 				
-				<strong>Boolean Operators: </strong>				
+				<strong><?php echo Kohana::lang("adminmap.boolean_operators"); ?></strong>				
 				
 					<li>
 						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
-							<h3>OR</h3>
-							The OR operator allows you to see all the reports that fall under any one of the categories you select.
-							<br/><br/>
-							For example, if you had selected categories A, B, and C, then you would see all the reports that were
-							labeled as falling under category A <strong>or</strong> B <strong>or</strong> C. Some of the reports
-							shown may only fall under category A. Others may only fall under category C. Some may fall under both 
-							category A and B.
-							<br/><br/>
-							When the OR operator is selected, dots will be colored according to the categories they fall under.
-							For example, if you have selected categories A and B, where A is red and B is blue, then those reports 
-							that are only categorized as A will have red dots, and those reports that are only categorized as B will have 
-							blue dots. If a report falls under A and B the two colors - red and blue - will be merged and that report will
-							be shown with a purple dot - the merged color.
+							<h3><?php echo Kohana::lang("adminmap.ORHEADER"); ?></h3>
+							<?php echo Kohana::lang("adminmap.ORBODY"); ?>
 						">What's this?</span></div>
 						<a class="active" id="logicalOperator_1" href="#">							
-							OR
+						<?php echo Kohana::lang("adminmap.OR"); ?>
 						</a>
 					</li>
 					<li>
 						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
-							<h3>AND</h3>
-							The AND operator allows you to see all the reports that fall under all of the categories you select.
-							<br/><br/>
-							For example, if you had selected categories A, B, and C, then you would see all the reports that were
-							labeled as falling under category A <strong>and</strong> B <strong>and</strong> C. 
-							<br/><br/>
-							When the AND operator is selected, dots will be colored according to the categories you have selected.
-							Since every report shown will fall under all of the categories selected, all of the colors of the categories
-							selected will be merged and the dots will have the merged color.
+							<h3><?php echo Kohana::lang("adminmap.ANDHEADER"); ?></h3>
+							<?php echo Kohana::lang("adminmap.ANDBODY"); ?>
 						">What's this?</span></div>
 						
 						<a  id="logicalOperator_2" href="#">
-							<div class="status-title">AND</div>
+							<div class="status-title"><?php echo Kohana::lang("adminmap.AND"); ?></div>
 						</a>
 					</li>
 				</ul>
@@ -71,7 +54,7 @@
 		
 	
 			<ul id="category_switch" class="category-filters">
-				<strong style="text-transform:uppercase;font-size:85%;">Categories: </strong>
+				<strong style="text-transform:uppercase;font-size:85%;"><?php echo Kohana::lang("adminmap.Categories"); ?></strong>
 				<li><a class="active" id="cat_0" href="#"><div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div><div class="category-title"><?php echo Kohana::lang('ui_main.all_categories');?></div></a></li>
 				<?php
 					foreach ($categories as $category => $category_info)
@@ -187,8 +170,8 @@
 				// Map and Timeline Blocks
 				echo '<div id="timeline_holder">
 				<div id="timeline_drag" onmousedown="mD(this,event)"> 
-				<strong style="margin-left:10px">TIME LINE</strong> 
-				<a id="toggletimeline" onclick="togglelayer(\'timeline_colapse\', \'toggletimeline\'); return false;" style="border: solid 1px black; marging: 1px; padding: 0px 10px; position:relative; left:525px;" href="#" > <strong>-</strong> </a>
+				<strong style="margin-left:10px">'.Kohana::lang("adminmap.TIME_LINE").'</strong> 
+				<a id="toggletimeline" onclick="togglelayer(\'timeline_colapse\', \'toggletimeline\'); return false;" style="border: solid 1px black; marging: 1px; padding: 0px 10px; position:relative; float:right;" href="#" > <strong>-</strong> </a>
 				</div>
 				<div id="timeline_colapse">';
 				echo $div_timeline;
