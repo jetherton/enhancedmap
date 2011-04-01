@@ -1,4 +1,4 @@
-This maps shows you all of the reports you are authorized to see. This includes unapproved reports.
+<?php echo Kohana::lang('adminmap.header_info') ?>
 </div> <!--class="bg"-->
 </div> <!--content-->
 </div> <!--holder-->
@@ -14,7 +14,7 @@ This maps shows you all of the reports you are authorized to see. This includes 
 					<input type = "hidden" value="2" name="colorCurrentStatus" id="colorCurrentStatus">
 				</form>
 
-				<strong>Status Filters:</strong>
+				<strong><?php echo Kohana::lang('adminmap.status_filters') ?>:</strong>
 				<ul id="status_switch" class="status-filters">
 					<!-- This was commented out to keep things simple for our users. I hate to cut out functionality,
 					       but we need to be aware of  overloading those who may not be tech savy
@@ -34,7 +34,7 @@ This maps shows you all of the reports you are authorized to see. This includes 
 					<li>
 						<a class="active" id="color_status_1" href="#">
 							<div class="swatch" style="background-color:#000000"></div>
-							<div class="status-title">Show unapproved reports as black</div>
+							<div class="status-title"><?php echo Kohana::lang('adminmap.unapproved_reports') ?></div>
 						</a>
 					</li>
 					
@@ -46,7 +46,7 @@ This maps shows you all of the reports you are authorized to see. This includes 
 
 		       <!-- logic filters -->
 			<div class="stat-filters clearingfix">
-				<strong>Logical Operators:</strong>
+				<strong><?php echo Kohana::lang('adminmap.logical_operators') ?>:</strong>
 				<!-- keep track of what status we're looking at -->
 				<form action="">
 					<input type = "hidden" value="or" name="currentLogicalOperator" id="currentLogicalOperator">
@@ -54,12 +54,12 @@ This maps shows you all of the reports you are authorized to see. This includes 
 				<ul id="status_switch" class="status-filters">
 					<li>
 						<a class="active" id="logicalOperator_1" href="#">							
-							<div class="status-title">OR - <span style="text-transform:none; font-size:85%;">Show all reports that fall under at least one of the categories selected below</span> </div>
+							<div class="status-title"><?php echo Kohana::lang('adminmap.or') ?> - <span style="text-transform:none; font-size:85%;"><?php echo Kohana::lang('adminmap.or_details') ?></span> </div>
 						</a>
 					</li>
 					<li>
 						<a  id="logicalOperator_2" href="#">
-							<div class="status-title">AND - <span style="text-transform:none; font-size:85%;">Show all reports that fall under all of the categories selected below</span></div>
+							<div class="status-title"><?php echo Kohana::lang('adminmap.and') ?> - <span style="text-transform:none; font-size:85%;"><?php echo Kohana::lang('adminmap.and_details') ?></span></div>
 						</a>
 					</li>
 				</ul>
@@ -72,7 +72,7 @@ This maps shows you all of the reports you are authorized to see. This includes 
 				<strong><?php echo strtoupper(Kohana::lang('ui_main.category_filter'));?>: </strong>
 		
 			<ul id="category_switch" class="category-filters">
-				<li><a class="active" id="cat_0" href="#"><div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div><div class="category-title">Show All Reports</div></a></li>
+				<li><a class="active" id="cat_0" href="#"><div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div><div class="category-title"><?php echo Kohana::lang('adminmap.show_all_reports') ?></div></a></li>
 				<?php
 					foreach ($categories as $category => $category_info)
 					{

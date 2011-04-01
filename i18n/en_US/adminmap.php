@@ -28,7 +28,20 @@
 							When the AND operator is selected, dots will be colored according to the categories you have selected.
 							Since every report shown will fall under all of the categories selected, all of the colors of the categories
 							selected will be merged and the dots will have the merged color.',
-	'AND' => 'AND',);
+	'AND' => 'AND',
+
+// Kpetermeni's Entries
+	'header_info' => 'This maps shows you all of the reports you are authorized to see. This includes unapproved reports.',
+	'logical_operators' => 'Logical Operators',
+	'unapproved_reports' => 'Show unapproved reports as black',
+	'status_filters' => 'Status Filters',
+	'or' => 'OR',
+	'and' => 'AND',
+	'or_details' => 'Show all reports that fall under at least one of the categories selected below',
+	'and_details' => 'Show all reports that fall under all of the categories selected below',
+	'show_all_reports' => 'Show All Reports',
+
+);
 	
 	
 	
