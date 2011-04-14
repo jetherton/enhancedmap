@@ -27,8 +27,16 @@ class adminmap {
 		//Just in case we need this
 		Event::add('ushahidi_action.nav_main_top', array($this, '_add_big_map_tab'));	 //adds the big map  tab
 		Event::add('ushahidi_action.map_main_filters', array($this, '_add_big_map_main_button'));	 //adds the big map  tab
+		Event::add('ushahidi_action.nav_admin_main_top', array($this, '_admin_nav_tab'));	 //adds the admin map  tab
 	}
 	
+	
+	public function _admin_nav_tab()
+	{
+		$tabs = Event::$data;
+		$tabs['adminmap'] = Kohana::lang('adminmap.admin_map_main_menu_tab');
+		Event::$data = $tabs;
+	}
 	
 	//adds the "Full Screen Map" button on the main page
 	public function _add_big_map_main_button()

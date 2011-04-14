@@ -3,6 +3,7 @@
 //Special thanks to Carter Draper for his help internationalizing this plugin
 
 	$lang = array(
+	'admin_map_main_menu_tab' => 'Admin Map',
 	'big_map_main_menu_tab' => 'Big Map',
 	'boolean_operators' => 'Boolean Operators:',
 	'FILTERS' => 'FILTERS',
