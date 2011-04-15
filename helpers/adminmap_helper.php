@@ -629,6 +629,15 @@ class adminmap_helper_Core {
 				}
 				$cat_array = array();
 				
+				
+				// Get Incident Geometries
+				$geometry = self::_get_geometry($marker->id, $marker->incident_title, $marker->incident_date);
+				if (count($geometry))
+				{
+					$json_item = implode(",", $geometry);
+					array_push($json_array, $json_item);
+				}
+				
 				//reset the variables
 				$cat_names = array();
 				$colors = array();
@@ -1035,6 +1044,7 @@ class adminmap_helper_Core {
         $json = "";
         $json_item = "";
         $json_array = array();
+	$geometry_array = array();
 
         $color = Kohana::config('settings.default_map_all');
 	$default_color = Kohana::config('settings.default_map_all');
@@ -1171,6 +1181,16 @@ class adminmap_helper_Core {
 								"colors"=>$colors, 
 								"cat_names"=>$cat_names);
 			array_push($markers, $incident_info);
+			
+			// Get Incident Geometries
+			//$geometry = $this->_get_geometry($incident['id'], $incident['incident_title'], $incident['incident_date']);
+			$geometry = self::_get_geometry($last_incident->id, $last_incident->incident_title, $last_incident->incident_date);
+			if (count($geometry))
+			{
+				$json_item = implode(",", $geometry);
+				array_push($geometry_array, $json_item);
+			}
+			
 			//reset the arrays
 			$cat_names = array();
 			$colors = array();
@@ -1507,6 +1527,10 @@ class adminmap_helper_Core {
         }
 
         $json = implode(",", $json_array);
+	if (count($geometry_array))
+	{
+		$json = implode(",", $geometry_array).",".$json;
+	}
 
         header('Content-type: application/json');
         $controller->template->json = $json;
@@ -1655,7 +1679,65 @@ class adminmap_helper_Core {
   
   
   
-  
+  /**
+	 * Get Geometry JSON
+	 * @param int $incident_id
+	 * @param string $incident_title
+	 * @param int $incident_date
+	 * @return array $geometry
+	 */
+	private static function _get_geometry($incident_id, $incident_title, $incident_date)
+	{
+		$geometry = array();
+		if ($incident_id)
+		{
+			$db = new Database();
+			// Get Incident Geometries via SQL query as ORM can't handle Spatial Data
+			$sql = "SELECT id, AsText(geometry) as geometry, geometry_label, 
+				geometry_comment, geometry_color, geometry_strokewidth FROM ".self::$table_prefix."geometry 
+				WHERE incident_id=".$incident_id;
+			$query = $db->query($sql);
+			$wkt = new Wkt();
+
+			foreach ( $query as $item )
+			{
+				$geom = $wkt->read($item->geometry);
+				$geom_array = $geom->getGeoInterface();
+
+				$json_item = "{";
+				$json_item .= "\"type\":\"Feature\",";
+				$json_item .= "\"properties\": {";
+				$json_item .= "\"id\": \"".$incident_id."\", ";
+				$json_item .= "\"feature_id\": \"".$item->id."\", ";
+
+				$title = ($item->geometry_label) ? 
+					utf8tohtml::convert($item->geometry_label,TRUE) : 
+					utf8tohtml::convert($incident_title,TRUE);
+					
+				$fillcolor = ($item->geometry_color) ? 
+					utf8tohtml::convert($item->geometry_color,TRUE) : "ffcc66";
+					
+				$strokecolor = ($item->geometry_color) ? 
+					utf8tohtml::convert($item->geometry_color,TRUE) : "CC0000";
+					
+				$strokewidth = ($item->geometry_strokewidth) ? $item->geometry_strokewidth : "3";
+
+				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . "reports/view/" . $incident_id . "'>".$title."</a>")) . "\",";
+
+				$json_item .= "\"description\": \"" . utf8tohtml::convert($item->geometry_comment,TRUE) . "\", ";
+				$json_item .= "\"color\": \"" . $fillcolor . "\", ";
+				$json_item .= "\"strokecolor\": \"" . $strokecolor . "\", ";
+				$json_item .= "\"strokewidth\": \"" . $strokewidth . "\", ";
+				$json_item .= "\"link\": \"".url::base()."reports/view/".$incident_id."\", ";
+				$json_item .= "\"category\":[0], ";
+				$json_item .= "\"timestamp\": \"" . strtotime($incident_date) . "\"";
+				$json_item .= "},\"geometry\":".json_encode($geom_array)."}";
+				$geometry[] = $json_item;
+			}
+		}
+		
+		return $geometry;
+	}
   
   
   
