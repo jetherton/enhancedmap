@@ -404,7 +404,7 @@
 		{
 			// Set Feature Styles
 			style = new OpenLayers.Style({
-				//'externalGraphic': "${icon}",
+				'externalGraphic': "${icon}",
 				'graphicTitle': "${cluster_count}",
 				pointRadius: "${radius}",
 				fillColor: "${color}",
@@ -584,7 +584,7 @@
 						feature_icon = feature.attributes.icon;
 						if (feature_icon!=="")
 						{
-							return baseUrl + feature_icon;
+							return baseUrl + 'media/img/openlayers/marker.png';
 						} 
 						else
 						{
