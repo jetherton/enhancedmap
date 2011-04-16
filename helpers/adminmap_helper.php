@@ -1182,8 +1182,7 @@ class adminmap_helper_Core {
 								"cat_names"=>$cat_names);
 			array_push($markers, $incident_info);
 			
-			// Get Incident Geometries
-			//$geometry = $this->_get_geometry($incident['id'], $incident['incident_title'], $incident['incident_date']);
+			// Get Incident Geometries			
 			$geometry = self::_get_geometry($last_incident->id, $last_incident->incident_title, $last_incident->incident_date);
 			if (count($geometry))
 			{
@@ -1246,6 +1245,14 @@ class adminmap_helper_Core {
 		//echo "last one ".$last_incident->incident_title."\n\r".Kohana::debug($cat_names)."\r\n\r\n";
 		$incident_info = array("incident" => $last_incident, "colors"=>$colors, "cat_names"=>$cat_names);
 		array_push($markers, $incident_info);
+		
+		// Get Incident Geometries			
+		$geometry = self::_get_geometry($last_incident->id, $last_incident->incident_title, $last_incident->incident_date);
+		if (count($geometry))
+		{
+			$json_item = implode(",", $geometry);
+			array_push($geometry_array, $json_item);
+		}
 	}
 
 	//echo "___________________________________________________\r\n";
