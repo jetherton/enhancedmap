@@ -631,7 +631,7 @@ class adminmap_helper_Core {
 				
 				
 				// Get Incident Geometries
-				$geometry = self::_get_geometry($marker->id, $marker->incident_title, $marker->incident_date);
+				$geometry = self::_get_geometry($marker->id, $marker->incident_title, $marker->incident_date, $on_the_back_end);
 				if (count($geometry))
 				{
 					$json_item = implode(",", $geometry);
@@ -1183,7 +1183,7 @@ class adminmap_helper_Core {
 			array_push($markers, $incident_info);
 			
 			// Get Incident Geometries			
-			$geometry = self::_get_geometry($last_incident->id, $last_incident->incident_title, $last_incident->incident_date);
+			$geometry = self::_get_geometry($last_incident->id, $last_incident->incident_title, $last_incident->incident_date, $on_the_back_end);
 			if (count($geometry))
 			{
 				$json_item = implode(",", $geometry);
@@ -1247,7 +1247,7 @@ class adminmap_helper_Core {
 		array_push($markers, $incident_info);
 		
 		// Get Incident Geometries			
-		$geometry = self::_get_geometry($last_incident->id, $last_incident->incident_title, $last_incident->incident_date);
+		$geometry = self::_get_geometry($last_incident->id, $last_incident->incident_title, $last_incident->incident_date, $on_the_back_end);
 		if (count($geometry))
 		{
 			$json_item = implode(",", $geometry);
@@ -1693,7 +1693,7 @@ class adminmap_helper_Core {
 	 * @param int $incident_date
 	 * @return array $geometry
 	 */
-	private static function _get_geometry($incident_id, $incident_title, $incident_date)
+	private static function _get_geometry($incident_id, $incident_title, $incident_date, $on_the_back_end)
 	{
 		$geometry = array();
 		if ($incident_id)
@@ -1729,7 +1729,14 @@ class adminmap_helper_Core {
 					
 				$strokewidth = ($item->geometry_strokewidth) ? $item->geometry_strokewidth : "3";
 
-				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . "reports/view/" . $incident_id . "'>".$title."</a>")) . "\",";
+				if($on_the_back_end)
+				{
+					$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . "admin/reports/edit/" . $incident_id . "'>".$title."</a>")) . "\",";
+				}
+				else
+				{
+					$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . "reports/view/" . $incident_id . "'>".$title."</a>")) . "\",";
+				}
 
 				$json_item .= "\"description\": \"" . utf8tohtml::convert($item->geometry_comment,TRUE) . "\", ";
 				$json_item .= "\"color\": \"" . $fillcolor . "\", ";
