@@ -588,18 +588,21 @@ class adminmap_helper_Core {
 				//check if it's a unapproved/unactive report
 				if($last_marker->incident_active == 0 && $color_unapproved==2)
 				{
+					$item_color = "000000";
 					$json_item .= "\"color\": \"000000\", \n";
 					$json_item .= "\"icon\": \"".$icon."\", \n";
 				}
 				//check if we're looking at all categories
 				elseif(count($category_ids) == 0 || $category_ids[0] == '0')
-				{					
+				{	
+					$item_color = $default_color;
 					$json_item .= "\"color\": \"".$default_color."\", \n";
 					$json_item .= "\"icon\": \"".$icon."\", \n";
 				}
 				//check if we're using AND
 				elseif($logical_operator=="and")
 				{					
+					$item_color = $color;
 					$json_item .= "\"color\": \"".$color."\", \n";
 					$json_item .= "\"icon\": \"".$icon."\", \n";
 				}
@@ -607,6 +610,7 @@ class adminmap_helper_Core {
 				else
 				{
 					$color = self::merge_colors_for_dots($colors);
+					$item_color = $color;
 					$json_item .= "\"color\": \"".$color."\", \n";
 					$json_item .= "\"icon\": \"".$icon."\", \n";
 				}
@@ -619,24 +623,28 @@ class adminmap_helper_Core {
 				$json_item .= "}";
 				$json_item .= "}";
 
-				if ($last_marker->id == $incident_id)
-				{
-					$json_item_first = $json_item;
-				}
-				else
-				{
-					array_push($json_array, $json_item);
-				}
-				$cat_array = array();
 				
-				
-				// Get Incident Geometries
-				$geometry = self::_get_geometry($marker->id, $marker->incident_title, $marker->incident_date, $on_the_back_end);
+								// Get Incident Geometries				
+				$geometry = self::_get_geometry($last_marker->id, $last_marker->incident_title, $last_marker->incident_date, $on_the_back_end, $item_color);
 				if (count($geometry))
 				{
 					$json_item = implode(",", $geometry);
 					array_push($json_array, $json_item);
 				}
+				else //if there are markers then don't draw the central dot, it's just an aproximation
+				{
+					if ($last_marker->id == $incident_id)
+					{
+						$json_item_first = $json_item;
+					}
+					else
+					{
+						array_push($json_array, $json_item);
+					}
+				}
+				$cat_array = array();
+				
+				
 				
 				//reset the variables
 				$cat_names = array();
@@ -724,18 +732,21 @@ class adminmap_helper_Core {
 				//check if it's a unapproved/unactive report
 				if($last_marker->incident_active == 0 && $color_unapproved==2)
 				{
+					$item_color = "000000";
 					$json_item .= "\"color\": \"000000\", \n";
 					$json_item .= "\"icon\": \"".$icon."\", \n";
 				}
 				//check if we're looking at all categories
 				elseif(count($category_ids) == 0 || $category_ids[0] == '0')
-				{					
+				{	
+					$item_color = $default_color;
 					$json_item .= "\"color\": \"".$default_color."\", \n";
 					$json_item .= "\"icon\": \"".$icon."\", \n";
 				}
 								//check if we're using AND
 				elseif($logical_operator=="and")
 				{					
+					$item_color = $color;
 					$json_item .= "\"color\": \"".$color."\", \n";
 					$json_item .= "\"icon\": \"".$icon."\", \n";
 				}
@@ -743,6 +754,7 @@ class adminmap_helper_Core {
 				else
 				{
 					$color = self::merge_colors_for_dots($colors);
+					$item_color = $color;
 					$json_item .= "\"color\": \"".$color."\", \n";
 					$json_item .= "\"icon\": \"".$icon."\", \n";
 				}
@@ -754,16 +766,27 @@ class adminmap_helper_Core {
 				$json_item .= "\"coordinates\":[" . $last_marker->location->longitude . ", " . $last_marker->location->latitude . "]";
 				$json_item .= "}";
 				$json_item .= "}";
-
-				if ($last_marker->id == $incident_id)
+				
+				// Get Incident Geometries				
+				$geometry = self::_get_geometry($last_marker->id, $last_marker->incident_title, $last_marker->incident_date, $on_the_back_end, $item_color);
+				if (count($geometry))
 				{
-					$json_item_first = $json_item;
-				}
-				else
-				{
+					$json_item = implode(",", $geometry);
 					array_push($json_array, $json_item);
 				}
+				else //if there are markers then don't draw the central dot, it's just an aproximation 
+				{
+					if ($last_marker->id == $incident_id)
+					{
+						$json_item_first = $json_item;
+					}
+					else
+					{
+						array_push($json_array, $json_item);
+				}
+				}
 				$cat_array = array();
+				
 				
 		}//end catching the last one
 		
@@ -1105,9 +1128,17 @@ class adminmap_helper_Core {
         // Category ID
 	$is_all_categories = false;
 	$category_ids=array();
-        if( isset($_GET['c']) AND ! empty($_GET['c']) )
+    if( isset($_GET['c']) AND ! empty($_GET['c']) )
 	{
-		$category_ids = explode(",", $_GET['c'],-1); //get rid of that trailing ";"
+		//check if there are any ',' in the category
+		if((strpos($_GET['c'], ",")===false) && is_numeric($_GET['c']))
+		{
+			$category_ids = array($_GET['c']);	
+		}
+		else
+		{
+			$category_ids = explode(",", $_GET['c'],-1); //get rid of that trailing ";"
+		}
 	}
 	else
 	{
@@ -1182,13 +1213,6 @@ class adminmap_helper_Core {
 								"cat_names"=>$cat_names);
 			array_push($markers, $incident_info);
 			
-			// Get Incident Geometries			
-			$geometry = self::_get_geometry($last_incident->id, $last_incident->incident_title, $last_incident->incident_date, $on_the_back_end);
-			if (count($geometry))
-			{
-				$json_item = implode(",", $geometry);
-				array_push($geometry_array, $json_item);
-			}
 			
 			//reset the arrays
 			$cat_names = array();
@@ -1245,14 +1269,6 @@ class adminmap_helper_Core {
 		//echo "last one ".$last_incident->incident_title."\n\r".Kohana::debug($cat_names)."\r\n\r\n";
 		$incident_info = array("incident" => $last_incident, "colors"=>$colors, "cat_names"=>$cat_names);
 		array_push($markers, $incident_info);
-		
-		// Get Incident Geometries			
-		$geometry = self::_get_geometry($last_incident->id, $last_incident->incident_title, $last_incident->incident_date, $on_the_back_end);
-		if (count($geometry))
-		{
-			$json_item = implode(",", $geometry);
-			array_push($geometry_array, $json_item);
-		}
 	}
 
 	//echo "___________________________________________________\r\n";
@@ -1263,11 +1279,13 @@ class adminmap_helper_Core {
         // Loop until all markers have been compared
         while (count($markers))
         {
-            $marker_info  = array_pop($markers);
+        
+        	$marker_info  = array_pop($markers);
 	    
-	    $colors = $marker_info["colors"];
-	    $cat_names = $marker_info["cat_names"];
-	    $marker = $marker_info["incident"];
+	    
+        	$colors = $marker_info["colors"];	    
+        	$cat_names = $marker_info["cat_names"];	    
+        	$marker = $marker_info["incident"];
 	    
 	    
 		//echo "\r\nLooking for clusters around ". $marker->incident_title. "\r\n";
@@ -1282,101 +1300,155 @@ class adminmap_helper_Core {
             // Compare marker against all remaining markers.
             foreach ($markers as $key => $target_info)
             {
-		$target_colors = $target_info["colors"];
-		$target_cat_names = $target_info["cat_names"];
-		$target = $target_info["incident"];
-	    
-		
-		
-                
-		$pixels = abs($marker->location->longitude - $target->location->longitude) + abs($marker->location->latitude - $target->location->latitude);
+				$target_colors = $target_info["colors"];
+				$target_cat_names = $target_info["cat_names"];
+				$target = $target_info["incident"];
+			    
+				
+				
+		                
+				$pixels = abs($marker->location->longitude - $target->location->longitude) + abs($marker->location->latitude - $target->location->latitude);
 
                 // If two markers are closer than defined distance, remove compareMarker from array and add to cluster.
                 if ($pixels < $distance)
                 {
-			//echo "\tFound cluster match with ". $target->incident_title. "\r\n";
+					//echo "\tFound cluster match with ". $target->incident_title. "\r\n";
                     unset($markers[$key]);
-                    $cluster[] = $target;
-		    //check if the colors and category names have been accounted for
-		    if(!$is_all_categories)
-		    {
-			    foreach($target_colors as $cat_id => $target_color)
-			    {
-				//echo "\t\t".$target->incident_title. " has category: ".$target_cat_names[$cat_id]."\r\n";
-				//colors
-				$category_colors[$cat_id] = $target_color;
-				//name
-				$category_names[$cat_id] = $target_cat_names[$cat_id];
-				//count
-				if(isset($category_count[$cat_id]))
-				{
-					$category_count[$cat_id] = $category_count[$cat_id] + 1;
-				}
-				else
-				{
-					$category_count[$cat_id] = 1;
-				}
-				
-			    }//end loop
-		    } //end if
-		    //check if this is a unapproved report
-		    if($target->incident_active == 0)
-		    {
-			$contains_nonactive = true;
-		    }
+                    
+                    
+	                // Get Incident Geometries
+	            	// are we using all categories red, or a specific blend of colors and goodness?
+	            	$geo_color = $is_all_categories ||  $logical_operator=="and" ? $color : self::merge_colors_for_dots($target_colors);
+					$geometry = self::_get_geometry($target->id, 
+						$target->incident_title, 
+						$target->incident_date, 
+						$on_the_back_end, 
+						$geo_color);
+					if (count($geometry))
+					{
+						$json_item = implode(",", $geometry);
+						array_push($geometry_array, $json_item);
+					}
+					else // we don't want any average markers, just the orignals
+					{
+						$cluster[] = $target;
+					}
+                    
+                    
+				    //check if the colors and category names have been accounted for
+				    if(!$is_all_categories)
+				    {
+					    foreach($target_colors as $cat_id => $target_color)
+					    {
+							//echo "\t\t".$target->incident_title. " has category: ".$target_cat_names[$cat_id]."\r\n";
+							//colors
+							$category_colors[$cat_id] = $target_color;
+							//name
+							$category_names[$cat_id] = $target_cat_names[$cat_id];
+							//count
+							if(isset($category_count[$cat_id]))
+							{
+								$category_count[$cat_id] = $category_count[$cat_id] + 1;
+							}
+							else
+							{
+								$category_count[$cat_id] = 1;
+							}
+							
+					    }//end loop
+				    } //end if
+				    //check if this is a unapproved report
+				    if($target->incident_active == 0)
+				    {
+						$contains_nonactive = true;
+				    }
                 }
             }
             // If a marker was added to cluster, also add the marker we were comparing to.
             if (count($cluster) > 0)
             {
-                $cluster[] = $marker;
-                
-		//check if the colors and category names have been accounted for
-		    if(!$is_all_categories)
-		    {
-			foreach($colors as $cat_id2 => $marker_color)
-			    {
-				//echo "\t\t".$marker->incident_title. " has category: ".$cat_names[$cat_id2]."\r\n";
-				//colors
-				$category_colors[$cat_id2] = $marker_color;
-				//name
-				$category_names[$cat_id2] = $cat_names[$cat_id2];
-				//count
-				if(isset($category_count[$cat_id2]))
+				// Get Incident Geometries
+				// are we using all categories red, or a specific blend of colors and goodness?
+				$geo_color = $is_all_categories ||  $logical_operator=="and" ? $color : self::merge_colors_for_dots($colors);
+				$geometry = self::_get_geometry($marker->id, 
+					$marker->incident_title, 
+					$marker->incident_date, 
+					$on_the_back_end, 
+					$geo_color);
+				if (count($geometry))
 				{
-					$category_count[$cat_id2] = $category_count[$cat_id2] + 1;
+					$json_item = implode(",", $geometry);
+					array_push($geometry_array, $json_item);
 				}
 				else
 				{
-					$category_count[$cat_id2] = 1;
+					$cluster[] = $marker;
 				}
-			    }//end loop
-		    }//end if   
+                
+                
+                
+                
+				//check if the colors and category names have been accounted for
+			    if(!$is_all_categories)
+			    {
+					foreach($colors as $cat_id2 => $marker_color)
+				    {
+						//echo "\t\t".$marker->incident_title. " has category: ".$cat_names[$cat_id2]."\r\n";
+						//colors
+						$category_colors[$cat_id2] = $marker_color;
+						//name
+						$category_names[$cat_id2] = $cat_names[$cat_id2];
+						//count
+						if(isset($category_count[$cat_id2]))
+						{
+							$category_count[$cat_id2] = $category_count[$cat_id2] + 1;
+						}
+						else
+						{
+							$category_count[$cat_id2] = 1;
+						}
+					}//end loop
+			    }//end if   
 		
 		
-		
-		//check if this is a unapproved report
-		    if($marker->incident_active == 0)
-		    {
-			$contains_nonactive = true;
-		    }
-		    
-		if($contains_nonactive)
-		{
-		
-			$clusters[] = array( 'contains_nonactive' => TRUE, 'cluster'=> $cluster, 'category_count'=>$category_count,
-				'category_names'=>$category_names, 'category_colors'=>$category_colors);
-		}
-		else
-		{			
-			$clusters[] = array( 'contains_nonactive' => FALSE, 'cluster'=> $cluster, 'category_count'=>$category_count,
-				'category_names'=>$category_names, 'category_colors'=>$category_colors);
-		}
+			
+				//check if this is a unapproved report
+			    if($marker->incident_active == 0)
+			    {
+				$contains_nonactive = true;
+			    }
+			    
+				if($contains_nonactive)
+				{
+				
+					$clusters[] = array( 'contains_nonactive' => TRUE, 'cluster'=> $cluster, 'category_count'=>$category_count,
+						'category_names'=>$category_names, 'category_colors'=>$category_colors);
+				}
+				else
+				{			
+					$clusters[] = array( 'contains_nonactive' => FALSE, 'cluster'=> $cluster, 'category_count'=>$category_count,
+						'category_names'=>$category_names, 'category_colors'=>$category_colors);
+				}
             }
             else
             {
-		//echo "putting in single ". $marker_info["incident"]->incident_title."\n\r".Kohana::debug($marker_info["cat_names"])."\r\n\r\n";
-                $singles[] = $marker_info;
+            	// Get Incident Geometries
+            	// are we using all categories red, or a specific blend of colors and goodness?            	
+            	$geo_color = $is_all_categories ||  $logical_operator=="and" ? $color : self::merge_colors_for_dots($marker_info["colors"]);
+				$geometry = self::_get_geometry($marker_info["incident"]->id, 
+					$marker_info["incident"]->incident_title, 
+					$marker_info["incident"]->incident_date, 
+					$on_the_back_end, 
+					$geo_color);
+				if (count($geometry))
+				{
+					$json_item = implode(",", $geometry);
+					array_push($geometry_array, $json_item);
+				}
+				else //if there are markers we don't want any average dots, we just want original dots
+				{
+					$singles[] = $marker_info;
+				}
             }
         }
 
@@ -1693,7 +1765,7 @@ class adminmap_helper_Core {
 	 * @param int $incident_date
 	 * @return array $geometry
 	 */
-	private static function _get_geometry($incident_id, $incident_title, $incident_date, $on_the_back_end)
+	private static function _get_geometry($incident_id, $incident_title, $incident_date, $on_the_back_end, $color)
 	{
 		$geometry = array();
 		if ($incident_id)
@@ -1722,10 +1794,10 @@ class adminmap_helper_Core {
 					utf8tohtml::convert($incident_title,TRUE);
 					
 				$fillcolor = ($item->geometry_color) ? 
-					utf8tohtml::convert($item->geometry_color,TRUE) : "ffcc66";
+					utf8tohtml::convert($item->geometry_color,TRUE) : $color;
 					
 				$strokecolor = ($item->geometry_color) ? 
-					utf8tohtml::convert($item->geometry_color,TRUE) : "CC0000";
+					utf8tohtml::convert($item->geometry_color,TRUE) : $color;
 					
 				$strokewidth = ($item->geometry_strokewidth) ? $item->geometry_strokewidth : "3";
 

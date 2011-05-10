@@ -584,7 +584,8 @@
 						feature_icon = feature.attributes.icon;
 						if (feature_icon!=="")
 						{
-							return baseUrl + 'media/img/openlayers/marker.png';
+							//return baseUrl + 'media/img/openlayers/marker.png'; //we don't like markers, we like dots
+							return "";
 						} 
 						else
 						{
