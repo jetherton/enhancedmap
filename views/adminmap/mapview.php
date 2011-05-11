@@ -131,6 +131,7 @@
 					<strong><?php echo Kohana::lang('ui_main.layers_filter');?> <span>[<a href="javascript:toggleLayer('kml_switch_link', 'kml_switch')" id="kml_switch_link"><?php echo Kohana::lang('ui_main.show'); ?></a>]</span></strong>
 				</div>
 				<br/>
+				&nbsp;
 				<ul id="kml_switch" class="category-filters" style="display:hidden;">
 					<?php
 					foreach ($layers as $layer => $layer_info)
