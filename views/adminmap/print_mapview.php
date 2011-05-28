@@ -183,8 +183,8 @@ For best results make sure that  "Print Background (Colors &amp; Images)" is tur
 			<strong>ORIENTATION</strong>
 			<div id="orientation" class="menuItem">					
 				<form>
-					<input type="radio" name="orientation" value="portrait" checked onchange="changeOrientation('portrait'); return false;" /> Portrait<br />
-					<input type="radio" name="orientation" value="landscape" onchange="changeOrientation('landscape'); return false;"/> Landscape
+					<input type="radio" id="orientation_portrait" name="orientation" value="portrait" checked onchange="changeOrientation('portrait'); return false;" /> Portrait<br />
+					<input type="radio" id="orientation_landscape" name="orientation" value="landscape" onchange="changeOrientation('landscape'); return false;"/> Landscape
 				</form>
 			</div>
 			<!-- /Orientation chooser -->

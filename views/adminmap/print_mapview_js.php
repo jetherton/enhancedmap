@@ -65,6 +65,15 @@ function setURL()
 	{
 		$.address.parameter("bottom","1");
 	}
+	
+	if($("#printpage").hasClass("landscape"))
+	{
+		$.address.parameter("orientation", "landscape");
+	}
+	else
+	{
+		$.address.parameter("orientation", "portrait");
+	}
 			
 	$.address.parameter("currStatus", currentStatus);
 	$.address.parameter("currColorStatus", colorCurrentStatus);
@@ -1244,6 +1253,20 @@ function changeTopBottom(direction)
 				$("#key").addClass("bottom");
 				$("#bottomPlacement").attr("checked","checked");
 			}
+			
+			if($.address.parameter("orientation") != null)
+			{
+				var orientation = $.address.parameter("orientation");
+				if(orientation == "landscape")
+				{
+					$("#orientation_landscape").trigger("change");
+				}
+				else
+				{
+					$("#orientation_portrait").trigger("change");
+				}
+			}
+			
 			
 			
 			$.get("<?php echo url::site(); ?>printmapkey/getKey/" + 
