@@ -45,25 +45,45 @@ function setURL()
 	{
 		$.address.parameter("hk","1");
 	}
+	else
+	{
+		$.address.parameter("hk","");
+	}
 	
 	if($("#key").hasClass("left"))
 	{
 		$.address.parameter("left","1");
+	}
+	else
+	{
+			$.address.parameter("left","");
 	}
 	
 	if($("#key").hasClass("right"))
 	{
 		$.address.parameter("right","1");
 	}
+	else
+	{
+		$.address.parameter("right","");
+	}
 	
 	if($("#key").hasClass("top"))
 	{
 		$.address.parameter("top","1");
 	}
+	else
+	{
+		$.address.parameter("top","");
+	}
 	
 	if($("#key").hasClass("bottom"))
 	{
 		$.address.parameter("bottom","1");
+	}
+	else
+	{
+			$.address.parameter("bottom","");
 	}
 	
 	if($("#printpage").hasClass("landscape"))
@@ -1229,7 +1249,14 @@ function changeTopBottom(direction)
 			if($.address.parameter("logic") != null)
 			{
 				var logic = $.address.parameter("logic")
-				$("#logicalOperator_"+logic).trigger("click");
+				if(logic == "and")
+				{
+					$("#logicalOperator_1").trigger("click");
+				}
+				else if (logic == "or")
+				{
+					$("#logicalOperator_2").trigger("click");
+				}
 			}
 			
 			if($.address.parameter("catId") != null)

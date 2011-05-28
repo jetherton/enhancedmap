@@ -36,7 +36,7 @@ class Printmapkey_Controller extends Controller {
 		//do the categories
 		//check if we're dealing with all categories
 		$categories = array();
-		if($catIds == "" || $catIds == "0" || $catIds == "0," || $catIds == "undefined" || (!is_numeric($catIds)))
+		if($catIds == "" || $catIds == "0" || $catIds == "0," || $catIds == "undefined" )
 		{
 			$cat = ORM::factory("category");
 			$cat->category_title = Kohana::lang('ui_main.all_categories');
