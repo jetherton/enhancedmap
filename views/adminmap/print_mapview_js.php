@@ -237,6 +237,7 @@ function changeTopBottom(direction)
 		
 
 		// Map JS
+		var canRedrawMapKey = false;
 		//number of categories selcted
 		var numOfCategoriesSelected = 0;
 		//Max number of categories to show at once, if you have more than 1000 reports with lots of categories you might want to turn this down
@@ -306,11 +307,15 @@ function changeTopBottom(direction)
 			{startDate = "1";}
 			if(endDate == "")
 			{endDate = "1";}
-			$.get("<?php echo url::site(); ?>printmapkey/getKey/" + catID + "/" + currLogicalOperator + "/" + startDate + "/" + endDate,
-				function(data){
-					$("#key").html(data);					
-										
-			});
+			//a poor man's attempt at thread safety
+			if(canRedrawMapKey)
+			{
+				$.get("<?php echo url::site(); ?>printmapkey/getKey/" + catID + "/" + currLogicalOperator + "/" + startDate + "/" + endDate,
+					function(data){
+						$("#key").html(data);					
+											
+				});
+			}
 			
 			return $.timeline({categoryId: catID,
 			                   startTime: new Date(startDate * 1000),
@@ -1351,7 +1356,8 @@ function changeTopBottom(direction)
 				$("#endDate").val(),
 				
 				function(data){
-					$("#key").html(data);					
+					$("#key").html(data);
+					canRedrawMapKey = true;					
 										
 			});
 			
