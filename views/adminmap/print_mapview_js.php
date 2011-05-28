@@ -1260,10 +1260,12 @@ function changeTopBottom(direction)
 				if(orientation == "landscape")
 				{
 					$("#orientation_landscape").trigger("change");
+					$("#orientation_landscape").attr("checked", "checked");
 				}
 				else
 				{
 					$("#orientation_portrait").trigger("change");
+					$("#orientation_portrait").attr("checked", "checked");
 				}
 			}
 			
