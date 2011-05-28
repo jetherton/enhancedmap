@@ -1,0 +1,29 @@
+/* To make things look right when printing*/
+
+#printpage{
+
+	margin: 0px;
+	position: absolute;
+}
+
+#controls
+{
+	display: none;
+}
+
+#mainmenu{
+	display: none;
+}
+
+
+.olControlPanZoomBar{
+	display: none;
+}
+
+#mapStatus{
+	display:none;
+}
+
+.maximizeDiv{
+	display:none;
+}
