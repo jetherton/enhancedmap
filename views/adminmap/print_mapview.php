@@ -218,7 +218,8 @@ For best results make sure that  "Print Background (Colors &amp; Images)" is tur
 					Generate specific URL for this map
 					<input type="button" name="getURL" id="getURL" value="Create URL" onclick="setURL(); return false;"/>
 					<br/>
-					URL for PDF: <input type="text"; id="urlText"/>
+					URL for this map: <input type="text"; id="urlText"/><br/>
+					URL for this page:  <input type="text"; id="mapUrlText"/>
 				</form>
 			</div>
 			<!-- /Set URL -->

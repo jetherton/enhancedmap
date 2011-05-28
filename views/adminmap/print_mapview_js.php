@@ -107,6 +107,8 @@ function setURL()
 	
 	//get the URL and put it in our text box, plus a real URL param
 	$("#urlText").val($.address.baseURL() + "?pdf=print#/?" + $.address.queryString());
+	
+	$("#mapUrlText").val($.address.baseURL() + "#/?" + $.address.queryString());
 }
         
 
