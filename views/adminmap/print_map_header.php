@@ -9,7 +9,9 @@
 	Event::run('ushahidi_action.header_scripts');
 	?>
 	
-	<?php if(isset($_GET["pdf"])){$media="all";} else{$media="print";}?>
+	<?php 
+		if(isset($_GET["pdf"])){$media="all";} else{$media="print";}
+	?>
 	<link rel="stylesheet" type="text/css" href="<?php echo url::site(); ?>plugins/adminmap/css/print_adminmap_media.css" media="<?php echo $media; ?>" />
 </head>
 

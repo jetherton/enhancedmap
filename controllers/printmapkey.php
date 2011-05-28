@@ -14,7 +14,7 @@
  */
 class Printmapkey_Controller extends Controller {
 
-	function getKey($catIds, $logicalOperator, $startDate, $endDate)
+	function getKey($catIds = "0", $logicalOperator = "or", $startDate = "1", $endDate = "2")
 	{
 		//Format the dates
 		$keyStartDate = date("M j, Y", $startDate);
@@ -36,7 +36,7 @@ class Printmapkey_Controller extends Controller {
 		//do the categories
 		//check if we're dealing with all categories
 		$categories = array();
-		if($catIds == "" || $catIds == "0" || $catIds == "0," || $catIds == "undefined")
+		if($catIds == "" || $catIds == "0" || $catIds == "0," || $catIds == "undefined" || (!is_numeric($catIds)))
 		{
 			$cat = ORM::factory("category");
 			$cat->category_title = Kohana::lang('ui_main.all_categories');

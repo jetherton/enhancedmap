@@ -78,6 +78,35 @@ function setURL()
 	$.address.parameter("currStatus", currentStatus);
 	$.address.parameter("currColorStatus", colorCurrentStatus);
 	$.address.parameter("logic", currentLogicalOperator);
+	
+	//setting the KML/KMZ layers, just search for all the "layer_" ids that have class active.
+	var layerStr = "";
+	var i = 0;
+	$("a[id^='layer_']").each(function(index){
+		if($(this).hasClass("active"))
+		{
+			i++;
+			if(i > 1)
+			{
+				layerStr += ",";
+			}
+			//get the id number
+			var id = $(this).attr("id").substring(6);
+			layerStr += id;
+		}
+	});
+	if(layerStr != "")
+	{
+		$.address.parameter("layer", layerStr);
+	}
+	else
+	{
+		$.address.parameter("layer", "");
+	}
+	
+	
+	//get the URL and put it in our text box, plus a real URL param
+	$("#urlText").val($.address.baseURL() + "?pdf=print#/?" + $.address.queryString());
 }
         
 
@@ -249,7 +278,12 @@ function changeTopBottom(direction)
 			currColorStatus = $("#colorCurrentStatus").val();
 			currLogicalOperator=$("#currentLogicalOperator").val();
 		
-		
+			if(catID == "")
+			{catID = "0";}
+			if(startDate == "")
+			{startDate = "1";}
+			if(endDate == "")
+			{endDate = "1";}
 			$.get("<?php echo url::site(); ?>printmapkey/getKey/" + catID + "/" + currLogicalOperator + "/" + startDate + "/" + endDate,
 				function(data){
 					$("#key").html(data);					
@@ -1269,6 +1303,16 @@ function changeTopBottom(direction)
 				}
 			}
 			
+			
+			//handle layers
+			if($.address.parameter("layer") != null)
+			{
+				var layersArray = $.address.parameter("layer").split(",");
+				for(i in layersArray)
+				{
+					$("#layer_" + layersArray[i]).trigger("click");
+				}
+			}
 			
 			
 			$.get("<?php echo url::site(); ?>printmapkey/getKey/" + 

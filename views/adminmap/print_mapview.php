@@ -1,9 +1,11 @@
+<div id="title">
 <h1>Map Printing</h1>
 This page if for creating maps that will be printed. This is made to work using Firefox 4 or higher. Chrome, Internet Explorer, 
 and other browsers may not print the page correctly.<br/>
 For best results make sure that  "Print Background (Colors &amp; Images)" is turned on and that scaling is set to
  "scale to fit" under "Page Setup"
 <br/><br/>
+</div>
 
 
 <!-- keep track of what status we're looking at -->
@@ -215,6 +217,8 @@ For best results make sure that  "Print Background (Colors &amp; Images)" is tur
 				<form>
 					Generate specific URL for this map
 					<input type="button" name="getURL" id="getURL" value="Create URL" onclick="setURL(); return false;"/>
+					<br/>
+					URL for PDF: <input type="text"; id="urlText"/>
 				</form>
 			</div>
 			<!-- /Set URL -->

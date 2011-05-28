@@ -1,5 +1,9 @@
 /* To make things look right when printing*/
 
+#title{
+	display: none;
+	}
+
 #printpage{
 
 	margin: 0px;
