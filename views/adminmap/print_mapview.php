@@ -212,7 +212,7 @@ that scaling is set to "scale to fit"
 			
 			
 			<!-- Set URL -->
-			<strong>KEY OPTIONS</strong>
+			<strong>Print URLs</strong>
 			<div id="keyoptions" class="menuItem">					
 				<form>
 					Generate specific URL for this map
@@ -223,6 +223,18 @@ that scaling is set to "scale to fit"
 				</form>
 			</div>
 			<!-- /Set URL -->
+			
+			
+			<!-- Print to image -->
+			<strong>Print to Image</strong>
+			<div id="keyoptions" class="menuItem">					
+				<form>
+					Generate an image of this map<br/>
+					<input type="button" name="printImage" id="printImage" value="Print To Image" onclick="stitchImage(); return false;"/>
+					<br/>
+				</form>
+			</div>
+			<!-- /Print to imgage -->
 			
 		</div>
 		<!-- /controls -->

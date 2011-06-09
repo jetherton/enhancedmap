@@ -108,6 +108,7 @@ class Printmap_Controller extends Template_Controller {
 	plugin::add_javascript("adminmap/js/timeline");
 	plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
 
+
 		// Cacheable Main Controller
 		$this->is_cachable = TRUE;
 
