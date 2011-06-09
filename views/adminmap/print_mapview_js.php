@@ -30,6 +30,9 @@ var print_wait_win = null;
 
 			     //-- post a wait message
 			    print_wait_win = window.open("<?php url::site();?>stitch/wait", "print_wait_win", "scrollbars=no, status=0, height=300, width=500, resizable=1");
+			    
+			    
+					
  
 				var print_url =  '<?php url::site();?>stitch/';
                 var size = this.map.getSize(); 
@@ -1493,7 +1496,7 @@ function changeTopBottom(direction)
 				
 				function(data){
 					$("#key").html(data);
-					canRedrawMapKey = true;					
+					canRedrawMapKey = true;			
 										
 			});
 			

@@ -137,8 +137,8 @@
 		{
 			if($feature->style) 
 			{
-				$dst_x = $feature->x + $viewport->left; 
-				$dst_y = $feature->y + $viewport->top; 
+				$dst_x = $feature->x; 
+				$dst_y = $feature->y; 
 				if($feature->style->externalGraphic) 
 				{
 					// Draw the external graphic 
@@ -248,8 +248,8 @@
 					{
 						if($linearRingComponents->type == "point")
 						{
-							$points[] = $linearRingComponents->x + $viewport->left;
-							$points[] = $linearRingComponents->y + $viewport->top;
+							$points[] = $linearRingComponents->x;
+							$points[] = $linearRingComponents->y;
 						}
 					}//end of dealing with a linear ring
 					//now draw the polyfon
