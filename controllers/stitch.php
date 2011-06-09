@@ -16,11 +16,13 @@
 		{
 			$this->TEMP_DIR = Kohana::config('upload.directory', TRUE);
 			$this->TEMP_URL = url::site()."media/uploads";
+			
+					
 			// fetch the request params, and generate the name of the tempfile and its URL
-			$width    = @$_REQUEST['width'];  if (!$width) $width = 1024;
-			$height   = @$_REQUEST['height']; if (!$height) $height = 768;
-			$tiles    = json_decode(@$_REQUEST['tiles']);
-			//$tiles    = json_decode(stripslashes(@$_REQUEST['tiles'])); // use this if you use magic_quotes_gpc
+			$width    = @$_POST['width'];  if (!$width) $width = 1024;
+			$height   = @$_POST['height']; if (!$height) $height = 768;
+			$tiles    = json_decode(@$_POST['tiles']);
+			//$tiles    = json_decode(stripslashes(@$_POST['tiles'])); // use this if you use magic_quotes_gpc
 			$random   = md5(microtime().mt_rand());
 			$file     = sprintf("%s/%s.png", $this->TEMP_DIR, $random );
 			$url      = sprintf("%s/%s.png", $this->TEMP_URL, $random );
@@ -32,51 +34,61 @@
 			$image = imagecreatetruecolor($width,$height);
 			imagefill($image,0,0, imagecolorallocate($image,255,255,255) ); // fill with white
 					
-			// loop through the tiles, blitting each one onto the canvas		  
-			foreach ($tiles as $tile) 
+			// loop through the tiles, blitting each one onto the canvas
+			if(is_array($tiles))
+			{		  
+				foreach ($tiles as $tile) 
+				{
+					// try to convert relative URLs into full URLs
+					// this could probably use some improvement
+					$tile->url = urldecode($tile->url);
+					if (substr($tile->url,0,4)!=='http') 
+					{
+						$tile->url = preg_replace('/^\.\//',dirname($_SERVER['REQUEST_URI']).'/',$tile->url);
+						$tile->url = preg_replace('/^\.\.\//',dirname($_SERVER['REQUEST_URI']).'/../',$tile->url);
+						$tile->url = sprintf("%s://%s:%d/%s", isset($_SERVER['HTTPS'])?'https':'http', $_SERVER['SERVER_ADDR'], $_SERVER['SERVER_PORT'], $tile->url);
+					}
+					$tile->url = str_replace(' ','+',$tile->url);     
+					
+					// fetch the tile into a temp file, and analyze its type; bail if it's invalid
+					$tempfile =  sprintf("%s/%s.img", $this->TEMP_DIR, md5(microtime().mt_rand()) );
+					file_put_contents($tempfile,file_get_contents($tile->url));
+					list($tilewidth,$tileheight,$tileformat) = @getimagesize($tempfile);
+					if (!$tileformat)
+					{ 
+						continue;
+					}
+					
+					// load the tempfile's image, and blit it onto the canvas
+					switch ($tileformat) 
+					{
+						case IMAGETYPE_GIF:
+						$tileimage = imagecreatefromgif($tempfile);
+						break;
+						case IMAGETYPE_JPEG:
+						$tileimage = imagecreatefromjpeg($tempfile);
+						break;
+						case IMAGETYPE_PNG:
+						$tileimage = imagecreatefrompng($tempfile);
+						break;
+					}
+					$this->imagecopymerge_alpha($image, $tileimage, $tile->x, $tile->y, 0, 0, $tilewidth, $tileheight, $tile->opacity);
+				}
+			}
+			else
 			{
-				// try to convert relative URLs into full URLs
-				// this could probably use some improvement
-				$tile->url = urldecode($tile->url);
-				if (substr($tile->url,0,4)!=='http') 
-				{
-					$tile->url = preg_replace('/^\.\//',dirname($_SERVER['REQUEST_URI']).'/',$tile->url);
-					$tile->url = preg_replace('/^\.\.\//',dirname($_SERVER['REQUEST_URI']).'/../',$tile->url);
-					$tile->url = sprintf("%s://%s:%d/%s", isset($_SERVER['HTTPS'])?'https':'http', $_SERVER['SERVER_ADDR'], $_SERVER['SERVER_PORT'], $tile->url);
-				}
-				$tile->url = str_replace(' ','+',$tile->url);     
-				
-				// fetch the tile into a temp file, and analyze its type; bail if it's invalid
-				$tempfile =  sprintf("%s/%s.img", $this->TEMP_DIR, md5(microtime().mt_rand()) );
-				file_put_contents($tempfile,file_get_contents($tile->url));
-				list($tilewidth,$tileheight,$tileformat) = @getimagesize($tempfile);
-				if (!$tileformat)
-				{ 
-					continue;
-				}
-				
-				// load the tempfile's image, and blit it onto the canvas
-				switch ($tileformat) 
-				{
-					case IMAGETYPE_GIF:
-					$tileimage = imagecreatefromgif($tempfile);
-					break;
-					case IMAGETYPE_JPEG:
-					$tileimage = imagecreatefromjpeg($tempfile);
-					break;
-					case IMAGETYPE_PNG:
-					$tileimage = imagecreatefrompng($tempfile);
-					break;
-				}
-				$this->imagecopymerge_alpha($image, $tileimage, $tile->x, $tile->y, 0, 0, $tilewidth, $tileheight, $tile->opacity);
+				//something went wrong and we're not getting tiles
+				echo "\r\n\r\n\r\n Tiles are: \r\n";
+				echo Kohana::debug($tiles);	
+				return;		
 			}
 					  
 			/////////////////////////////////////////////////////////////////
 			//do dots and polygons
 			/////////////////////////////////////////////////////////////////
 
-			$features = json_decode(@$_REQUEST['features']);
-			$viewport = json_decode(@$_REQUEST['viewport']);
+			$features = json_decode(@$_POST['features']);
+			$viewport = json_decode(@$_POST['viewport']);
 			
 			$image = $this->handleDotsAndPolygons($image, $features, $viewport);			                
 			

@@ -138,7 +138,6 @@ var print_wait_win = null;
                 var viewport = {top: viewport_top, left: viewport_left}; 
                 var viewport_json = JSON.stringify(viewport); 
                 var scale = Math.round(this.map.getScale()); 
-                
                 OpenLayers.Request.POST( 
                   { url:print_url, 
                         data:OpenLayers.Util.getParameterString({width:size.w,height:size.h,scale:scale,viewport: viewport_json,tiles:tiles_json,features:features_json}), 
