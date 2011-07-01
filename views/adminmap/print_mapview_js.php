@@ -268,6 +268,11 @@ function setURL()
 	$("#urlText").val($.address.baseURL() + "?pdf=print#/?" + $.address.queryString());
 	
 	$("#mapUrlText").val($.address.baseURL() + "#/?" + $.address.queryString());
+
+	
+	var embedUrl = "<?php echo url::site();?>";
+	
+	$("#embedMapUrlText").val('<iframe src="' + embedUrl + "iframemap#/?" + $.address.queryString() + '" width="510px" height="430px"></iframe>');
 }
         
 
