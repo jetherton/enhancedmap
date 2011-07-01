@@ -272,7 +272,7 @@ function setURL()
 	
 	var embedUrl = "<?php echo url::site();?>";
 	
-	$("#embedMapUrlText").val('<iframe src="' + embedUrl + "iframemap#/?" + $.address.queryString() + '" width="510px" height="430px"></iframe>');
+	$("#embedMapUrlText").val('<iframe src="' + embedUrl + "iframemap#/?" + $.address.queryString() + '" width="515px" height="430px"></iframe>');
 }
         
 
