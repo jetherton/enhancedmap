@@ -307,14 +307,14 @@ ul.category-filters{
     padding: 0px;
 	border: none;
 	margin: 0px;
-	height: 200px;
+	height: 170px;
 	overflow: auto;
 	position: relative;
 	border-top:solid 1px black;
 }
 
 ul#kml_switch{
-	height: auto;
+	height: 80px;
 }
 
 

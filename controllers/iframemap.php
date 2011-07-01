@@ -103,7 +103,7 @@ class Iframemap_Controller extends Template_Controller {
 	plugin::add_stylesheet("adminmap/css/jquery.hovertip-1.0");
 
 	//make sure the right java script files are used.
-	plugin::add_javascript("adminmap/js/jquery.address-1.4.min.js");
+	//plugin::add_javascript("adminmap/js/jquery.address-1.4.min.js");
 	plugin::add_javascript("adminmap/js/jquery.flot");
 	plugin::add_javascript("adminmap/js/excanvas.min");
 	plugin::add_javascript("adminmap/js/timeline");
@@ -324,7 +324,7 @@ class Iframemap_Controller extends Template_Controller {
 		$lonTo = Kohana::config('map.lonTo');
 		$latTo = Kohana::config('map.latTo');
 
-		$this->themes->js = new View('adminmap/print_mapview_js');
+		$this->themes->js = new View('adminmap/iframe_mapview_js');
 		$this->themes->js->json_url = ($clustering == 1) ?
 			"json/cluster" : "json";
 		$this->themes->js->marker_radius =
