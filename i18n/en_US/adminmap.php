@@ -1,6 +1,15 @@
 <?php
-
-//Special thanks to Carter Draper for his help internationalizing this plugin
+/**
+ *  Admin Map English Language file
+ *
+ * This plugin was written for Ushahidi Liberia, by the contractors of Ushahidi Liberia
+ * 2011
+ *
+ * @package    Admin Map plugin
+ * @author     Carter Draper <carjimdra@gmail.com>
+ * @author     Kpetermeni Siakor <tksiakor@gmail.com>
+ * 
+ */ 
 
 	$lang = array(
 	'admin_map_main_menu_tab' => 'Admin Map',
