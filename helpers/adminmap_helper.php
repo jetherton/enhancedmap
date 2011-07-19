@@ -437,7 +437,15 @@ class adminmap_helper_Core {
 
 		if( isset($_GET['c']) AND ! empty($_GET['c']) )
 		{
-			$category_ids = explode(",", $_GET['c'],-1); //get rid of that trailing ";"
+			//check if there are any ',' in the category
+			if((strpos($_GET['c'], ",")===false) && is_numeric($_GET['c']))
+			{
+				$category_ids = array($_GET['c']);	
+			}
+			else
+			{
+				$category_ids = explode(",", $_GET['c'],-1); //get rid of that trailing ";"
+			}
 		}
 		else
 		{
