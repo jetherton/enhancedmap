@@ -289,11 +289,11 @@ function changeTopBottom(direction)
 								//check and see if we're clustering
 								if( stripos($json_url, "cluster") != false)
 								{
-									echo "bigmap_json/cluster";
+									echo "iframemap_json/cluster";
 								}
 								else
 								{
-									echo "bigmap_json";
+									echo "iframemap_json";
 								}
 						    ?>";
 		// Current json_url, if map is switched dynamically between json and json_cluster

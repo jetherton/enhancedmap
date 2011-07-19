@@ -417,7 +417,8 @@ class adminmap_helper_Core {
 	public static function json_index($json_controller, $edit_report_path = 'admin/reports/edit/', $on_the_back_end = true,
 		$extra_where_text = "",
 		$joins = array(),
-		$custom_category_to_table_mapping = array())
+		$custom_category_to_table_mapping = array(),
+		$link_target = "_self")
 	{
 		$json = "";
 		$json_item = "";
@@ -572,7 +573,7 @@ class adminmap_helper_Core {
 					}
 				}
 				
-				$json_item .= "\"name\":\"" .date("n/j/Y", strtotime($marker->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
+				$json_item .= "\"name\":\"" .date("n/j/Y", strtotime($marker->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
 				//for compatiblity with the InfoWindows plugin
 				$json_item .= "\"link\":\"" .url::base(). "$edit_report_path{$last_marker->id}\",";
 
@@ -625,7 +626,7 @@ class adminmap_helper_Core {
 
 				
 								// Get Incident Geometries				
-				$geometry = self::_get_geometry($last_marker->id, $last_marker->incident_title, $last_marker->incident_date, $on_the_back_end, $item_color);
+				$geometry = self::_get_geometry($last_marker->id, $last_marker->incident_title, $last_marker->incident_date, $on_the_back_end, $item_color, $link_target);
 				if (count($geometry))
 				{
 					$json_item = implode(",", $geometry);
@@ -715,7 +716,7 @@ class adminmap_helper_Core {
 						
 					}
 				}
-				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
+				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . $edit_report_path . $last_marker->id . "'>" . htmlentities($last_marker->incident_title) . "</a>".$cat_names_txt)) . "\",";
 				//compatibility with the InfoWindow Plugin
 				$json_item .= "\"link\":\"" .url::base(). "$edit_report_path{$last_marker->id}\",";
 
@@ -768,7 +769,7 @@ class adminmap_helper_Core {
 				$json_item .= "}";
 				
 				// Get Incident Geometries				
-				$geometry = self::_get_geometry($last_marker->id, $last_marker->incident_title, $last_marker->incident_date, $on_the_back_end, $item_color);
+				$geometry = self::_get_geometry($last_marker->id, $last_marker->incident_title, $last_marker->incident_date, $on_the_back_end, $item_color, $link_target);
 				if (count($geometry))
 				{
 					$json_item = implode(",", $geometry);
@@ -1057,7 +1058,8 @@ class adminmap_helper_Core {
 	$on_the_back_end = true,
 	$extra_where_text = "",
 	$joins = array(),
-	$custom_category_to_table_mapping = array())
+	$custom_category_to_table_mapping = array(),
+	$link_target = "_self")
     {
         //$profiler = new Profiler;
 
@@ -1323,7 +1325,8 @@ class adminmap_helper_Core {
 						$target->incident_title, 
 						$target->incident_date, 
 						$on_the_back_end, 
-						$geo_color);
+						$geo_color,
+						$link_target);
 					if (count($geometry))
 					{
 						$json_item = implode(",", $geometry);
@@ -1372,9 +1375,10 @@ class adminmap_helper_Core {
 				$geo_color = $is_all_categories ||  $logical_operator=="and" ? $color : self::merge_colors_for_dots($colors);
 				$geometry = self::_get_geometry($marker->id, 
 					$marker->incident_title, 
-					$marker->incident_date, 
+					$marker->incident_date,
 					$on_the_back_end, 
-					$geo_color);
+					$geo_color,
+					$link_target);
 				if (count($geometry))
 				{
 					$json_item = implode(",", $geometry);
@@ -1439,7 +1443,8 @@ class adminmap_helper_Core {
 					$marker_info["incident"]->incident_title, 
 					$marker_info["incident"]->incident_date, 
 					$on_the_back_end, 
-					$geo_color);
+					$geo_color,
+					$link_target);
 				if (count($geometry))
 				{
 					$json_item = implode(",", $geometry);
@@ -1496,7 +1501,7 @@ class adminmap_helper_Core {
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
 	    $categories_str = implode(",", $category_ids);
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . $list_reports_path."?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.">" . $cluster_count . " Reports</a> ".$category_str)) . "\",";
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . $list_reports_path."?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved."'>" . $cluster_count . " Reports</a> ".$category_str)) . "\",";
 	    $json_item .= "\"link\":\"" . url::base(). "$list_reports_path?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved."\",";
             $json_item .= "\"category\":[0], ";
 		if($contains_nonactive && $color_unapproved==2)
@@ -1565,7 +1570,7 @@ class adminmap_helper_Core {
             $json_item = "{";
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
-            $json_item .= "\"name\":\"" .date("n/j/Y", strtotime($single->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href=" . url::base() . $edit_report_path . $single->id . "/>".str_replace('"','\"',$single->incident_title)."</a>".$category_description)) . "\",";   
+            $json_item .= "\"name\":\"" .date("n/j/Y", strtotime($single->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . $edit_report_path . $single->id . "'/>".str_replace('"','\"',$single->incident_title)."</a>".$category_description)) . "\",";   
 	    $json_item .= "\"link\":\"" .url::base(). "{$edit_report_path}{$single->id}\","; 
             $json_item .= "\"category\":[0], ";
 	    //check if it's a unapproved/unactive report
@@ -1765,7 +1770,7 @@ class adminmap_helper_Core {
 	 * @param int $incident_date
 	 * @return array $geometry
 	 */
-	private static function _get_geometry($incident_id, $incident_title, $incident_date, $on_the_back_end, $color)
+	private static function _get_geometry($incident_id, $incident_title, $incident_date, $on_the_back_end, $color, $link_target = "_self")
 	{
 		$geometry = array();
 		if ($incident_id)
@@ -1807,7 +1812,7 @@ class adminmap_helper_Core {
 				}
 				else
 				{
-					$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a href='" . url::base() . "reports/view/" . $incident_id . "'>".$title."</a>")) . "\",";
+					$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . "reports/view/" . $incident_id . "'>".$title."</a>")) . "\",";
 				}
 
 				$json_item .= "\"description\": \"" . utf8tohtml::convert($item->geometry_comment,TRUE) . "\", ";
