@@ -106,7 +106,14 @@ class Bigmap_reports_Controller extends Main_Controller
 
 	$approved_text = " incident.incident_active = 1 ";
 	
+    // Start Date
+    $start_date = (isset($_GET['s']) AND !empty($_GET['s'])) ? (int) $_GET['s'] : "0";
+
+    // End Date
+    $end_date = (isset($_GET['e']) AND !empty($_GET['e'])) ? (int) $_GET['e'] : "0";
 	
+	$filter .= ($start_date) ? " AND incident.incident_date >= '" . date("Y-m-d H:i:s", $start_date) . "'" : "";
+    $filter .= ($end_date) ? " AND incident.incident_date <= '" . date("Y-m-d H:i:s", $end_date) . "'" : "";
 	
 	$location_where = "";
 	// Break apart location variables, if necessary
