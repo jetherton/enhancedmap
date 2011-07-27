@@ -1008,7 +1008,7 @@ function mU() {
 						var endTime = new Date(endDate * 1000);
 						if ((endTime - startTime) / (1000 * 60 * 60 * 24) <= 32)
 						{
-							json_url = "bigmap_json";
+							json_url = default_json_url;
 						} 
 						else
 						{

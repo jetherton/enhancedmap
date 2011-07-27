@@ -1501,6 +1501,12 @@ class adminmap_helper_Core {
             $cluster_center = $bounds['center'];
             $southwest = $bounds['sw'];
             $northeast = $bounds['ne'];
+            
+        	$time_filter = "";
+			if($start_date != "0" && $end_date != "0")
+			{
+				$time_filter = "&s=".$start_date."&e=".$end_date;
+			}
 
             // Number of Items in Cluster
             $cluster_count = count($cluster);
@@ -1509,8 +1515,8 @@ class adminmap_helper_Core {
             $json_item .= "\"type\":\"Feature\",";
             $json_item .= "\"properties\": {";
 	    $categories_str = implode(",", $category_ids);
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . $list_reports_path."?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved."'>" . $cluster_count . " Reports</a> ".$category_str)) . "\",";
-	    $json_item .= "\"link\":\"" . url::base(). "$list_reports_path?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved."\",";
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . $list_reports_path."?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.$time_filter."'>" . $cluster_count . " Reports</a> ".$category_str)) . "\",";
+	    $json_item .= "\"link\":\"" . url::base(). "$list_reports_path?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.$time_filter."\",";
             $json_item .= "\"category\":[0], ";
 		if($contains_nonactive && $color_unapproved==2)
 		{
