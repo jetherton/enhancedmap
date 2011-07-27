@@ -235,14 +235,91 @@ class adminmap_helper_Core {
 	public static function set_categories($map_controller, $on_backend = false, $group = false)
 	{
 	
-	// Check for localization of parent category
-	// Get locale
-	$l = Kohana::config('locale.language.0');
-
-	/////////////////////////////////////////////////////////////////////////////////////////////
-        // Get all active top level categories
-	/////////////////////////////////////////////////////////////////////////////////////////////
+		// Check for localization of parent category
+		// Get locale
+		$l = Kohana::config('locale.language.0');
+	
 		$parent_categories = array();
+	
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//Check to see if we're dealing with a group, and thus
+		//should show group specific categories
+		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		if($group != false)
+		{
+			//check and make sure the simpel groups category is installed
+			$plugin = ORM::factory('plugin')
+				->where('plugin_name', 'simplegroups')
+				->where('plugin_active', '1')
+				->find();
+			if(!$plugin)
+			{
+				throw new Exception("A group was set in adminmap_helper::set_categories() when the SimpleGroupl plugin is not installed");
+			}
+		
+			$cats = ORM::factory('simplegroups_category');
+			if(!$on_backend)
+			{	
+				$cats = $cats->where('category_visible', '1');
+			}
+			$cats = $cats->where('parent_id', '0');
+			$cats = $cats->where('applies_to_report', 1);
+			$cats = $cats->where('simplegroups_groups_id', $group->id)
+				->find_all() ;
+			foreach ($cats as $category)
+			{				
+				/////////////////////////////////////////////////////////////////////////////////////////////
+				// Get the children
+				/////////////////////////////////////////////////////////////////////////////////////////////
+				$children = array();
+				foreach ($category->children as $child)
+				{
+					// Check for localization of child category
+
+					$translated_title = Simplegroups_category_lang_Model::simplegroups_category_title($child->id,$l);
+
+					if($translated_title)
+					{
+						$display_title = $translated_title;
+					}
+					else
+					{
+						$display_title = $child->category_title;
+					}
+
+					$children["sg_".$child->id] = array(
+						$display_title,
+						$child->category_color,
+						$child->category_image
+					);
+					
+				}
+
+				
+
+				$translated_title = Simplegroups_category_lang_Model::simplegroups_category_title($category->id,$l);
+
+				if($translated_title)
+				{
+					$display_title = $translated_title;
+				}else{
+					$display_title = $category->category_title;
+				}
+
+				// Put it all together				
+				$parent_categories["sg_".$category->id] = array(
+					$display_title,
+					$category->category_color,
+					$category->category_image,
+					$children
+				);				
+			}
+		}
+
+		/////////////////////////////////////////////////////////////////////////////////////////////
+        // Get all active top level categories
+		/////////////////////////////////////////////////////////////////////////////////////////////
+		
 		$cats = ORM::factory('category');
 		if(!$on_backend)
 		{	
@@ -320,80 +397,7 @@ class adminmap_helper_Core {
 			}
 		}
 		
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//Check to see if we're dealing with a group, and thus
-		//should show group specific categories
-		///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		if($group != false)
-		{
-			//check and make sure the simpel groups category is installed
-			$plugin = ORM::factory('plugin')
-				->where('plugin_name', 'simplegroups')
-				->where('plugin_active', '1')
-				->find();
-			if(!$plugin)
-			{
-				throw new Exception("A group was set in adminmap_helper::set_categories() when the SimpleGroupl plugin is not installed");
-			}
 		
-			$cats = ORM::factory('simplegroups_category');
-			if(!$on_backend)
-			{	
-				$cats = $cats->where('category_visible', '1');
-			}
-			$cats = $cats->where('parent_id', '0');
-			$cats = $cats->where('applies_to_report', 1);
-			$cats = $cats->where('simplegroups_groups_id', $group->id)
-				->find_all() ;
-			foreach ($cats as $category)
-			{				
-				/////////////////////////////////////////////////////////////////////////////////////////////
-				// Get the children
-				/////////////////////////////////////////////////////////////////////////////////////////////
-				$children = array();
-				foreach ($category->children as $child)
-				{
-					// Check for localization of child category
-
-					$translated_title = Simplegroups_category_lang_Model::simplegroups_category_title($child->id,$l);
-
-					if($translated_title)
-					{
-						$display_title = $translated_title;
-					}
-					else
-					{
-						$display_title = $child->category_title;
-					}
-
-					$children["sg_".$child->id] = array(
-						$display_title,
-						$child->category_color,
-						$child->category_image
-					);
-					
-				}
-
-				
-
-				$translated_title = Simplegroups_category_lang_Model::simplegroups_category_title($category->id,$l);
-
-				if($translated_title)
-				{
-					$display_title = $translated_title;
-				}else{
-					$display_title = $category->category_title;
-				}
-
-				// Put it all together				
-				$parent_categories["sg_".$category->id] = array(
-					$display_title,
-					$category->category_color,
-					$category->category_image,
-					$children
-				);				
-			}
-		}
 		
 		
 		$map_controller->template->content->categories = $parent_categories;
