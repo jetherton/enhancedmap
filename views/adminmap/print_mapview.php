@@ -220,7 +220,6 @@ that scaling is set to "scale to fit"
 					<br/>
 					URL for this map: <input type="text"; id="urlText"/><br/>
 					URL for this page:  <input type="text"; id="mapUrlText"/>
-					URL to embed this map:  <input type="text"; id="embedMapUrlText"/>
 				</form>
 			</div>
 			<!-- /Set URL -->

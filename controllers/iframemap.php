@@ -364,5 +364,14 @@ class Iframemap_Controller extends Template_Controller {
 		// Rebuild Header Block
 		$this->template->header->header_block = $this->themes->header_block();
 	}
+	
+	public function setup()
+	{
+		$this->auto_render = FALSE;
+		$view = View::factory("adminmap/iframemap_setup");
+		$view->html = htmlentities('<iframe src="'. url::base().'iframemap" width="515px" height="430px"></iframe>');
+		$view->render(true);
+				
+	}
 
 } // End Main

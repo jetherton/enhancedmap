@@ -291,6 +291,7 @@
 			this.graphData = this.graphData || gTimelineData;
 			var plotData = this.graphData;
 			gPlayEndDate = gStartTime.getTime()/1000 + (this.playCount * 60*60*24);
+			gPlayStartDate = gPlayEndDate - (60*60*24);
 			var playEndDateTime = new Date(gPlayEndDate * 1000);
 			var data = this.filteredData(new Date(gPlayEndDate * 1000));
 
@@ -314,13 +315,13 @@
 				categoryId: this.categoryId,
 				startTime: gStartTime,
 				endTime: gEndTime
-			}
+			};
 
 			playTimeline = $.timeline(playOptions);
 			var style = playTimeline.markerStyle();
 			var markers = gTimelineMarkers;
 			playTimeline.plot();
-			playTimeline.plotMarkers(style, markers, gPlayEndDate);
+			playTimeline.plotMarkers(style, markers, gPlayStartDate, gPlayEndDate);
 			this.playCount++;
 			if (gPlayEndDate >= gEndTime.getTime()/1000)
 			{
@@ -339,9 +340,9 @@
 			return this;
 		};
 		
-		this.plotMarkers = function(style, markers, endDate)
+		this.plotMarkers = function(style, markers, startDate, endDate)
 		{
-			var startDate = this.startTime.getTime() / 1000;
+			//var startDate = this.startTime.getTime() / 1000;
 			endDate = endDate || this.endTime.getTime() / 1000;
 
 			// Uncomment to play at monthly intervals
@@ -363,10 +364,30 @@
 					property: "timestamp",
 					lowerBoundary: startDate,
 					upperBoundary: endDate
-				})
+				}),
+				symbolizer: {
+					fillOpacity: 1,
+					strokeColor: "black"
+				}
 			});
+			
+			var sliderfilter2 = new OpenLayers.Rule({
+				filter: new OpenLayers.Filter.Comparison(
+				{
+					type: OpenLayers.Filter.Comparison.BETWEEN,
+					property: "timestamp",
+					lowerBoundary: 0,
+					upperBoundary: endDate
+				}),
+				symbolizer: {
+					fillOpacity: 0.3,
+					strokeColor: "white",
+					strokeOpacity: 1
+				}
+			});
+			
 			style.rules = [];
-			style.addRules(sliderfilter);					
+			style.addRules([sliderfilter2, sliderfilter]);					
 			markers.styleMap.styles["default"] = style;
 			markers.redraw();
 			return this;
@@ -389,15 +410,15 @@
 			{
 				params.push('e=' + endDate);
 			}
-			if (typeof(mediaType) != 'undefined')
+			if (typeof(this.mediaType) != 'undefined')
 			{
-			//params.push('m=' + mediaType);
+				params.push('m=' + this.mediaType);
 			}
 			return params;
 		};
 
 
-/*
+		/*
 		 * Style
 		 */
 		this.markerStyle = function()
@@ -653,7 +674,7 @@
 
 			var	protocolUrl = baseUrl + json_url + "/"; // Default Json
 			var thisLayer = "Reports"; // Default Layer Name
-			var protocolFormat = OpenLayers.Format.GeoJSON;
+			var protocolFormat = new OpenLayers.Format.GeoJSON();
 			newlayer = false;
 
 			if (thisLayer && thisLayerType == 'shares')
@@ -666,25 +687,28 @@
 			{
 				protocolUrl = baseUrl + "json/layer/"+thisLayerID+"/";
 				thisLayer = "Layer_"+thisLayerID;
-				protocolFormat = OpenLayers.Format.KML;
-				//protocolFormat = OpenLayers.Format.GeoJSON;
+				protocolFormat = new OpenLayers.Format.KML({
+					extractStyles: true,
+					extractAttributes: true,
+					maxDepth: 5
+				});
+
 				newlayer = true;
 			}
 
 			var myPoint;
-			if ( currZoom && currCenter &&
-				typeof(currZoom) != 'undefined' && typeof(currCenter) != 'undefined')
+			if ( currZoom && currCenter && typeof(currZoom) != 'undefined' && typeof(currCenter) != 'undefined')
 			{
 				myPoint = currCenter;
 				myZoom = currZoom;
 			}
 			else
 			{
-				// create a lat/lon object
+				// Create a lat/lon object
 				myPoint = new OpenLayers.LonLat(longitude, latitude);
 				myPoint.transform(proj_4326, map.getProjectionObject());
 
-				// display the map centered on a latitude and longitude (Google zoom levels)
+				// Display the map centered on a latitude and longitude (Google zoom levels)
 				myZoom = defaultZoom;
 			}
 
@@ -720,6 +744,7 @@
 			}
 
 			//markers = new OpenLayers.Layer.GML(thisLayer, protocolUrl + '?z='+ myZoom +'&sw='+ southwest +'&ne='+ northeast +'&' + params.join('&'),
+			/* ETHERTON Git rid of this if it works
 			markers = new OpenLayers.Layer.GML(thisLayer, protocolUrl + '?z=' +
 				myZoom + '&' + this.markerUrlParams(startDate, endDate).join('&') + "&u="+currStatus + "&uc="+currColorStatus
 				+ "&lo="+currLogicalOperator,
@@ -736,21 +761,58 @@
 						"select": style
 					})
 				});
+			*/
+			
+			// Build the URL for fetching the data
+			fetchUrl = (thisLayer && thisLayerType == 'layers')
+				? protocolUrl
+				: protocolUrl + '?z=' + myZoom + '&' + this.markerUrlParams(startDate, endDate).join('&') + "&u="+currStatus + "&uc="+currColorStatus
+					+ "&lo="+currLogicalOperator;
+			
+			// Create the reports layer
+			markers = new OpenLayers.Layer.Vector(thisLayer, {
+				preFeatureInsert:preFeatureInsert,
+				projection: proj_4326,
+				formatOptions: {
+					extractStyles: true,
+					extractAttributes: true
+				},
+				styleMap: new OpenLayers.StyleMap({
+					"default":style,
+					"select": style
+				}),
+				strategies: [new OpenLayers.Strategy.Fixed()],
+				protocol: new OpenLayers.Protocol.HTTP({
+					url: fetchUrl,
+					format: protocolFormat
+				})
+				
+			});
+			
+			
 
 			map.addLayer(markers);
-
 			
-//			if (!newlayer)
-//			{ // Keep the Base Layer in Focus
-				selectControl = new OpenLayers.Control.SelectFeature(markers);
-				map.addControl(selectControl);
-				selectControl.activate();
-				markers.events.on({
-					"featureselected": onFeatureSelect,
-					"featureunselected": onFeatureUnselect
-				});
-//			}
-
+			/*
+			 - Added by E.Kala <emmanuel(at)ushahidi.com>
+			 - Part of the fix to issue #2168
+			*/
+			
+			// Check if the the new layer is a KML layer
+			if (thisLayer && thisLayerType == 'layers')
+			{
+				// Add layer object to the kmlOvelays array
+				kmlOverlays.push(markers);
+			}
+			
+			selectControl = new OpenLayers.Control.SelectFeature(markers);
+			map.addControl(selectControl);
+			selectControl.activate();
+			markers.events.on({
+				"featureselected": onFeatureSelect,
+				"featureunselected": onFeatureUnselect
+			});
+			
 			return markers;
 		};
 		
@@ -798,7 +860,7 @@
 	{
 		timeline = new Timeline(options);
 		return timeline;
-	}
+	};
 	
 	$.timelinePeriod = function(plotData)
 	{

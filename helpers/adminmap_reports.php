@@ -5,7 +5,7 @@
  * @package    Admin Map
  * @author     John Etherton
  */
-class reports_Core {
+class adminmap_reports_Core {
 
 
 
@@ -68,10 +68,10 @@ class reports_Core {
 
 			
 			// OR up all the categories we're interested in
-			$where_category = reports::or_up_categories($category_ids, $custom_category_to_table_mapping);
-			$test_text = reports::create_test_for_match($category_ids, $custom_category_to_table_mapping);
+			$where_category = adminmap_reports::or_up_categories($category_ids, $custom_category_to_table_mapping);
+			$test_text = adminmap_reports::create_test_for_match($category_ids, $custom_category_to_table_mapping);
 			
-			$custom_cat_selects = reports::create_custom_category_selects($category_ids, $custom_category_to_table_mapping);
+			$custom_cat_selects = adminmap_reports::create_custom_category_selects($category_ids, $custom_category_to_table_mapping);
 
 			
 			//if we're using OR
@@ -218,7 +218,7 @@ class reports_Core {
 		{ //we're gonna use category filters
 		
 			// OR up all the categories we're interested in
-			$where_category = reports::or_up_categories($category_ids, $custom_category_to_table_mapping);
+			$where_category = adminmap_reports::or_up_categories($category_ids, $custom_category_to_table_mapping);
 			
 						
 			//if we're using OR
@@ -262,7 +262,7 @@ class reports_Core {
 			{
 			
 				//based on what's in the custom cat mappings make some fancy selects
-				$custom_cat_selects = reports::create_custom_category_selects($category_ids, $custom_category_to_table_mapping);
+				$custom_cat_selects = adminmap_reports::create_custom_category_selects($category_ids, $custom_category_to_table_mapping);
 			
 				// Retrieve incidents by category			
 				$incidents = ORM::factory('incident')
@@ -378,7 +378,7 @@ class reports_Core {
 		else //we are using category IDs, double the fun
 		{
 			// OR up all the categories we're interested in
-			$where_category = reports::or_up_categories($category_ids, $custom_category_to_table_mapping);
+			$where_category = adminmap_reports::or_up_categories($category_ids, $custom_category_to_table_mapping);
 			
 						
 			//if we're using OR
@@ -413,7 +413,7 @@ class reports_Core {
 			{
 			
 				//based on what's in the custom cat mappings make some fancy selects
-				$custom_cat_selects = reports::create_custom_category_selects($category_ids, $custom_category_to_table_mapping);
+				$custom_cat_selects = adminmap_reports::create_custom_category_selects($category_ids, $custom_category_to_table_mapping);
 				
 			
 			
@@ -535,13 +535,13 @@ class reports_Core {
 				$parent_table = $custom_category_to_table_mapping[$custom_cat_name]["parent"];
 				
 				$where_category = ($i > 1) ? $where_category . " OR " : $where_category;
-				$where_category = $where_category . "(".reports_Core::$table_prefix.$child_table.".id = " . $custom_cat_id. " OR ".$parent_table.".id = " . $custom_cat_id.")";
+				$where_category = $where_category . "(".adminmap_reports::$table_prefix.$child_table.".id = " . $custom_cat_id. " OR ".$parent_table.".id = " . $custom_cat_id.")";
 				
 			}
 			else
 			{	//this a normal, site wide, category, so treat it normally								
 				$where_category = ($i > 1) ? $where_category . " OR " : $where_category;
-				$where_category = $where_category . "(".reports_Core::$table_prefix.'incident_category.category_id = ' . $id." OR parent_cat.id = " . $id.")";
+				$where_category = $where_category . "(".adminmap_reports::$table_prefix.'incident_category.category_id = ' . $id." OR parent_cat.id = " . $id.")";
 			}
 
 		}
@@ -757,5 +757,5 @@ class reports_Core {
 }//end class reports_core
 
 
-	reports_Core::init();
+	adminmap_reports_Core::init();
 

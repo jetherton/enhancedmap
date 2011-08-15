@@ -1,0 +1,14 @@
+@CHARSET "UTF-8";
+
+div#adminmap_map_embedd{
+		background-color: #E1E1E1;
+		color:#333;
+		padding:2px;
+		border: solid 1px #999;
+	}
+	
+div#adminmap_map_embedd input{
+
+		color:#333;		
+		width: 99%;		
+	}

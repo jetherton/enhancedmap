@@ -541,7 +541,7 @@ class adminmap_helper_Core {
 		//get our new custom color based on the categories we're working with
 		$color = self::merge_colors($category_ids, $custom_category_to_table_mapping);
 
-		$incidents = reports::get_reports_list_by_cat($category_ids, 
+		$incidents = adminmap_reports::get_reports_list_by_cat($category_ids, 
 			$approved_text, 
 			$where_text. " ". $extra_where_text, 
 			$logical_operator,
@@ -826,7 +826,7 @@ class adminmap_helper_Core {
 	public static function merge_colors($category_ids_temp, $custom_category_to_table_mapping = array())
 	{
 		//because I might unset some of the values in the $category_ids array
-		$category_ids = reports::array_copy($category_ids_temp);
+		$category_ids = adminmap_reports::array_copy($category_ids_temp);
 		
 		//check if we're looking at category 0
 		if(count($category_ids) == 0 || $category_ids[0] == '0')
@@ -1197,9 +1197,9 @@ class adminmap_helper_Core {
 
 	//stuff john just added
 	$color = self::merge_colors($category_ids, $custom_category_to_table_mapping);
-	//$incidents = reports::get_reports($category_ids, $approved_text, $filter, $logical_operator);
+	//$incidents = adminmap_reports::get_reports($category_ids, $approved_text, $filter, $logical_operator);
 
-	$incidents = reports::get_reports_list_by_cat($category_ids, 
+	$incidents = adminmap_reports::get_reports_list_by_cat($category_ids, 
 		$approved_text, 
 		$filter. " ". $extra_where_text, 
 		$logical_operator,
@@ -1738,7 +1738,7 @@ class adminmap_helper_Core {
         $graph_data[0]['color'] = '#'. self::merge_colors($category_ids, $custom_category_to_table_mapping);
         $graph_data[0]['data'] = array();
 	
-	$incidents = reports::get_reports($category_ids, 
+	$incidents = adminmap_reports::get_reports($category_ids, 
 		$approved_text, 
 		" ".$extra_where_text, 
 		$logical_operator,

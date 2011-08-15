@@ -50,6 +50,7 @@
 	'or_details' => 'Show all reports that fall under at least one of the categories selected below',
 	'and_details' => 'Show all reports that fall under all of the categories selected below',
 	'show_all_reports' => 'Show All Reports',
+	'embedd_html' => 'To embedd this map in your own site use this HTML:',
 
 );
 	

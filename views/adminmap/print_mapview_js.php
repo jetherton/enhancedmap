@@ -270,9 +270,7 @@ function setURL()
 	$("#mapUrlText").val($.address.baseURL() + "#/?" + $.address.queryString());
 
 	
-	var embedUrl = "<?php echo url::site();?>";
 	
-	$("#embedMapUrlText").val('<iframe src="' + embedUrl + "iframemap#/?" + $.address.queryString() + '" width="515px" height="430px"></iframe>');
 }
         
 
@@ -439,7 +437,6 @@ function changeTopBottom(direction)
 		function addMarkers(catID,startDate,endDate, currZoom, currCenter,
 			mediaType, thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor)
 		{
-		
 			// Get Current Status, and if we should color these reports black
 			currStatus = $("#currentStatus").val();
 			currColorStatus = $("#colorCurrentStatus").val();
@@ -1354,11 +1351,19 @@ function changeTopBottom(direction)
 			});
 			
 			
+			
+		});
+		
+		
+		$(document).ready(function(){
+		
+			
 			///////////////////////////////////////////////////////////////////////////
 			//check and see if we should update the map given the URL
 			/////////////////////////////////////////////////////////////////////////
 			
 			//re center the map
+			
 			if($.address.parameter("lon") != null && $.address.parameter("lat"))
 			{
 				var lon = $.address.parameter("lon");
@@ -1379,7 +1384,8 @@ function changeTopBottom(direction)
 				$("#startDate").val(startDate);
 				$("#startDate").trigger("change");
 				
-			}
+			}			
+			
 			
 			if($.address.parameter("endDate") != null)
 			{
@@ -1389,12 +1395,12 @@ function changeTopBottom(direction)
 				
 			}
 			
-			
+									
 			if($.address.parameter("currColorStatus") != null)
 			{
 				$("#color_status_1").trigger("click");
 			}
-			
+
 			if($.address.parameter("logic") != null)
 			{
 				var logic = $.address.parameter("logic")
@@ -1407,7 +1413,7 @@ function changeTopBottom(direction)
 					$("#logicalOperator_2").trigger("click");
 				}
 			}
-			
+
 			if($.address.parameter("catId") != null)
 			{
 				var cats = $.address.parameter("catId")
@@ -1433,7 +1439,7 @@ function changeTopBottom(direction)
 				}
 				
 			}
-			
+						
 			//handle the key
 			if($.address.parameter("hk") != null)
 			{
@@ -1481,7 +1487,7 @@ function changeTopBottom(direction)
 				}
 			}
 			
-			
+
 			//handle layers
 			if($.address.parameter("layer") != null)
 			{
@@ -1491,7 +1497,7 @@ function changeTopBottom(direction)
 					$("#layer_" + layersArray[i]).trigger("click");
 				}
 			}
-			
+
 			
 			$.get("<?php echo url::site(); ?>printmapkey/getKey/" + 
 				$("#currentCat").val() + "/" + 
@@ -1504,8 +1510,6 @@ function changeTopBottom(direction)
 					canRedrawMapKey = true;			
 										
 			});
-			
-			
 			
 		});
 		
