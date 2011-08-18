@@ -141,7 +141,7 @@ class Bigmap_reports_Controller extends Main_Controller
 	}
 	
 	
-	$reports_count = reports::get_reports_count($category_ids, $approved_text, $location_where. " AND ". $filter, $logical_operator);
+	$reports_count = adminmap_reports::get_reports_count($category_ids, $approved_text, $location_where. " AND ". $filter, $logical_operator);
 
 	
 	// Pagination
@@ -151,7 +151,7 @@ class Bigmap_reports_Controller extends Main_Controller
 			'total_items' => $reports_count
 			));
 
-	$incidents = reports::get_reports($category_ids,  $approved_text, $location_where. " AND ". $filter, $logical_operator, 
+	$incidents = adminmap_reports::get_reports($category_ids,  $approved_text, $location_where. " AND ". $filter, $logical_operator, 
 		"incident.incident_date", "asc",
 		(int) Kohana::config('settings.items_per_page'), $pagination->sql_offset );
 		
