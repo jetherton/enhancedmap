@@ -1057,7 +1057,6 @@ class adminmap_helper_Core {
 	
 	
 
-
 /***************************************************************************************************************
      * Generate JSON in CLUSTER mode
      * $edit_report_path sets the path to the link to edit/view a report
@@ -1073,7 +1072,6 @@ class adminmap_helper_Core {
 	$custom_category_to_table_mapping = array(),
 	$link_target = "_self")
     {
-        //$profiler = new Profiler;
 
         // Database
         $db = new Database();
@@ -1081,261 +1079,398 @@ class adminmap_helper_Core {
         $json = "";
         $json_item = "";
         $json_array = array();
-	$geometry_array = array();
+		$geometry_array = array();
 
         $color = Kohana::config('settings.default_map_all');
-	$default_color = Kohana::config('settings.default_map_all');
+		$default_color = Kohana::config('settings.default_map_all');
         $icon = "";
-	$logical_operator = "or";
+		$logical_operator = "or";
 	
-	$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
-	if($on_the_back_end)
-	{
-		//figure out if we're showing unapproved stuff or what.
-		if (isset($_GET['u']) AND !empty($_GET['u']))
+		$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
+		if($on_the_back_end)
 		{
-		    $show_unapproved = (int) $_GET['u'];
-		}
-		$approved_text = "";
-		if($show_unapproved == 1)
-		{
-			$approved_text = "incident.incident_active = 1 ";
-		}
-		else if ($show_unapproved == 2)
-		{
-			$approved_text = "incident.incident_active = 0 ";
-		}
-		else if ($show_unapproved == 3)
-		{
-			$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
-		}	
-	}
-	else
-	{
-		$approved_text = "incident.incident_active = 1 ";
-		$show_unapproved = 1;
-	}
-	
-	
-	//should we color unapproved reports a different color?
-	$color_unapproved = 2;
-        if (isset($_GET['uc']) AND !empty($_GET['uc']))
-        {
-	    $color_unapproved = (int) $_GET['uc'];
-        }
-	
-
-	if (isset($_GET['lo']) AND !empty($_GET['lo']))
-        {
-	    $logical_operator =  $_GET['lo'];
-        }
-
-
-        // Get Zoom Level
-        $zoomLevel = (isset($_GET['z']) AND !empty($_GET['z'])) ?
-            (int) $_GET['z'] : 8;
-
-        //$distance = 60;
-        $distance = ((10000000 >> $zoomLevel) / 100000) / 2.5;
-	
-
-        // Category ID
-	$is_all_categories = false;
-	$category_ids=array();
-    if( isset($_GET['c']) AND ! empty($_GET['c']) )
-	{
-		//check if there are any ',' in the category
-		if((strpos($_GET['c'], ",")===false) && is_numeric($_GET['c']))
-		{
-			$category_ids = array($_GET['c']);	
+			//figure out if we're showing unapproved stuff or what.
+			if (isset($_GET['u']) AND !empty($_GET['u']))
+			{
+			    $show_unapproved = (int) $_GET['u'];
+			}
+			$approved_text = "";
+			if($show_unapproved == 1)
+			{
+				$approved_text = "incident.incident_active = 1 ";
+			}
+			else if ($show_unapproved == 2)
+			{
+				$approved_text = "incident.incident_active = 0 ";
+			}
+			else if ($show_unapproved == 3)
+			{
+				$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
+			}	
 		}
 		else
 		{
-			$category_ids = explode(",", $_GET['c'],-1); //get rid of that trailing ";"
-		}
-	}
-	else
-	{
-		$category_ids = array("0");
-	}
-	If(count($category_ids) == 0 || $category_ids[0] == '0')
-	{
-		$is_all_categories = true;
-	}
-
-        // Start Date
-        $start_date = (isset($_GET['s']) AND !empty($_GET['s'])) ?
-            (int) $_GET['s'] : "0";
-
-        // End Date
-        $end_date = (isset($_GET['e']) AND !empty($_GET['e'])) ?
-            (int) $_GET['e'] : "0";
-
-        // SouthWest Bound
-        $southwest = (isset($_GET['sw']) AND !empty($_GET['sw'])) ?
-            $_GET['sw'] : "0";
-
-        $northeast = (isset($_GET['ne']) AND !empty($_GET['ne'])) ?
-            $_GET['ne'] : "0";
-
-        $filter = "";
-        $filter .= ($start_date) ?
-            " AND incident.incident_date >= '" . date("Y-m-d H:i:s", $start_date) . "'" : "";
-        $filter .= ($end_date) ?
-            " AND incident.incident_date <= '" . date("Y-m-d H:i:s", $end_date) . "'" : "";
-
-        if ($southwest AND $northeast)
-        {
-            list($latitude_min, $longitude_min) = explode(',', $southwest);
-            list($latitude_max, $longitude_max) = explode(',', $northeast);
-
-            $filter .= " AND location.latitude >=".(float) $latitude_min.
-                " AND location.latitude <=".(float) $latitude_max;
-            $filter .= " AND location.longitude >=".(float) $longitude_min.
-                " AND location.longitude <=".(float) $longitude_max;
-        }
-
-	//stuff john just added
-	$color = self::merge_colors($category_ids, $custom_category_to_table_mapping);
-	//$incidents = adminmap_reports::get_reports($category_ids, $approved_text, $filter, $logical_operator);
-
-	$incidents = adminmap_reports::get_reports_list_by_cat($category_ids, 
-		$approved_text, 
-		$filter. " ". $extra_where_text, 
-		$logical_operator,
-		"incident.id",
-		"asc",
-		$joins,
-		$custom_category_to_table_mapping);        
-	
-
-	
-	// Create markers by marrying the the stuff together
-        $markers = array();
-	$last_incident = null;
-	$curr_id = "no idea";
-	$isnt_first = false;
-	$cat_names = array();
-	$colors = array();
-	foreach($incidents as $incident)
-	{
-		if($isnt_first && $curr_id != $incident->id)
-		{
-			//echo $last_incident->incident_title."\n\r".Kohana::debug($cat_names)."\r\n\r\n";
-			$incident_info = array("incident" => $last_incident, 
-								"colors"=>$colors, 
-								"cat_names"=>$cat_names);
-			array_push($markers, $incident_info);
-			
-			
-			//reset the arrays
-			$cat_names = array();
-			$colors = array();
+			$approved_text = "incident.incident_active = 1 ";
+			$show_unapproved = 1;
 		}
 		
-		$last_incident = $incident;
-		$curr_id = $incident->id;
-		$isnt_first = true;
-		$incident_array = $incident->as_array();
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//Now we try and figure out which category this report was matched to
-		//////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		
-		//if we're looking at all categories don't bother doing all this crazyness
-		if(!$is_all_categories)
+		//should we color unapproved reports a different color?
+		$color_unapproved = 2;
+	        if (isset($_GET['uc']) AND !empty($_GET['uc']))
+	        {
+		    $color_unapproved = (int) $_GET['uc'];
+	        }
+		
+	
+		if (isset($_GET['lo']) AND !empty($_GET['lo']))
+	        {
+		    $logical_operator =  $_GET['lo'];
+	        }
+	
+	
+	        // Get Zoom Level
+	        $zoomLevel = (isset($_GET['z']) AND !empty($_GET['z'])) ?
+	            (int) $_GET['z'] : 8;
+	
+	        //$distance = 60;
+	        $distance = ((10000000 >> $zoomLevel) / 100000) / 2.5;
+		
+	
+	        // Category ID
+		$is_all_categories = false;
+		$category_ids=array();
+	    if( isset($_GET['c']) AND ! empty($_GET['c']) )
 		{
+			//check if there are any ',' in the category
+			if((strpos($_GET['c'], ",")===false) && is_numeric($_GET['c']))
+			{
+				$category_ids = array($_GET['c']);	
+			}
+			else
+			{
+				$category_ids = explode(",", $_GET['c'],-1); //get rid of that trailing ";"
+			}
+		}
+		else
+		{
+			$category_ids = array("0");
+		}
+		If(count($category_ids) == 0 || $category_ids[0] == '0')
+		{
+			$is_all_categories = true;
+		}
+	
+	        // Start Date
+	        $start_date = (isset($_GET['s']) AND !empty($_GET['s'])) ?
+	            (int) $_GET['s'] : "0";
+	
+	        // End Date
+	        $end_date = (isset($_GET['e']) AND !empty($_GET['e'])) ?
+	            (int) $_GET['e'] : "0";
+	
+	        // SouthWest Bound
+	        $southwest = (isset($_GET['sw']) AND !empty($_GET['sw'])) ?
+	            $_GET['sw'] : "0";
+	
+	        $northeast = (isset($_GET['ne']) AND !empty($_GET['ne'])) ?
+	            $_GET['ne'] : "0";
+	
+	        $filter = "";
+	        $filter .= ($start_date) ?
+	            " AND incident.incident_date >= '" . date("Y-m-d H:i:s", $start_date) . "'" : "";
+	        $filter .= ($end_date) ?
+	            " AND incident.incident_date <= '" . date("Y-m-d H:i:s", $end_date) . "'" : "";
+	
+	        if ($southwest AND $northeast)
+	        {
+	            list($latitude_min, $longitude_min) = explode(',', $southwest);
+	            list($latitude_max, $longitude_max) = explode(',', $northeast);
+	
+	            $filter .= " AND location.latitude >=".(float) $latitude_min.
+	                " AND location.latitude <=".(float) $latitude_max;
+	            $filter .= " AND location.longitude >=".(float) $longitude_min.
+	                " AND location.longitude <=".(float) $longitude_max;
+	        }
+	
+		//stuff john just added
+		$color = self::merge_colors($category_ids, $custom_category_to_table_mapping);
+		//$incidents = reports::get_reports($category_ids, $approved_text, $filter, $logical_operator);
+	
+		$incidents = adminmap_reports::get_reports_list_by_cat($category_ids, 
+			$approved_text, 
+			$filter. " ". $extra_where_text, 
+			$logical_operator,
+			"incident.id",
+			"asc",
+			$joins,
+			$custom_category_to_table_mapping);        
+
+		/**
+		 * **********************************************************************************************************************
+		 * ********************************************************************************************************************** 
+		 * We have the incidents, now process them
+		 */
+
+	
+		// Create markers by marrying the the stuff together
+	    $markers = array();
+		$last_incident = null;
+		$curr_id = "no idea";
+		$isnt_first = false;
+		$cat_names = array();
+		$colors = array();
 		
-			if(isset($incident_array["is_parent"]) && $incident_array["is_parent"] != 0) 
+		foreach($incidents as $incident)
+		{
+			if($isnt_first && $curr_id != $incident->id)
 			{
-				//echo $incident->incident_title." parent matched\r\n";
-				$cat_names[$incident->parent_id] = $incident->parent_title;
-				$colors[$incident->parent_id] = $incident->parent_color;
+				//echo $last_incident->incident_title."\n\r".Kohana::debug($cat_names)."\r\n\r\n";
+				$incident_info = array("incident" => $last_incident, 
+									"colors"=>$colors, 
+									"cat_names"=>$cat_names);
+				//array_push($markers, $incident_info);
+				$markers[] = $incident_info;
+				//reset the arrays
+				$cat_names = array();
+				$colors = array();
 			}
-			elseif(isset($incident_array["is_child"]) && $incident_array["is_child"] != 0) 
+			//things to keep us moving forward
+			$last_incident = $incident;
+			$curr_id = $incident->id;
+			$isnt_first = true;
+			////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			//Now we try and figure out which category this report was matched to
+			//////////////////////////////////////////////////////////////////////////////////////////////////////////////
+			
+			//if we're looking at all categories don't bother doing all this crazyness
+			if(!$is_all_categories)
 			{
-				//echo $incident->incident_title." kid matched\r\n";			
-				$cat_names[$incident->cat_id] = $incident->category_title;
-				$colors[$incident->cat_id] = $incident->color;
-			}
-			//now the fun part, loop through all the custom categories
-			foreach($custom_category_to_table_mapping as $name=>$custom_cat)
-			{
-				if(isset($incident_array["is_".$name."_parent"]) && $incident_array["is_".$name."_parent"] != 0) 
+				$incident_array = $incident->as_array();
+				if(isset($incident_array["is_parent"]) && $incident_array["is_parent"] != 0) 
 				{
-					//echo $incident->incident_title." $name parent matched\r\n";
-					$cat_names[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_title"];
-					$colors[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_color"];
+					//echo $incident->incident_title." parent matched\r\n";
+					$cat_names[$incident->parent_id] = $incident->parent_title;
+					$colors[$incident->parent_id] = $incident->parent_color;
 				}
-				elseif(isset($incident_array["is_".$name."_child"]) && $incident_array["is_".$name."_child"] != 0) 
+				elseif(isset($incident_array["is_child"]) && $incident_array["is_child"] != 0) 
 				{
-					//echo $incident->incident_title." $name kid matched. With color: ".$incident_array[$name."_color"]."\r\n";			
-					$cat_names[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_title"];
-					$colors[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_color"];
+					//echo $incident->incident_title." kid matched\r\n";			
+					$cat_names[$incident->cat_id] = $incident->category_title;
+					$colors[$incident->cat_id] = $incident->color;
 				}
-			}
-		}//end if not is_all_categories
+				//now the fun part, loop through all the custom categories
+				foreach($custom_category_to_table_mapping as $name=>$custom_cat)
+				{
+					if(isset($incident_array["is_".$name."_parent"]) && $incident_array["is_".$name."_parent"] != 0) 
+					{
+						//echo $incident->incident_title." $name parent matched\r\n";
+						$cat_names[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_title"];
+						$colors[$name."_".$incident_array[$name."_parent_cat_id"]] = $incident_array[$name."_parent_color"];
+					}
+					elseif(isset($incident_array["is_".$name."_child"]) && $incident_array["is_".$name."_child"] != 0) 
+					{
+						//echo $incident->incident_title." $name kid matched. With color: ".$incident_array[$name."_color"]."\r\n";			
+						$cat_names[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_title"];
+						$colors[$name."_".$incident_array[$name."_cat_id"]] = $incident_array[$name."_color"];
+					}
+				}
+			}//end if not is_all_categories
+			unset($incident_array);
+		}//end loop
 		
-	}//end loop
-
-	//catch the last report
-	if($last_incident != null)
-	{
-		//echo "last one ".$last_incident->incident_title."\n\r".Kohana::debug($cat_names)."\r\n\r\n";
-		$incident_info = array("incident" => $last_incident, "colors"=>$colors, "cat_names"=>$cat_names);
-		array_push($markers, $incident_info);
-	}
-
-	//echo "___________________________________________________\r\n";
-
-        $clusters = array();    // Clustered
-        $singles = array();     // Non Clustered
-
-        // Loop until all markers have been compared
-        while (count($markers))
-        {
-        
-        	$marker_info  = array_pop($markers);
-	    
-	    
-        	$colors = $marker_info["colors"];	    
-        	$cat_names = $marker_info["cat_names"];	    
-        	$marker = $marker_info["incident"];
-	    
-	    
-		//echo "\r\nLooking for clusters around ". $marker->incident_title. "\r\n";
-		
-	    $cluster = array();
-            
-	    $category_colors = array();	//all the colors that were seen while making a cluster
-	    $category_count = array();	//how many times we've seen a category while making this cluster
-	    $category_names = array(); //all the names
-	    
-	    $contains_nonactive = false;
-            // Compare marker against all remaining markers.
-            foreach ($markers as $key => $target_info)
-            {
-				$target_colors = $target_info["colors"];
-				$target_cat_names = $target_info["cat_names"];
-				$target = $target_info["incident"];
+	
+		//catch the last report
+		if($last_incident != null)
+		{
+			//echo "last one ".$last_incident->incident_title."\n\r".Kohana::debug($cat_names)."\r\n\r\n";
+			$incident_info = array("incident" => $last_incident, "colors"=>$colors, "cat_names"=>$cat_names);
+			$markers[] = $incident_info;
+		}
+	
+		//echo "___________________________________________________\r\n";
+	
+	        $clusters = array();    // Clustered
+	        $singles = array();     // Non Clustered
+	
+	        // Loop until all markers have been compared
+	        while (count($markers))
+	        {
+	        
+	        	$marker_info  = array_pop($markers);
+		    
+	        	$colors = $marker_info["colors"];	    
+	        	$cat_names = $marker_info["cat_names"];	    
+	        	$marker = $marker_info["incident"];
+		    
+		    
+				//echo "\r\nLooking for clusters around ". $marker->incident_title. "\r\n";
+				
+			    $cluster = array();
+		            
+			    $category_colors = array();	//all the colors that were seen while making a cluster
+			    $category_count = array();	//how many times we've seen a category while making this cluster
+			    $category_names = array(); //all the names
 			    
+			    $contains_nonactive = false;
+	            // Compare marker against all remaining markers.
+	            foreach ($markers as $key => $target_info)
+	            {
+					
+			        $target = $target_info["incident"];        
+					$pixels = abs($marker->location->longitude - $target->location->longitude) + abs($marker->location->latitude - $target->location->latitude);
+	
+	                // If two markers are closer than defined distance, remove compareMarker from array and add to cluster.
+	                if ($pixels < $distance)
+	                {					
+	                    unset($markers[$key]);
+	                    
+	                    $target_colors = $target_info["colors"];
+						$target_cat_names = $target_info["cat_names"];
+						
+	                    
+	                    
+		                // Get Incident Geometries
+		            	// are we using all categories red, or a specific blend of colors and goodness?
+		            	$geo_color = $is_all_categories ||  $logical_operator=="and" ? $color : self::merge_colors_for_dots($target_colors);
+						
+		            	/** This is too slow
+		            	/*$geometry = self::_get_geometry($target->id, 
+							$target->incident_title, 
+							$target->incident_date, 
+							$on_the_back_end, 
+							$geo_color,
+							$link_target);
+						$geometry = array();
+						if (count($geometry))
+						{
+							$json_item = implode(",", $geometry);
+							array_push($geometry_array, $json_item);
+						}
+						else // we don't want any average markers, just the orignals
+						*/
+						{
+							$cluster[] = $target;
+						}
+	                    
+	                    
+					    //check if the colors and category names have been accounted for
+					    if(!$is_all_categories)
+					    {
+						    foreach($target_colors as $cat_id => $target_color)
+						    {
+								//echo "\t\t".$target->incident_title. " has category: ".$target_cat_names[$cat_id]."\r\n";
+								//colors
+								$category_colors[$cat_id] = $target_color;
+								//name
+								$category_names[$cat_id] = $target_cat_names[$cat_id];
+								//count
+								if(isset($category_count[$cat_id]))
+								{
+									$category_count[$cat_id] = $category_count[$cat_id] + 1;
+								}
+								else
+								{
+									$category_count[$cat_id] = 1;
+								}
+								
+						    }//end loop
+					    } //end if
+					    //check if this is a unapproved report
+					    if($target->incident_active == 0)
+					    {
+							$contains_nonactive = true;
+					    }
+	                }//end if the the two points are close
+	                //trying to minizmie memory use
+	                unset($target_colors);
+	                unset($target_cat_names);
+	                unset($target);
+	            }//end for loop
+	            
+	            // If a marker was added to cluster, also add the marker we were comparing to.
+	            if (count($cluster) > 0)
+	            {
+					// Get Incident Geometries
+					// are we using all categories red, or a specific blend of colors and goodness?
+					
+	            	/**
+	            	/**This is too slow
+	            	$geo_color = $is_all_categories ||  $logical_operator=="and" ? $color : self::merge_colors_for_dots($colors);
+					
+					/*$geometry = self::_get_geometry($marker->id, 
+						$marker->incident_title, 
+						$marker->incident_date,
+						$on_the_back_end, 
+						$geo_color,
+						$link_target);
+					
+					$geometry = array();
+					if (count($geometry))
+					{
+						$json_item = implode(",", $geometry);
+						array_push($geometry_array, $json_item);
+					}
+					else*/
+					{
+						$cluster[] = $marker;
+					}
+	                
+	                
+	                
+	                
+					//check if the colors and category names have been accounted for
+				    if(!$is_all_categories)
+				    {
+						foreach($colors as $cat_id2 => $marker_color)
+					    {
+							//echo "\t\t".$marker->incident_title. " has category: ".$cat_names[$cat_id2]."\r\n";
+							//colors
+							$category_colors[$cat_id2] = $marker_color;
+							//name
+							$category_names[$cat_id2] = $cat_names[$cat_id2];
+							//count
+							if(isset($category_count[$cat_id2]))
+							{
+								$category_count[$cat_id2] = $category_count[$cat_id2] + 1;
+							}
+							else
+							{
+								$category_count[$cat_id2] = 1;
+							}
+						}//end loop
+				    }//end if   
+			
+			
 				
-				
-		                
-				$pixels = abs($marker->location->longitude - $target->location->longitude) + abs($marker->location->latitude - $target->location->latitude);
-
-                // If two markers are closer than defined distance, remove compareMarker from array and add to cluster.
-                if ($pixels < $distance)
-                {
-					//echo "\tFound cluster match with ". $target->incident_title. "\r\n";
-                    unset($markers[$key]);
-                    
-                    
-	                // Get Incident Geometries
+					//check if this is an unapproved report
+				    if($marker->incident_active == 0)
+				    {
+					$contains_nonactive = true;
+				    }
+				    
+					if($contains_nonactive)
+					{
+					
+						$clusters[] = array( 'contains_nonactive' => TRUE, 'cluster'=> $cluster, 'category_count'=>$category_count,
+							'category_names'=>$category_names, 'category_colors'=>$category_colors);
+					}
+					else
+					{			
+						$clusters[] = array( 'contains_nonactive' => FALSE, 'cluster'=> $cluster, 'category_count'=>$category_count,
+							'category_names'=>$category_names, 'category_colors'=>$category_colors);
+					}
+	            }
+	            else
+	            {
+	            	// Get Incident Geometries
 	            	// are we using all categories red, or a specific blend of colors and goodness?
-	            	$geo_color = $is_all_categories ||  $logical_operator=="and" ? $color : self::merge_colors_for_dots($target_colors);
-					$geometry = self::_get_geometry($target->id, 
-						$target->incident_title, 
-						$target->incident_date, 
+
+	            	/** THIS IS TOO SLOW
+	            	$geo_color = $is_all_categories ||  $logical_operator=="and" ? $color : self::merge_colors_for_dots($marker_info["colors"]);
+					$geometry = self::_get_geometry($marker_info["incident"]->id, 
+						$marker_info["incident"]->incident_title, 
+						$marker_info["incident"]->incident_date, 
 						$on_the_back_end, 
 						$geo_color,
 						$link_target);
@@ -1344,135 +1479,18 @@ class adminmap_helper_Core {
 						$json_item = implode(",", $geometry);
 						array_push($geometry_array, $json_item);
 					}
-					else // we don't want any average markers, just the orignals
+					else //if there are markers we don't want any average dots, we just want original dots
+					*/
 					{
-						$cluster[] = $target;
+						$singles[] = $marker_info;
 					}
-                    
-                    
-				    //check if the colors and category names have been accounted for
-				    if(!$is_all_categories)
-				    {
-					    foreach($target_colors as $cat_id => $target_color)
-					    {
-							//echo "\t\t".$target->incident_title. " has category: ".$target_cat_names[$cat_id]."\r\n";
-							//colors
-							$category_colors[$cat_id] = $target_color;
-							//name
-							$category_names[$cat_id] = $target_cat_names[$cat_id];
-							//count
-							if(isset($category_count[$cat_id]))
-							{
-								$category_count[$cat_id] = $category_count[$cat_id] + 1;
-							}
-							else
-							{
-								$category_count[$cat_id] = 1;
-							}
-							
-					    }//end loop
-				    } //end if
-				    //check if this is a unapproved report
-				    if($target->incident_active == 0)
-				    {
-						$contains_nonactive = true;
-				    }
-                }
-            }
-            // If a marker was added to cluster, also add the marker we were comparing to.
-            if (count($cluster) > 0)
-            {
-				// Get Incident Geometries
-				// are we using all categories red, or a specific blend of colors and goodness?
-				$geo_color = $is_all_categories ||  $logical_operator=="and" ? $color : self::merge_colors_for_dots($colors);
-				$geometry = self::_get_geometry($marker->id, 
-					$marker->incident_title, 
-					$marker->incident_date,
-					$on_the_back_end, 
-					$geo_color,
-					$link_target);
-				if (count($geometry))
-				{
-					$json_item = implode(",", $geometry);
-					array_push($geometry_array, $json_item);
-				}
-				else
-				{
-					$cluster[] = $marker;
-				}
-                
-                
-                
-                
-				//check if the colors and category names have been accounted for
-			    if(!$is_all_categories)
-			    {
-					foreach($colors as $cat_id2 => $marker_color)
-				    {
-						//echo "\t\t".$marker->incident_title. " has category: ".$cat_names[$cat_id2]."\r\n";
-						//colors
-						$category_colors[$cat_id2] = $marker_color;
-						//name
-						$category_names[$cat_id2] = $cat_names[$cat_id2];
-						//count
-						if(isset($category_count[$cat_id2]))
-						{
-							$category_count[$cat_id2] = $category_count[$cat_id2] + 1;
-						}
-						else
-						{
-							$category_count[$cat_id2] = 1;
-						}
-					}//end loop
-			    }//end if   
-		
-		
-			
-				//check if this is a unapproved report
-			    if($marker->incident_active == 0)
-			    {
-				$contains_nonactive = true;
-			    }
-			    
-				if($contains_nonactive)
-				{
-				
-					$clusters[] = array( 'contains_nonactive' => TRUE, 'cluster'=> $cluster, 'category_count'=>$category_count,
-						'category_names'=>$category_names, 'category_colors'=>$category_colors);
-				}
-				else
-				{			
-					$clusters[] = array( 'contains_nonactive' => FALSE, 'cluster'=> $cluster, 'category_count'=>$category_count,
-						'category_names'=>$category_names, 'category_colors'=>$category_colors);
-				}
-            }
-            else
-            {
-            	// Get Incident Geometries
-            	// are we using all categories red, or a specific blend of colors and goodness?            	
-            	$geo_color = $is_all_categories ||  $logical_operator=="and" ? $color : self::merge_colors_for_dots($marker_info["colors"]);
-				$geometry = self::_get_geometry($marker_info["incident"]->id, 
-					$marker_info["incident"]->incident_title, 
-					$marker_info["incident"]->incident_date, 
-					$on_the_back_end, 
-					$geo_color,
-					$link_target);
-				if (count($geometry))
-				{
-					$json_item = implode(",", $geometry);
-					array_push($geometry_array, $json_item);
-				}
-				else //if there are markers we don't want any average dots, we just want original dots
-				{
-					$singles[] = $marker_info;
-				}
-            }
-        }
+	            }
+	        }
 
 
-	//echo "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\r\n\r\n";
-
-	$i = 0;
+		//echo "xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx\r\n\r\n";
+	
+		$i = 0;
         // Create Json
         foreach ($clusters as $cluster_alpha)
         {
@@ -1481,25 +1499,19 @@ class adminmap_helper_Core {
 	    $cluster_cat_names = $cluster_alpha['category_names'];
 	    $cluster_cat_count = $cluster_alpha['category_count'];
 	    
-	//make category description string
-	$category_str = "";
-	if( (!$is_all_categories) && ($logical_operator!="and"))
-	{
-		$count = 0;
-		foreach($cluster_cat_count as $cat_id => $cat_count)
+		//make category description string
+		$category_str = "";
+		if( (!$is_all_categories) && ($logical_operator!="and"))
 		{
-			$count++;
-			if($count > 1)
+			foreach($cluster_cat_count as $cat_id => $cat_count)
 			{
-				//$category_str .= "<br/> ";
+				$category_str .= "<li>".$cluster_cat_names[$cat_id]." (".$cat_count.")</li>";
 			}
-			$category_str .= "<li>".$cluster_cat_names[$cat_id]." (".$cat_count.")</li>";
+			$category_str = "<br/><br/> Categories in this cluster (number of reports):<ul>". $category_str."</ul>";
 		}
-		$category_str = "<br/><br/> Categories in this cluster (number of reports):<ul>". $category_str."</ul>";
-	}
-	
+		
 	    
-	    $contains_nonactive = $cluster_alpha['contains_nonactive'];
+	    	$contains_nonactive = $cluster_alpha['contains_nonactive'];
             // Calculate cluster center
             $bounds = self::_calculateCenter($cluster);
             $cluster_center = $bounds['center'];
@@ -1515,51 +1527,38 @@ class adminmap_helper_Core {
             // Number of Items in Cluster
             $cluster_count = count($cluster);
 
-            $json_item = "{";
-            $json_item .= "\"type\":\"Feature\",";
-            $json_item .= "\"properties\": {";
-	    $categories_str = implode(",", $category_ids);
+            $json_item = "{\"type\":\"Feature\",\"properties\": {";
+	    	$categories_str = implode(",", $category_ids);
             $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . $list_reports_path."?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.$time_filter."'>" . $cluster_count . " Reports</a> ".$category_str)) . "\",";
-	    $json_item .= "\"link\":\"" . url::base(). "$list_reports_path?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.$time_filter."\",";
+	    	$json_item .= "\"link\":\"" . url::base(). "$list_reports_path?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.$time_filter."\",";
             $json_item .= "\"category\":[0], ";
-		if($contains_nonactive && $color_unapproved==2)
-		{
-			$json_item .= "\"color\": \"000000\", \n";
-			$json_item .= "\"icon\": \"".$icon."\", \n";
-		}
-		//check if we're looking at all categories
-		elseif($is_all_categories)
-		{					
-			$json_item .= "\"color\": \"".$default_color."\", \n";
-			$json_item .= "\"icon\": \"".$icon."\", \n";
-		}
-		//check if we're using AND
-		elseif($logical_operator=="and")
-		{					
-			$json_item .= "\"color\": \"".$color."\", \n";
-			$json_item .= "\"icon\": \"".$icon."\", \n";
-		}
-		//else we're using OR to combine categories
-		else
-		{
-			$dot_color = self::merge_colors_for_dots($cluster_cat_colors);
-			$json_item .= "\"color\": \"".$dot_color."\", \n";
-			$json_item .= "\"icon\": \"".$icon."\", \n";
-		}            
-            $json_item .= "\"timestamp\": \"0\", ";
-            $json_item .= "\"count\": \"" . $cluster_count . "\"";
-            $json_item .= "},";
-            $json_item .= "\"geometry\": {";
-            $json_item .= "\"type\":\"Point\", ";
-            $json_item .= "\"coordinates\":[" . $cluster_center . "]";
-            $json_item .= "}";
-            $json_item .= "}";
+			if($contains_nonactive && $color_unapproved==2)
+			{
+				$json_item .= "\"color\": \"000000\", \n\"icon\": \"".$icon."\", \n";
+			}
+			//check if we're looking at all categories
+			elseif($is_all_categories)
+			{					
+				$json_item .= "\"color\": \"".$default_color."\", \n\"icon\": \"".$icon."\", \n";
+			}
+			//check if we're using AND
+			elseif($logical_operator=="and")
+			{					
+				$json_item .= "\"color\": \"".$color."\", \n\"icon\": \"".$icon."\", \n";
+			}
+			//else we're using OR to combine categories
+			else
+			{
+				$dot_color = self::merge_colors_for_dots($cluster_cat_colors);
+				$json_item .= "\"color\": \"".$dot_color."\", \n\"icon\": \"".$icon."\", \n";
+			}            
+            $json_item .= "\"timestamp\": \"0\", \"count\": \"" . $cluster_count . "\"},\"geometry\": {\"type\":\"Point\", \"coordinates\":[" . $cluster_center . "]}}";
 
             array_push($json_array, $json_item);
         }
 
 
-	//do singles
+		//do singles
         foreach ($singles as $single_info)
         {
 		$single = $single_info["incident"];
@@ -1585,10 +1584,10 @@ class adminmap_helper_Core {
 			$category_description = "<br/><br/>Falls under categories:<br/>".$category_description;
 		}
 		
-            $json_item = "{";
-            $json_item .= "\"type\":\"Feature\",";
-            $json_item .= "\"properties\": {";
-            $json_item .= "\"name\":\"" .date("n/j/Y", strtotime($single->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . $edit_report_path . $single->id . "'/>".str_replace('"','\"',$single->incident_title)."</a>".$category_description)) . "\",";   
+		$json_item = "{";
+		$json_item .= "\"type\":\"Feature\",";
+		$json_item .= "\"properties\": {";
+		$json_item .= "\"name\":\"" .date("n/j/Y", strtotime($single->incident_date)).":<br/>". str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . $edit_report_path . $single->id . "'/>".str_replace('"','\"',$single->incident_title)."</a>".$category_description)) . "\",";   
 	    $json_item .= "\"link\":\"" .url::base(). "{$edit_report_path}{$single->id}\","; 
             $json_item .= "\"category\":[0], ";
 	    //check if it's a unapproved/unactive report
@@ -1638,7 +1637,7 @@ class adminmap_helper_Core {
         $controller->template->json = $json;
 
     }//end cluster method
-    
+	    
     
   
   
