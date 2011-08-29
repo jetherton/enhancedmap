@@ -40,7 +40,7 @@ class adminmap_reports_Core {
 						'(0=1) AS is_parent')*/
 				->with('location');
 				//->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
-				//->join('media', 'incident.id', 'media.incident_id','LEFT')
+				$incidents = $incidents->join('media', 'incident.id', 'media.incident_id','LEFT');
 				//->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
 				//->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
 			//run code to add in extra joins
@@ -79,11 +79,11 @@ class adminmap_reports_Core {
 			{
 				$incidents = ORM::factory('incident')
 					->select('incident.*, category.category_color as color, category.category_title as category_title, category.id as cat_id, '.
-						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id'.
+						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id, media.media_type'.
 						$test_text.' '. $custom_cat_selects)
 					->with('location')
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','RIGHT')
-					//->join('media', 'incident.id', 'media.incident_id','LEFT')
+					->join('media', 'incident.id', 'media.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
 					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
 				//run code to add in extra joins
@@ -109,12 +109,12 @@ class adminmap_reports_Core {
 				// Retrieve incidents by category			
 				$incidents = ORM::factory('incident')
 					->select('incident.*,  category.category_color as color, category.category_title as category_title, category.id as cat_id, '.
-						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id'.
+						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id, media.media_type'.
 						$test_text.' '. $custom_cat_selects)
 					->with('location')
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id')
-					//->join('media', 'incident.id', 'media.incident_id','LEFT')
+					->join('media', 'incident.id', 'media.incident_id','LEFT')
 					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
 				//run code to add in extra joins
 				foreach($joins as $join)
@@ -186,9 +186,9 @@ class adminmap_reports_Core {
 		{
 			// Retrieve all markers
 			$incidents = ORM::factory('incident')
-				->select('DISTINCT incident.*')
-				->with('location');
-				//->join('media', 'incident.id', 'media.incident_id','LEFT')
+				->select('DISTINCT incident.*, media.media_type')
+				->with('location')
+				->join('media', 'incident.id', 'media.incident_id','LEFT');
 			//run code to add in extra joins
 			foreach($joins as $join)
 			{
@@ -226,10 +226,10 @@ class adminmap_reports_Core {
 			{
 			
 				$incidents = ORM::factory('incident')
-					->select('DISTINCT incident.*')
+					->select('DISTINCT incident.*, media.media_type')
 					->with('location')
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
-					//->join('media', 'incident.id', 'media.incident_id','LEFT')
+					->join('media', 'incident.id', 'media.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id', 'LEFT')
 					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
 				//run code to add in extra joins
@@ -267,12 +267,12 @@ class adminmap_reports_Core {
 				// Retrieve incidents by category			
 				$incidents = ORM::factory('incident')
 					->select('incident.*,  category.category_color as color, category.category_title as category_title, category.id as cat_id, '.
-						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id'.
+						'parent_cat.category_title as parent_title, parent_cat.category_color as parent_color, parent_cat.id as parent_id, media.media_type'.
 						$custom_cat_selects)
 					->with('location')
 					->join('incident_category', 'incident.id', 'incident_category.incident_id','LEFT')
 					->join('category', 'incident_category.category_id', 'category.id')
-					//->join('media', 'incident.id', 'media.incident_id','LEFT')
+					->join('media', 'incident.id', 'media.incident_id','LEFT')
 					->join('category as parent_cat', 'category.parent_id', 'parent_cat.id', 'LEFT');
 					//run code to add in extra joins
 				foreach($joins as $join)
