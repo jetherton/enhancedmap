@@ -285,17 +285,7 @@ function changeTopBottom(direction)
 		// Change to 1 after map loads
 		var mapLoad = 0;
 		// /json or /json/cluster depending on if clustering is on
-		var default_json_url = "<?php 
-								//check and see if we're clustering
-								if( stripos($json_url, "cluster") != false)
-								{
-									echo "iframemap_json/cluster";
-								}
-								else
-								{
-									echo "iframemap_json";
-								}
-						    ?>";
+		var default_json_url = "<?php echo $json_url; ?>";
 		// Current json_url, if map is switched dynamically between json and json_cluster
 		var json_url = default_json_url;
 		
