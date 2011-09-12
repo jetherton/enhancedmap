@@ -270,7 +270,9 @@ function setURL()
 	$("#mapUrlText").val($.address.baseURL() + "#/?" + $.address.queryString());
 
 	
+	var embedUrl = "<?php echo url::site();?>";
 	
+	$("#embedMapUrlText").val('<iframe src="' + embedUrl + "iframemap#/?" + $.address.queryString() + '" width="515px" height="430px"></iframe>');
 }
         
 
@@ -403,17 +405,9 @@ function changeTopBottom(direction)
 		// Change to 1 after map loads
 		var mapLoad = 0;
 		// /json or /json/cluster depending on if clustering is on
-		var default_json_url = "<?php 
-								//check and see if we're clustering
-								if( stripos($json_url, "cluster") != false)
-								{
-									echo "bigmap_json/cluster";
-								}
-								else
-								{
-									echo "bigmap_json";
-								}
-						    ?>";
+		var default_json_url = "<?php echo $json_url ?>";
+		
+
 		// Current json_url, if map is switched dynamically between json and json_cluster
 		var json_url = default_json_url;
 		
@@ -437,6 +431,7 @@ function changeTopBottom(direction)
 		function addMarkers(catID,startDate,endDate, currZoom, currCenter,
 			mediaType, thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor)
 		{
+		
 			// Get Current Status, and if we should color these reports black
 			currStatus = $("#currentStatus").val();
 			currColorStatus = $("#colorCurrentStatus").val();
@@ -664,7 +659,7 @@ function changeTopBottom(direction)
 			// plot hourly incidents when period is within 2 days
 			if ((endTime - startTime) / (1000 * 60 * 60 * 24) <= 3)
 			{
-				$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>"+currentCat+"?i=hour&u="+currStatus + 
+				$.getJSON("<?php echo url::site().$json_timeline_url; ?>"+currentCat+"?i=hour&u="+currStatus + 
 				"&lo="+ currLogicalOperator, function(data) {
 					graphData = data[0];
 
@@ -680,7 +675,7 @@ function changeTopBottom(direction)
 			else if ((endTime - startTime) / (1000 * 60 * 60 * 24) <= 124)
 			{
 			    // weekly if period > 2 months
-				$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>"+currentCat+"?i=day&u="+currStatus+ 
+				$.getJSON("<?php echo url::site().$json_timeline_url; ?>"+currentCat+"?i=day&u="+currStatus+ 
 				"&lo="+ currLogicalOperator, function(data) {
 					graphData = data[0];
 
@@ -696,7 +691,7 @@ function changeTopBottom(direction)
 			else if ((endTime - startTime) / (1000 * 60 * 60 * 24) > 124)
 			{
 				// monthly if period > 4 months
-				$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>"+currentCat+"?u="+currStatus+ 
+				$.getJSON("<?php echo url::site().$json_timeline_url; ?>"+currentCat+"?u="+currStatus+ 
 				"&lo="+ currLogicalOperator, function(data) {
 					graphData = data[0];
 
@@ -711,13 +706,13 @@ function changeTopBottom(direction)
 			}
 
 			// Get dailyGraphData for All Categories
-			$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>"+currentCat+"?i=day&u="+currStatus+ 
+			$.getJSON("<?php echo url::site().$json_timeline_url; ?>"+currentCat+"?i=day&u="+currStatus+ 
 				"&lo="+ currLogicalOperator, function(data) {
 				dailyGraphData = data[0];
 			});
 
 			// Get allGraphData for All Categories
-			$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>"+currentCat + "?u="+currStatus+ 
+			$.getJSON("<?php echo url::site().$json_timeline_url; ?>"+currentCat + "?u="+currStatus+ 
 				"&lo="+ currLogicalOperator, function(data) {
 				allGraphData = data[0];
 			});
@@ -1351,19 +1346,11 @@ function changeTopBottom(direction)
 			});
 			
 			
-			
-		});
-		
-		
-		$(document).ready(function(){
-		
-			
 			///////////////////////////////////////////////////////////////////////////
 			//check and see if we should update the map given the URL
 			/////////////////////////////////////////////////////////////////////////
 			
 			//re center the map
-			
 			if($.address.parameter("lon") != null && $.address.parameter("lat"))
 			{
 				var lon = $.address.parameter("lon");
@@ -1384,8 +1371,7 @@ function changeTopBottom(direction)
 				$("#startDate").val(startDate);
 				$("#startDate").trigger("change");
 				
-			}			
-			
+			}
 			
 			if($.address.parameter("endDate") != null)
 			{
@@ -1395,12 +1381,12 @@ function changeTopBottom(direction)
 				
 			}
 			
-									
+			
 			if($.address.parameter("currColorStatus") != null)
 			{
 				$("#color_status_1").trigger("click");
 			}
-
+			
 			if($.address.parameter("logic") != null)
 			{
 				var logic = $.address.parameter("logic")
@@ -1413,7 +1399,7 @@ function changeTopBottom(direction)
 					$("#logicalOperator_2").trigger("click");
 				}
 			}
-
+			
 			if($.address.parameter("catId") != null)
 			{
 				var cats = $.address.parameter("catId")
@@ -1439,7 +1425,7 @@ function changeTopBottom(direction)
 				}
 				
 			}
-						
+			
 			//handle the key
 			if($.address.parameter("hk") != null)
 			{
@@ -1487,7 +1473,7 @@ function changeTopBottom(direction)
 				}
 			}
 			
-
+			
 			//handle layers
 			if($.address.parameter("layer") != null)
 			{
@@ -1497,7 +1483,7 @@ function changeTopBottom(direction)
 					$("#layer_" + layersArray[i]).trigger("click");
 				}
 			}
-
+			
 			
 			$.get("<?php echo url::site(); ?>printmapkey/getKey/" + 
 				$("#currentCat").val() + "/" + 
@@ -1510,6 +1496,8 @@ function changeTopBottom(direction)
 					canRedrawMapKey = true;			
 										
 			});
+			
+			
 			
 		});
 		

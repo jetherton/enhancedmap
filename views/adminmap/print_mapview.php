@@ -219,12 +219,15 @@ that scaling is set to "scale to fit"
 					<input type="button" name="getURL" id="getURL" value="Create URL" onclick="setURL(); return false;"/>
 					<br/>
 					URL for this map: <input type="text"; id="urlText"/><br/>
+					<?php if (isset($_GET["dev"])): ?>					
 					URL for this page:  <input type="text"; id="mapUrlText"/>
+					URL to embed this map:  <input type="text"; id="embedMapUrlText"/>
+					<?php endif; ?>
 				</form>
 			</div>
 			<!-- /Set URL -->
 			
-			
+			<?php if (isset($_GET["dev"])): ?>
 			<!-- Print to image -->
 			<strong>Print to Image</strong>
 			<div id="keyoptions" class="menuItem">					
@@ -235,7 +238,7 @@ that scaling is set to "scale to fit"
 				</form>
 			</div>
 			<!-- /Print to imgage -->
-			
+			<?php endif; ?>
 		</div>
 		<!-- /controls -->
 		

@@ -9,8 +9,8 @@ Reports from <strong><?php echo $keyStartDate; ?></strong> to <strong><?php echo
 		{
 		?>
 			<li> 
-				<div class="swatch" style="background:#<?php echo $cat->category_color; ?>;"></div> 
-				<?php echo $cat->category_title;?>
+				<div class="swatch" style="background:#<?php echo $cat["color"]; ?>;"></div> 
+				<?php echo $cat["name"];?>
 			</li>
 		<?php 
 		}

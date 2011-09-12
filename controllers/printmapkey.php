@@ -35,32 +35,63 @@ class Printmapkey_Controller extends Controller {
 		
 		//do the categories
 		//check if we're dealing with all categories
-		$categories = array();
+		$cat_data = array();
 		if($catIds == "" || $catIds == "0" || $catIds == "0," || $catIds == "undefined" )
 		{
-			$cat = ORM::factory("category");
-			$cat->category_title = Kohana::lang('ui_main.all_categories');
-			$cat->category_color = Kohana::config('settings.default_map_all');
-			$categories = array($cat); 
+			$cat_data[0] = array("color"=>Kohana::config('settings.default_map_all'), "name"=>Kohana::lang('ui_main.all_categories'));			
 		}
 		else 
 		{
 			$catIds = explode(",", $catIds, -1);
+			$groupWhereStr = "";
 			$whereStr = "";
 			$i = 0;
+			$g = 0;
 			foreach($catIds as $catId)
 			{
-				$i++;
-				if($i > 1)
+				if(strpos($catId, "sg")=== FALSE )
 				{
-					$whereStr .= " || ";
+					$i++;
+					if($i > 1)
+					{
+						$whereStr .= " || ";
+					}
+					$whereStr .= "id = $catId";
 				}
-				$whereStr .= "id = $catId";
+				else
+				{
+					$g++;
+					if($g > 1)
+					{
+						$groupWhereStr .= " || ";
+					}
+					$groupWhereStr .= "id = ".substr($catId, 3);
+				}
 			}
 			
-			$categories = ORM::factory("category")
-				->where($whereStr)
-				->find_all();
+			if($whereStr != "")
+			{
+				$categories = ORM::factory("category")
+					->where($whereStr)
+					->find_all();
+					
+				foreach($categories as $cat)
+				{
+					$cat_data[$cat->id] = array("color"=>$cat->category_color, "name"=>$cat->category_title);
+				}
+			}
+			
+			if($groupWhereStr != "")
+			{
+				$categories = ORM::factory("simplegroups_category")
+					->where($groupWhereStr)
+					->find_all();
+					
+				foreach($categories as $cat)
+				{
+					$cat_data[$cat->id] = array("color"=>$cat->category_color, "name"=>$cat->category_title);
+				}
+			}
 		}
 		
 		
@@ -70,7 +101,7 @@ class Printmapkey_Controller extends Controller {
 		$view->logic = $logicStr;
 		$view->keyStartDate = $keyStartDate;
 		$view->keyEndDate = $keyEndDate;
-		$view->categories = $categories;
+		$view->categories = $cat_data;
 		
 		$view->render(true);
 		
