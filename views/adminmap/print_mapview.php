@@ -1,9 +1,9 @@
 <div id="title">
 <h1>Map Printing</h1>
-This page is for creating maps that will be printed. This is made to work using Firefox 4 or higher. Chrome, Internet Explorer, 
+This page is for creating maps that will be printed. This is made to work using <strong>Firefox</strong> 4 or higher. <strong>Chrome, Internet Explorer,</strong> 
 and other browsers may not print the page correctly.<br/>
-For best results, go to "Page Setup" and make sure that "Print Background (Colors &amp; Images)" is turned on and 
-that scaling is set to "scale to fit"
+For best results, go to <strong>"Page Setup"</strong> and make sure that <strong>"Print Background (Colors &amp; Images)"</strong> is turned on and 
+that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 <br/><br/>
 </div>
 
