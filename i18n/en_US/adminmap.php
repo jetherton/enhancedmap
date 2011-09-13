@@ -18,7 +18,7 @@
 	'FILTERS' => 'FILTERS',
 	'Categories' => 'Categories',
 	'TIME_LINE' => 'TIME LINE',
-	'ORHEADER'  => 'ORHEADER',
+	'ORHEADER'  => 'OR',
 	'ORBODY' =>				'The OR operator allows you to see all the reports that fall under any one of the categories you select.
 							<br/><br/>
 							For example, if you had selected categories A, B, and C, then you would see all the reports that were
@@ -31,7 +31,7 @@
 							blue dots. If a report falls under A and B the two colors - red and blue - will be merged and that report will
 							be shown with a purple dot - the merged color.',
 	'OR' => 'OR',
-	'ANDHEADER' => 'ORHEADER',
+	'ANDHEADER' => 'AND',
 	'ANDBODY' =>				'The AND operator allows you to see all the reports that fall under all of the categories you select.<br/><br/>
 							For example, if you had selected categories A, B, and C, then you would see all the reports that were
 							labeled as falling under category A <strong>and</strong> B <strong>and</strong> C. <br/><br/>
