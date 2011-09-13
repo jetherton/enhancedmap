@@ -2,9 +2,9 @@
 <h1>Map Printing</h1>
 <div id="print_warning">
 <h2>Please Read Before Printing:</h2>
-This page is for creating maps that will be printed. This is made to work using <strong>Firefox</strong> 4 or higher. <strong>Chrome, Internet Explorer,</strong> 
-and other browsers may not print the page correctly.<br/>
-For best results, go to <strong>"Page Setup"</strong> and make sure that <strong>"Print Background (Colors &amp; Images)"</strong> is turned on and 
+This page is for creating maps that will be printed. Printing works best using <strong>Firefox</strong> 4 or higher. <strong>Chrome, Internet Explorer,</strong> 
+and other browsers may not print this page correctly.<br/>
+For best results in Firefox, go to <strong>"Page Setup"</strong> and make sure that <strong>"Print Background (Colors &amp; Images)"</strong> is turned on and 
 that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 </div>
 <br/><br/>
