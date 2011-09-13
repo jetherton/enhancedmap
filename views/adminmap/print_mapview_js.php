@@ -444,7 +444,6 @@ function changeTopBottom(direction)
 			if(endDate == "")
 			{endDate = "1";}
 			//a poor man's attempt at thread safety
-			console.log("Trying to redraw: "+canRedrawMapKey);
 			if(canRedrawMapKey)
 			{
 				$.get("<?php echo url::site(); ?>printmapkey/getKey/" + catID + "/" + currLogicalOperator + "/" + startDate + "/" + endDate,
@@ -1395,13 +1394,17 @@ function changeTopBottom(direction)
 			if($.address.parameter("logic") != null)
 			{
 				var logic = $.address.parameter("logic")
+				console.log("Logic: " + logic);
 				if(logic == "and")
 				{
-					$("#logicalOperator_1").trigger("click");
+					console.log("clicking AND");
+					$("#logicalOperator_2").trigger("click");
 				}
 				else if (logic == "or")
 				{
-					$("#logicalOperator_2").trigger("click");
+					console.log("clicking OR");
+					//because OR is the default
+					//$("#logicalOperator_1").trigger("click");
 				}
 			}
 			
@@ -1500,7 +1503,7 @@ function changeTopBottom(direction)
 				function(data){
 					$("#key").html(data);					
 					canRedrawMapKey = true;
-					console.log("canRedrawMapKey: " + canRedrawMapKey);
+					
 					
 					// Get Current Category
 					currCat = $("#currentCat").val();
