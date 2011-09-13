@@ -1,5 +1,6 @@
 /*Stuff for the big map*/
 
+
 .menuItem{
 	border-top: 1px solid black;
 	padding-top:10px;
@@ -534,3 +535,11 @@ ul.category-filters li ul{
 .slider-holder .play a:hover{
 	text-decoration:underline;
 }
+
+#print_warning{
+	border: 4px solid #ffaaaa;
+	padding: 5px;
+	margin: 0px 20px 0px 20px;
+	background: #ffcccc;
+	}
+	

@@ -1,9 +1,12 @@
 <div id="title">
 <h1>Map Printing</h1>
+<div id="print_warning">
+<h2>Please Read Before Printing:</h2>
 This page is for creating maps that will be printed. This is made to work using <strong>Firefox</strong> 4 or higher. <strong>Chrome, Internet Explorer,</strong> 
 and other browsers may not print the page correctly.<br/>
 For best results, go to <strong>"Page Setup"</strong> and make sure that <strong>"Print Background (Colors &amp; Images)"</strong> is turned on and 
 that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
+</div>
 <br/><br/>
 </div>
 
@@ -110,6 +113,16 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 			</ul>
 			<!-- / category filters -->
 			
+			<!-- #layersAndSuch -->
+			<br/>
+			<div id="ShowLayersAndSuch">
+				
+				<strong><a href="#" onclick="$('#layersAndSuch').show(); $('#ShowLayersAndSuch').hide(); return false;">LAYERS</a></strong>
+				<br/>
+				<br/>
+			</div>
+			<div id="layersAndSuch" style="display:none;">
+			
 			<?php
 			if ($layers)
 			{
@@ -160,6 +173,8 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 				<?php
 			}
 			?>
+			</div>
+			<!-- /#layersAndSuch -->
 			
 			
 			
