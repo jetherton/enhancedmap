@@ -444,6 +444,7 @@ function changeTopBottom(direction)
 			if(endDate == "")
 			{endDate = "1";}
 			//a poor man's attempt at thread safety
+			console.log("Trying to redraw: "+canRedrawMapKey);
 			if(canRedrawMapKey)
 			{
 				$.get("<?php echo url::site(); ?>printmapkey/getKey/" + catID + "/" + currLogicalOperator + "/" + startDate + "/" + endDate,
@@ -451,6 +452,10 @@ function changeTopBottom(direction)
 						$("#key").html(data);					
 											
 				});
+			}
+			else
+			{
+				return;
 			}
 			
 			return $.timeline({categoryId: catID,
@@ -1410,9 +1415,11 @@ function changeTopBottom(direction)
 				}
 				else
 				{
+				
 					var catsarray = cats.split(",",-1);
 					for(i in catsarray)
 					{
+						
 						//check if the given category is hidden under a parent
 						if($("#cat_"+catsarray[i]).is(":hidden"))
 						{
@@ -1420,7 +1427,7 @@ function changeTopBottom(direction)
 							//find it's drop_cat and go from there
 							$("#cat_"+catsarray[i]).parents("div[id^='child_']").siblings("a[id^='drop_cat_']").trigger("click");
 						}
-						$("#cat_"+catsarray[i]).trigger("click");	
+						$("#cat_"+catsarray[i]).trigger("click");						
 					}
 				}
 				
@@ -1473,7 +1480,7 @@ function changeTopBottom(direction)
 				}
 			}
 			
-			
+
 			//handle layers
 			if($.address.parameter("layer") != null)
 			{
@@ -1484,7 +1491,6 @@ function changeTopBottom(direction)
 				}
 			}
 			
-			
 			$.get("<?php echo url::site(); ?>printmapkey/getKey/" + 
 				$("#currentCat").val() + "/" + 
 				$("#currentLogicalOperator").val() + "/" + 
@@ -1492,8 +1498,27 @@ function changeTopBottom(direction)
 				$("#endDate").val(),
 				
 				function(data){
-					$("#key").html(data);
-					canRedrawMapKey = true;			
+					$("#key").html(data);					
+					canRedrawMapKey = true;
+					console.log("canRedrawMapKey: " + canRedrawMapKey);
+					
+					// Get Current Category
+					currCat = $("#currentCat").val();
+		
+					// Get Current Start Date
+					currStartDate = $("#startDate").val();
+		
+					// Get Current End Date
+					currEndDate = $("#endDate").val();
+		
+					// Get Current Zoom
+					currZoom = map.getZoom();
+		
+					// Get Current Center
+					currCenter = map.getCenter();
+		
+					// Refresh Map
+					addMarkers(currCat, currStartDate, currEndDate, currZoom, currCenter);
 										
 			});
 			
