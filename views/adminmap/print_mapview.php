@@ -1,3 +1,7 @@
+<!-- Social media stuff -->
+<!-- /Social Media stuff -->
+
+
 <div id="title">
 <h1>Map Printing</h1>
 <div id="print_warning">
@@ -239,18 +243,24 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 			
 			
 			<!-- Set URL -->
-			<strong>Print URLs</strong>
+			<strong>Share this map</strong>
 			<div id="keyoptions" class="menuItem">					
 				<form>
-					Generate specific URL for this map
+					Generate a URL to share this map with others
 					<input type="button" name="getURL" id="getURL" value="Create URL" onclick="setURL(); return false;"/>
 					<br/>
-					URL for this map: <input type="text"; id="urlText"/><br/>
+					<br/>
+					URL for this map: <br/><textarea id="urlText" rows="5" cols="33"></textarea><br/>
 					<?php if (isset($_GET["dev"])): ?>					
 					URL for this page:  <input type="text"; id="mapUrlText"/>
 					URL to embed this map:  <input type="text"; id="embedMapUrlText"/>
 					<?php endif; ?>
 				</form>
+				
+				<div id="socialSharing">
+					
+									
+				</div>				
 			</div>
 			<!-- /Set URL -->
 			
