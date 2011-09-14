@@ -65,8 +65,20 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 				
 				<li><a class="active" id="cat_0" href="#"><div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div><div class="category-title"><?php echo Kohana::lang('ui_main.all_categories');?></div></a></li>
 				<?php
+					$print_group = false;
+					$print_site = false;
 					foreach ($categories as $category => $category_info)
 					{
+						if(strpos($category, "sg_") !== false && !$print_group)
+						{
+							echo "<li><h2>".Kohana::lang("adminmap.group_categories").":</h2></li>";
+							$print_group = true;
+						}
+						elseif(strpos($category, "sg_") === false && $print_group && !$print_site)
+						{
+							echo "<li><h2>".Kohana::lang("adminmap.site_categories").":</h2></li>";
+							$print_site = true;
+						}
 						$category_title = $category_info[0];
 						$category_color = $category_info[1];
 						$category_image = '';
