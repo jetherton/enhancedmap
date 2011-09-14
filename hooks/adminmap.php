@@ -25,11 +25,11 @@ class adminmap {
 	public function add()
 	{
 		//Just in case we need this
-		Event::add('ushahidi_action.nav_main_top', array($this, '_add_big_map_tab'));	 //adds the big map  tab
-		Event::add('ushahidi_action.map_main_filters', array($this, '_add_big_map_main_button'));	 //adds the big map  tab
+		Event::add('ushahidi_action.nav_main_top', array($this, '_add_big_map_tab'));	 //adds the big map  tab		
 		Event::add('ushahidi_action.nav_admin_main_top', array($this, '_admin_nav_tab'));	 //adds the admin map  tab
 		if(Router::$controller == "main")
 		{
+			Event::add('ushahidi_action.map_main_filters', array($this, '_add_big_map_main_button'));	 //adds the big map  tab
 			//use sneaky JS
 			plugin::add_javascript("adminmap/js/embedd_setup");
 			plugin::add_stylesheet("adminmap/css/embedd_setup");
