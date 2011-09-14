@@ -26,7 +26,7 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 		<div id="controls">	
 		
 	
-		
+		<INPUT style="width: auto; padding:6px; margin:6px; font-size:18px;" TYPE="BUTTON" VALUE="Print this map" ONCLICK="window.print()"/>
 		   <!-- logic filters -->
 		   
 			<div class="stat-filters clearingfix">
