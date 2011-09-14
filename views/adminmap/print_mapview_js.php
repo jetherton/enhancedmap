@@ -457,7 +457,8 @@ function changeTopBottom(direction)
 				return;
 			}
 			
-			return $.timeline({categoryId: catID,
+			
+			var retval = $.timeline({categoryId: catID,
 			                   startTime: new Date(startDate * 1000),
 			                   endTime: new Date(endDate * 1000),
 							   mediaType: mediaType
@@ -465,7 +466,10 @@ function changeTopBottom(direction)
 								startDate, endDate, gMap.getZoom(),
 								gMap.getCenter(), thisLayerID, thisLayerType, 
 								thisLayerUrl, thisLayerColor, json_url, currStatus, currColorStatus,
-								currLogicalOperator);							
+								currLogicalOperator);
+			
+			map.updateSize();
+			return retval;															
 			
 		}
 
@@ -1394,15 +1398,12 @@ function changeTopBottom(direction)
 			if($.address.parameter("logic") != null)
 			{
 				var logic = $.address.parameter("logic")
-				console.log("Logic: " + logic);
 				if(logic == "and")
 				{
-					console.log("clicking AND");
 					$("#logicalOperator_2").trigger("click");
 				}
 				else if (logic == "or")
 				{
-					console.log("clicking OR");
 					//because OR is the default
 					//$("#logicalOperator_1").trigger("click");
 				}
