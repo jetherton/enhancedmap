@@ -1073,6 +1073,9 @@ class adminmap_helper_Core {
 	$link_target = "_self")
     {
 
+    	//check to see how we're adding GET params 
+    	$url_param_join_character = (strpos($list_reports_path, "?") === false) ? "?" : "&";
+    	
         // Database
         $db = new Database();
 
@@ -1510,7 +1513,23 @@ class adminmap_helper_Core {
 			$category_str = "<br/><br/> Categories in this cluster (number of reports):<ul>". $category_str."</ul>";
 		}
 		
-	    
+		//make the categories string for the URL
+		//if we're on the backend do it the old fashioned way
+		$categories_str = "";
+		if($on_the_back_end)
+		{
+			$categories_str = implode(",", $category_ids);
+			$categories_str = "c=" . $categories_str;
+		}
+		//otherwise do it the new fangled fancy way, which is better, but it's a pain to change the way i do everything.
+		else
+		{
+			foreach($category_ids as $c)
+			{
+				$categories_str .= "&c%5B%5D=" . mysql_real_escape_string($c); 
+			}
+		}
+			    
 	    	$contains_nonactive = $cluster_alpha['contains_nonactive'];
             // Calculate cluster center
             $bounds = self::_calculateCenter($cluster);
@@ -1527,10 +1546,9 @@ class adminmap_helper_Core {
             // Number of Items in Cluster
             $cluster_count = count($cluster);
 
-            $json_item = "{\"type\":\"Feature\",\"properties\": {";
-	    	$categories_str = implode(",", $category_ids);
-            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . $list_reports_path."?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.$time_filter."'>" . $cluster_count . " Reports</a> ".$category_str)) . "\",";
-	    	$json_item .= "\"link\":\"" . url::base(). "$list_reports_path?c=".$categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.$time_filter."\",";
+            $json_item = "{\"type\":\"Feature\",\"properties\": {";	    	
+            $json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target='".$link_target."' href='" . url::base() . $list_reports_path. $url_param_join_character . $categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.$time_filter."'>" . $cluster_count . " Reports</a> ".$category_str)) . "\",";
+	    	$json_item .= "\"link\":\"" . url::base(). $list_reports_path . $url_param_join_character . $categories_str."&sw=".$southwest."&ne=".$northeast."&lo=".$logical_operator."&u=".$show_unapproved.$time_filter."\",";
             $json_item .= "\"category\":[0], ";
 			if($contains_nonactive && $color_unapproved==2)
 			{

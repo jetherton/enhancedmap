@@ -522,7 +522,7 @@ class adminmap_reports_Core {
 				//get the custom category name
 				$custom_cat_name = substr($id, 0, $delimiter_pos);
 				//get the custom category's numeric id
-				$custom_cat_id = substr($id,$delimiter_pos + 1);
+				$custom_cat_id = intval(substr($id,$delimiter_pos + 1));
 				
 				//check to make sure an index is set in custom_category_to_table_mapping for this custom cateogry
 				//if not throw an error
