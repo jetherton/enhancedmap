@@ -358,7 +358,7 @@ class Iframemap_Controller extends Template_Controller {
 
 		$this->themes->js = new View('adminmap/iframe_mapview_js');
 		$this->themes->js->json_url = ($clustering == 1) ?
-			"json/cluster" : "json";
+			"bigmap_json/cluster" : "bigmap_json";
 		$this->themes->js->marker_radius =
 			($marker_radius >=1 && $marker_radius <= 10 ) ? $marker_radius : 5;
 		$this->themes->js->marker_opacity =
