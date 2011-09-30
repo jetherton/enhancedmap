@@ -50,7 +50,7 @@ class Iframemap_json_Controller extends Template_Controller
      */
     public function cluster()
     {
-        adminmap_helper::json_cluster($this, "reports/view/", "bigmap_reports/index", false, "", array(), array(), "_blank");
+        adminmap_helper::json_cluster($this, "reports/view/", "reports", false, "", array(), array(), "_blank");
 
     }
 
