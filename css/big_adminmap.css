@@ -285,13 +285,13 @@ ul.category-filters{
 	border: none;
 	margin: 0px;
 	margin: 0px;
-	height: 200px;
+	height: 125px;
 	overflow: auto;
 	position: relative;
 }
 
 ul#kml_switch{
-	height: 100px;
+	height: 75px;
 }
 
 
