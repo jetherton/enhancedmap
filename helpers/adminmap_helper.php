@@ -21,7 +21,10 @@ class adminmap_helper_Core {
 	{
 	
 		//set the CSS for this
-		plugin::add_stylesheet($map_css);
+		if($map_css != null)
+		{
+			plugin::add_stylesheet($map_css);
+		}
 		
 		plugin::add_javascript("adminmap/js/jquery.flot");
 		plugin::add_javascript("adminmap/js/excanvas.min");
