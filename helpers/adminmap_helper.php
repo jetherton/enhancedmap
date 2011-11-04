@@ -26,7 +26,7 @@ class adminmap_helper_Core {
 		plugin::add_javascript("adminmap/js/jquery.flot");
 		plugin::add_javascript("adminmap/js/excanvas.min");
 		plugin::add_javascript("adminmap/js/timeline");
-
+		plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
 		
 		$map_controller->template->content = new View($map_view);
 		
