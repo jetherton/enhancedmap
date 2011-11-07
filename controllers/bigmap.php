@@ -128,6 +128,7 @@ class Bigmap_Controller extends Template_Controller {
 		foreach (ORM::factory('category')
 				->where('category_visible', '1')
 				->where('parent_id', '0')
+				->orderby('category_position', 'asc')
 				->find_all() as $category)
 		{
 			// Get The Children

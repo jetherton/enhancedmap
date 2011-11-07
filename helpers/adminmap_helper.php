@@ -361,6 +361,7 @@ class adminmap_helper_Core {
 			$cats = $cats->where('category_visible', '1');
 		}
 		$cats = $cats->where('parent_id', '0')
+			->orderby('category_position', 'asc')		
 			->find_all() ;
 		foreach ($cats as $category)
 		{
