@@ -1302,11 +1302,29 @@ function changeTopBottom(direction)
 			{
 				return $(this).val(); 
 			});
-			startTime = $.grep(options, function(n,i)
+			//figure out what time is the greatest time, that is less than the startTime
+			var foundStartTime = false;
+			for(i = 1; i < options.length; i++)
 			{
-			  var newVal = parseInt(n);
-			  return newVal >= startTime;
-			})[0];
+				var time = parseInt(options[i]);
+				if(time == startTime)
+				{
+					foundStartTime = true;
+					break;
+				}
+				else if(time > startTime)
+				{
+					startTime = options[i-1];
+					foundStartTime = true;
+					break;
+				}
+				
+			}
+			//if the original start time is after the last option date
+			if(!foundStartTime)
+			{
+				startTime = options[options.length-1];
+			}
 			
 			options = $('#endDate > optgroup > option').map(function()
 			{
