@@ -379,9 +379,36 @@
 				new_layer = map.getLayersByName("Layer_"+layerID);
 				if (new_layer)
 				{
-					for (var i = 0; i < new_layer.length; i++)
+					for (var i = 0; i <?php echo '<'; ?> new_layer.length; i++)
 					{
 						map.removeLayer(new_layer[i]);
+					}
+					
+					// Part of #2168 fix
+					// Added by E.Kala <emmanuel(at)ushahidi.com>
+					// Remove the layer from the list of KML overlays - kmlOverlays
+					if (kmlOverlays.length == 1)
+					{
+						kmlOverlays.pop();
+					}
+					else if (kmlOverlays.length > 1)
+					{
+						// Temporarily store the current list of overlays
+						tempKmlOverlays = kmlOverlays;
+						
+						// Re-initialize the list of overlays
+						kmlOverlays = [];
+						
+						// Search for the overlay that has just been removed from display
+						for (var i = 0; i < tempKmlOverlays.length; i ++)
+						{
+							if (tempKmlOverlays[i].name != "Layer_"+layerID)
+							{
+								kmlOverlays.push(tempKmlOverlays[i]);
+							}
+						}
+						// Unset the working list
+						tempKmlOverlays = null;
 					}
 				}
 				$("#layer_" + layerID).removeClass("active");
@@ -396,10 +423,9 @@
 
 				// Get Current Center
 				currCenter = map.getCenter();
-
+				
 				// Add New Layer
 				addMarkers('', '', '', currZoom, currCenter, '', layerID, 'layers', layerURL, layerColor);
-				mapMove(null);
 			}
 		}
 
