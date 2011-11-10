@@ -4,8 +4,8 @@
 	<?php //echo $ushahidi_stats; ?>
 	<?php echo $google_analytics; ?>
 	
-	<!-- Task Scheduler -->
-	<img src="<?php echo url::site().'scheduler'; ?>" height="1" width="1" border="0" />
+
+	<!-- Task Scheduler --><script type="text/javascript">$(document).ready(function(){$.get("<?php echo url::base(); ?>scheduler");});</script><!-- End Task Scheduler -->
  
 </body>
 <?php Event::run('ushahidi_action.main_footer'); ?>
