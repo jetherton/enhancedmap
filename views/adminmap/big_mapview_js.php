@@ -178,6 +178,9 @@ function mU() {
 		// Current json_url, if map is switched dynamically between json and json_cluster
 		var json_url = default_json_url;
 		
+		// Global list for current KML overlays in display
+		var kmlOverlays = [];
+		
 		var baseUrl = "<?php echo url::base(); ?>";
 		var longitude = <?php echo $longitude; ?>;
 		var latitude = <?php echo $latitude; ?>;
