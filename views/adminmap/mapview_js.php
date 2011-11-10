@@ -61,6 +61,9 @@
 		var markerRadius = <?php echo $marker_radius; ?>;
 		var markerOpacity = "<?php echo $marker_opacity; ?>";
 		var selectedFeature;
+		
+		// Global list for current KML overlays in display
+		var kmlOverlays = [];
 
 		var gMarkerOptions = {baseUrl: baseUrl, longitude: longitude,
 		                     latitude: latitude, defaultZoom: defaultZoom,

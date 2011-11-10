@@ -417,6 +417,9 @@ function changeTopBottom(direction)
 		// /json or /json/cluster depending on if clustering is on
 		var default_json_url = "<?php echo $json_url ?>";
 		
+		// Global list for current KML overlays in display
+		var kmlOverlays = [];
+		
 
 		// Current json_url, if map is switched dynamically between json and json_cluster
 		var json_url = default_json_url;
