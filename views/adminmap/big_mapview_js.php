@@ -49,7 +49,7 @@ function togglelayer(objectID, changeID) {
 }
 
 
-
+var lastPanOnResizeDirection = 1;
 var dragObject, offsetX, offsetY, isDragging=false;
 window.onload = init;
 document.onmousemove = mM;
@@ -58,6 +58,20 @@ document.onmouseup = mU;
 //init things so we can drag things on screen
 function init() {
 
+	//capture resize events on the map to make sure it's redrawn properly
+	$(window).resize(function() {
+  			map.updateSize();
+  			if(lastPanOnResizeDirection == 1)
+  			{
+				map.pan(0,1);
+				lastPanOnResizeDirection = 0
+			}
+			else
+			{
+				map.pan(0,-1);
+				lastPanOnResizeDirection = 1
+			}
+		});
 	
 	var myWidth = 0, myHeight = 0;
 	if( typeof( window.innerWidth ) == 'number' ) {
