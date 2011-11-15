@@ -58,9 +58,9 @@ class Bigmap_json_Controller extends Template_Controller
      /**************************************************************
      * Retrieve timeline JSON
      */
-    public function timeline( $category_ids = "0," )
+    public function timeline()
     {
-	adminmap_helper::json_timeline($this, $category_ids, false);
+	adminmap_helper::json_timeline($this, false);
     }
 
 

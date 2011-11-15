@@ -25,11 +25,9 @@
 							labeled as falling under category A <strong>or</strong> B <strong>or</strong> C. Some of the reports
 							shown may only fall under category A. Others may only fall under category C. Some may fall under both 
 							category A and B.<br/><br/>
-							When the OR operator is selected, dots will be colored according to the categories they fall under.
-							For example, if you have selected categories A and B, where A is red and B is blue, then those reports 
-							that are only categorized as A will have red dots, and those reports that are only categorized as B will have 
-							blue dots. If a report falls under A and B the two colors - red and blue - will be merged and that report will
-							be shown with a purple dot - the merged color.',
+							When the OR operator is selected, dots will be colored according to the categories selected.
+							For example, if you have selected categories A and B, where A is red and B is blue, then all dots will be purple
+							since purple is the color you get when mixing red and blue.',
 	'OR' => 'OR',
 	'ANDHEADER' => 'AND',
 	'ANDBODY' =>				'The AND operator allows you to see all the reports that fall under all of the categories you select.<br/><br/>

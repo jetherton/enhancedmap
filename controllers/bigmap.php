@@ -106,7 +106,9 @@ class Bigmap_Controller extends Template_Controller {
 	plugin::add_javascript("adminmap/js/excanvas.min");
 	plugin::add_javascript("adminmap/js/timeline");
 	plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
-
+	//javascript for the big map special features
+	plugin::add_javascript("adminmap/js/bigmap");
+	
 		// Cacheable Main Controller
 		$this->is_cachable = TRUE;
 
@@ -356,9 +358,9 @@ class Bigmap_Controller extends Template_Controller {
 		$lonTo = Kohana::config('map.lonTo');
 		$latTo = Kohana::config('map.latTo');
 
-		$this->themes->js = new View('adminmap/big_mapview_js');
+		$this->themes->js = new View('adminmap/adminmap_js');
 		$this->themes->js->json_url = ($clustering == 1) ?
-			"json/cluster" : "json";
+			"bigmap_json/cluster" : "bigmap_json";
 		$this->themes->js->marker_radius =
 			($marker_radius >=1 && $marker_radius <= 10 ) ? $marker_radius : 5;
 		$this->themes->js->marker_opacity =

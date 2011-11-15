@@ -400,7 +400,10 @@
 			params = [];
 			if (typeof(this.categoryId) != 'undefined' && this.categoryId.length > 0)
 			{
-				params.push('c=' + this.categoryId);
+				for(i = 0; i < this.categoryId.length; i++)
+				{
+					params.push('c%5B%5D=' + this.categoryId[i]);
+				}
 			}
 			if (typeof(startDate) != 'undefined')
 			{
@@ -414,6 +417,7 @@
 			{
 				params.push('m=' + this.mediaType);
 			}
+
 			return params;
 		};
 

@@ -42,7 +42,7 @@ class Printmapkey_Controller extends Controller {
 		}
 		else 
 		{
-			$catIds = explode(",", $catIds, -1);
+			$catIds = explode(",", $catIds);
 			$groupWhereStr = "";
 			$whereStr = "";
 			$i = 0;

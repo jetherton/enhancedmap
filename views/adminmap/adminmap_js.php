@@ -15,253 +15,14 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 ?>
-
-            $(function() {
-                $('span[title]').hovertip();
-            });
-            
-/**
-*
-* From http://osgeo-org.1803224.n2.nabble.com/How-to-print-map-area-with-openlayers-td4901023.html
-*
-*/
-var print_wait_win = null;
- function stitchImage() {
-
-			     //-- post a wait message
-			    print_wait_win = window.open("<?php url::site();?>stitch/wait", "print_wait_win", "scrollbars=no, status=0, height=300, width=500, resizable=1");
-			    
-			    
-					
- 
-				var print_url =  '<?php url::site();?>stitch/';
-                var size = this.map.getSize(); 
-                var tiles = []; 
-                
-                var nb_layers = this.map.layers.length; 
-                var layeri = 0; 
-                var nb_vector_layers = 0; 
-                var features = []; 
-                for (layeri = 0; layeri < nb_layers; layeri++) { 
-                        // if the layer isn't visible at this range, or is turned off, skip it 
-                        var layer = this.map.layers[layeri]; 
-                        if (!layer.getVisibility()) continue; 
-                        if (!layer.calculateInRange()) continue; 
-                        if (layer.grid) { 
-                                // iterate through their grid's tiles, collecting each tile's extent and pixel location at this moment 
-                                var grid_length = layer.grid.length; 
-                                var row_length = 0; 
-                                var tilerow = 0; 
-                                var tilei = 0; 
-                                for (tilerow = 0; tilerow < grid_length; tilerow++) { 
-                                        row_length = layer.grid[tilerow].length; 
-                                        tilei = 0; 
-                                        for (tilei = 0; tilei < row_length; tilei++) { 
-                                                var tile     = layer.grid[tilerow][tilei]; 
-                                                var url      = layer.getURL(tile.bounds); 
-                                                var position = tile.position; 
-                                                var opacity  = layer.opacity ? parseInt(100*layer.opacity) : 100; 
-                                                var bounds = tile.bounds; 
-                                                tiles[tiles.length] = {url:url, x:position.x, y:position.y, opacity:opacity, bounds:{left:bounds.left, right: bounds.right, top: bounds.top, bottom: bounds.bottom}}; 
-                                        } 
-                                } 
-                        } else { 
-                                // get the features of the layer 
-                                var olFeatures = layer.features; 
-                                var features_temp = []; 
-                                var styles = {}; 
-                                var nb_features = layer.features.length; 
-                                var featuresi = 0; 
-                                var nextId = 1; 
-                                for (var i = 0; i < nb_features; i++) { 
-                                        var feature = olFeatures[i]; 
-                                        var style = feature.style || layer.style || layer.styleMap.createSymbolizer(feature, feature.renderIntent); 
-                                        if(feature.geometry) { 
-                                                if (feature.geometry.CLASS_NAME.search(/point$/i) >= 0) { 
-                                                        var fpos = this.map.getLayerPxFromLonLat(new OpenLayers.LonLat(feature.geometry.x, feature.geometry.y)); 
-                                                        if(fpos != null) { 
-                                                                features_temp[featuresi] = {type: 'point', x: fpos.x, y:fpos.y, style: style}; 
-                                                                featuresi++; 
-                                                        } 
-                                                }
-                                                //checks for polygons
-                                                if (feature.geometry.CLASS_NAME.search(/polygon$/i) >= 0) { 
-                                                		var polyComponentArray = [];
-                                                		var polyItemCount = 0;
-                                                		//////////////////////////////////////////////////////////////
-                                                		//loops over components of a polygon, most likely linear rings
-                                                		//////////////////////////////////////////////////////////////
-                                                        for(var polyComponentName in feature.geometry.components)
-                                                        {
-                                                        	var polygonComponent = feature.geometry.components[polyComponentName];
-                                                        	//checks if it's a linear ring
-                                                        	if(polygonComponent.CLASS_NAME.search(/LinearRing$/) >=0)
-                                                        	{
-                                                        		var linearRingComponentArray = [];
-                                                        		var linRingItemCount = 0;
-                                                        		
-                                                        		//////////////////////////////////////////
-                                                        		//loops over the points in a linear ring
-                                                        		/////////////////////////////////////////
-                                                        		for(var linearRingComponentName in polygonComponent.components)
-                                                        		{
-                                                        			var linearRingComponent = polygonComponent.components[linearRingComponentName];
-                                                        			if (linearRingComponent.CLASS_NAME.search(/point$/i) >= 0) 
-                                                        			{ 
-	                                                        			var lrpos = this.map.getLayerPxFromLonLat(new OpenLayers.LonLat(linearRingComponent.x, linearRingComponent.y)); 
-	                                                        			if(lrpos != null) 
-	                                                        			{ 
-	                                                                		linearRingComponentArray[linRingItemCount] = {type: 'point', x: lrpos.x, y:lrpos.y}; 
-	                                                                		linRingItemCount++; 
-	                                                        			}
-	                                                        		}
-                                                        		}
-                                                        		
-                                                        		polyComponentArray[polyItemCount] = {type: 'linearRing', components: linearRingComponentArray};
-                                                        		polyItemCount++;
-                                                        	}
-                                                        }
-                                                        
-                                                        features_temp[featuresi] = {type: 'polygon', components: polyComponentArray, style: style}; 
-                                                        featuresi++;
-                                                }  
-                                        } 
-                                } 
-                                features[nb_vector_layers] = features_temp; 
-                                nb_vector_layers++; 
-                        } 
-                                        
-                } 
-
-                // hand off the list to our server-side script, which will do the heavy lifting 
-                var tiles_json = JSON.stringify(tiles); 
-                var features_json = JSON.stringify(features); 
-                var viewport_left = parseInt(this.map.layerContainerDiv.style.left); 
-                var viewport_top = parseInt(this.map.layerContainerDiv.style.top); 
-                var viewport = {top: viewport_top, left: viewport_left}; 
-                var viewport_json = JSON.stringify(viewport); 
-                var scale = Math.round(this.map.getScale()); 
-                OpenLayers.Request.POST( 
-                  { url:print_url, 
-                        data:OpenLayers.Util.getParameterString({width:size.w,height:size.h,scale:scale,viewport: viewport_json,tiles:tiles_json,features:features_json}), 
-                        headers:{'Content-Type':'application/x-www-form-urlencoded'}, 
-                        callback: function(request) {
-         							print_wait_win.close();
-           							window.open(request.responseText);
-        							} 
-                  } 
-                ); 
-        }            
-            
+</script>
+<script type="text/javascript">
 
 
 
-
-/**
-* Pass in a string of either "landscape" or something else, and this will
-* change the orientation of the map to eithe landscape or portrait
-*
-*/
-function changeOrientation(orientation)
-{
-	
-	var width;
-	var height;
-	if(orientation == "landscape")
-	{
-		$("#printpage").removeClass("portrait");
-		$("#printpage").addClass("landscape");
-	}
-	else
-	{	
-		$("#printpage").removeClass("landscape");	
-		$("#printpage").addClass("portrait");
-	}
-	
-
-	map.updateSize();
-	map.pan(1,0);
-}
-
-/**
-* Shows or hides the map key according to the check state of the #showKeyCheckBox
-*
-*/
-function showHideKey()
-{
-	if($("#showKeyCheckbox:checked").val())
-	{
-		$("#key").show();
-		$("#keyPlacement").show();
-	}
-	else
-	{
-		$("#key").hide();
-		$("#keyPlacement").hide();
-	}
-	
-}
-
-
-/**
-* Takes a string as input and from that determines what class to assign to the map key
-* and thus what positioning the key will have over the map.
-*/
-function changeLeftRight(direction)
-{
-	if(direction == "left")
-	{
-		$("#key").removeClass("right");
-		$("#key").addClass("left");
-	}
-	else
-	{
-		$("#key").removeClass("left");
-		$("#key").addClass("right");
-	}
-}
-
-
-/**
-* Takes a string as input and from that determines what class to assign to the map key
-* and thus what positioning the key will have over the map.
-*/
-function changeLeftRight(direction)
-{
-	if(direction == "left")
-	{
-		$("#key").removeClass("right");
-		$("#key").addClass("left");
-	}
-	else
-	{
-		$("#key").removeClass("left");
-		$("#key").addClass("right");
-	}
-}
-
-/**
-* Takes a string as input, and from that determines what class to assign to the map key
-* and thus what positioning the key will have over the map.
-*/
-function changeTopBottom(direction)
-{
-	if(direction == "top")
-	{
-		$("#key").removeClass("bottom");
-		$("#key").addClass("top");
-	}
-	else
-	{
-		$("#key").removeClass("top");
-		$("#key").addClass("bottom");
-	}
-}
-
-		
+		var baseUrl = "<?php echo url::site(); ?>";		
 
 		// Map JS
-		var canRedrawMapKey = false;
 		//number of categories selcted
 		var numOfCategoriesSelected = 0;
 		//Max number of categories to show at once, if you have more than 1000 reports with lots of categories you might want to turn this down
@@ -269,13 +30,13 @@ function changeTopBottom(direction)
 		// Map Object
 		var map;
 		// Selected Category
-		var currentCat;
+		var gCategoryId = ['0']; //default to all
 		// Selected Status
-		var currentStatus;
+		var currentStatus = '1';
 		// color the reports who's status is unapproved black?
-		var colorCurrentStatus;
+		var colorCurrentStatus = '1';
 		//logical operator to use
-		var currentLogicalOperator;
+		var currentLogicalOperator = 'or';
 		// Selected Layer
 		var thisLayer;
 		// WGS84 Datum
@@ -285,7 +46,7 @@ function changeTopBottom(direction)
 		// Change to 1 after map loads
 		var mapLoad = 0;
 		// /json or /json/cluster depending on if clustering is on
-		var default_json_url = "<?php echo $json_url; ?>";
+		var default_json_url = "<?php echo $json_url;?>";
 		// Current json_url, if map is switched dynamically between json and json_cluster
 		var json_url = default_json_url;
 		
@@ -313,27 +74,7 @@ function changeTopBottom(direction)
 			mediaType, thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor)
 		{
 		
-			// Get Current Status, and if we should color these reports black
-			currStatus = $("#currentStatus").val();
-			currColorStatus = $("#colorCurrentStatus").val();
-			currLogicalOperator=$("#currentLogicalOperator").val();
-		
-			if(catID == "")
-			{catID = "0";}
-			if(startDate == "")
-			{startDate = "1";}
-			if(endDate == "")
-			{endDate = "1";}
-			//a poor man's attempt at thread safety
-			if(canRedrawMapKey)
-			{
-				$.get("<?php echo url::site(); ?>printmapkey/getKey/" + catID + "/" + currLogicalOperator + "/" + startDate + "/" + endDate,
-					function(data){
-						$("#key").html(data);					
-											
-				});
-			}
-			
+				
 			return $.timeline({categoryId: catID,
 			                   startTime: new Date(startDate * 1000),
 			                   endTime: new Date(endDate * 1000),
@@ -341,9 +82,8 @@ function changeTopBottom(direction)
 							  }).addMarkers(
 								startDate, endDate, gMap.getZoom(),
 								gMap.getCenter(), thisLayerID, thisLayerType, 
-								thisLayerUrl, thisLayerColor, json_url, currStatus, currColorStatus,
-								currLogicalOperator);							
-			
+								thisLayerUrl, thisLayerColor, json_url, currentStatus, colorCurrentStatus,
+								currentLogicalOperator);
 		}
 
 
@@ -351,24 +91,18 @@ function changeTopBottom(direction)
 		/******
 		* Removes the category ID from the string currentCat
 		*******/
-		function removeCategoryFilter(idToRemove, currentCat)
+		function removeCategoryFilter(idToRemove)
 		{
-			
-			var cat_ids = currentCat.split(",");
-			var newCurrentCat = "";
-			//loop through the IDs
-			for( tempId in cat_ids)
+			for(i = 0; i < gCategoryId.length; i++)
 			{
-				//take out blanks and the ID we're trying to remove
-				if(cat_ids[tempId] != idToRemove && cat_ids[tempId] != "")
+				if (gCategoryId[i] == idToRemove)
 				{
-					newCurrentCat += cat_ids[tempId]+",";
+					//deactivate
+					$("#cat_"+idToRemove).removeClass("active");
+					gCategoryId.splice(i,1);
+					break;
 				}
 			}
-			//deactivate
-			$("#cat_"+idToRemove).removeClass("active");
-			
-			return newCurrentCat;
 		}//end removeCategoryFilter()
 
 
@@ -464,12 +198,6 @@ function changeTopBottom(direction)
 			// Prevent this event from running on the first load
 			if (mapLoad > 0)
 			{
-				// Get Current Category
-				currCat = $("#currentCat").val();
-				
-				// Get Current Status
-				currStatus = $("#currentStatus").val();
-
 				// Get Current Start Date
 				currStartDate = $("#startDate").val();
 
@@ -483,7 +211,7 @@ function changeTopBottom(direction)
 				currCenter = map.getCenter();
 
 				// Refresh Map
-				addMarkers(currCat, currStartDate, currEndDate, currZoom, currCenter);
+				addMarkers(gCategoryId, currStartDate, currEndDate, currZoom, currCenter);
 			}
 		}
 
@@ -492,9 +220,6 @@ function changeTopBottom(direction)
 			// Prevent this event from running on the first load
 			if (mapLoad > 0)
 			{
-				// Get Current Category
-				currCat = $("#currentCat").val();
-
 				// Get Current Start Date
 				currStartDate = $("#startDate").val();
 
@@ -508,7 +233,7 @@ function changeTopBottom(direction)
 				currCenter = map.getCenter();
 
 				// Refresh Map
-				addMarkers(currCat, currStartDate, currEndDate, currZoom, currCenter);
+				addMarkers(gCategoryId, currStartDate, currEndDate, currZoom, currCenter);
 			}
 		}
 
@@ -518,85 +243,60 @@ function changeTopBottom(direction)
 		*/
 		function refreshGraph(startDate, endDate)
 		{
-			var currentCat = gCategoryId;
-			// Get Current Status
-			var currStatus = $("#currentStatus").val();
 			
-			//Get currentl logical operator
-			var currLogicalOperator = $("#currentLogicalOperator").val();
-
-			// refresh graph
-			if (!currentCat || currentCat == '0')
-			{
-				currentCat = '0';
-			}
-
 			var startTime = new Date(startDate * 1000);
 			var endTime = new Date(endDate * 1000);
 
 			// daily
 			var graphData = "";
 
-			// plot hourly incidents when period is within 2 days
+			var iValue = "";
 			if ((endTime - startTime) / (1000 * 60 * 60 * 24) <= 3)
 			{
-				$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>"+currentCat+"?i=hour&u="+currStatus + 
-				"&lo="+ currLogicalOperator, function(data) {
-					graphData = data[0];
-
-					gTimeline = $.timeline({categoryId: currentCat,
-						startTime: new Date(startDate * 1000),
-					    endTime: new Date(endDate * 1000), mediaType: gMediaType,
-						markerOptions: gMarkerOptions,
-						graphData: graphData
-					});
-					gTimeline.plot();
-				});
-			} 
+				iValue = "&i=hour";
+			}
 			else if ((endTime - startTime) / (1000 * 60 * 60 * 24) <= 124)
 			{
-			    // weekly if period > 2 months
-				$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>"+currentCat+"?i=day&u="+currStatus+ 
-				"&lo="+ currLogicalOperator, function(data) {
-					graphData = data[0];
-
-					gTimeline = $.timeline({categoryId: currentCat,
-						startTime: new Date(startDate * 1000),
-					    endTime: new Date(endDate * 1000), mediaType: gMediaType,
-						markerOptions: gMarkerOptions,
-						graphData: graphData
-					});
-					gTimeline.plot();
-				});
-			} 
-			else if ((endTime - startTime) / (1000 * 60 * 60 * 24) > 124)
-			{
-				// monthly if period > 4 months
-				$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>"+currentCat+"?u="+currStatus+ 
-				"&lo="+ currLogicalOperator, function(data) {
-					graphData = data[0];
-
-					gTimeline = $.timeline({categoryId: currentCat,
-						startTime: new Date(startDate * 1000),
-					    endTime: new Date(endDate * 1000), mediaType: gMediaType,
-						markerOptions: gMarkerOptions,
-						graphData: graphData
-					});
-					gTimeline.plot();
-				});
+				iValue = "&i=day";
 			}
 
+			var categoriesStr = "";
+			for(i = 0; i < gCategoryId.length; i++)
+			{
+				if(categoriesStr.length != 0)
+				{
+					categoriesStr = categoriesStr + "&";
+				}
+				categoriesStr += "c%5B%5D=" + gCategoryId[i];
+			}
+
+			$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>?"+categoriesStr+iValue+"&u="+currentStatus + 
+			"&lo="+ currentLogicalOperator, function(data) {
+				graphData = data[0];
+
+				gTimeline = $.timeline({categoryId: gCategoryId,
+					startTime: new Date(startDate * 1000),
+				    endTime: new Date(endDate * 1000), mediaType: gMediaType,
+					markerOptions: gMarkerOptions,
+					graphData: graphData
+				});
+				gTimeline.plot();
+			});
+		 
+
+			/* I don't think we need this
 			// Get dailyGraphData for All Categories
-			$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>"+currentCat+"?i=day&u="+currStatus+ 
-				"&lo="+ currLogicalOperator, function(data) {
+			$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>?"+categoriesStr+iValue+"&u="+currentStatus + 
+			"&lo="+ currentLogicalOperator, function(data) {
 				dailyGraphData = data[0];
 			});
 
 			// Get allGraphData for All Categories
-			$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>"+currentCat + "?u="+currStatus+ 
-				"&lo="+ currLogicalOperator, function(data) {
+			$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>?"+categoriesStr+iValue+"&u="+currentStatus + 
+			"&lo="+ currentLogicalOperator, function(data) {
 				allGraphData = data[0];
 			});
+			*/
 
 		}
 
@@ -679,6 +379,7 @@ function changeTopBottom(direction)
 				addMarkers('', '', '', currZoom, currCenter, '', layerID, 'layers', layerURL, layerColor);
 			}
 		}
+
 		/*
 		Toggle Layer Switchers
 		*/
@@ -772,7 +473,7 @@ function changeTopBottom(direction)
 						{
 							//remove this category ID from the list of IDs to show
 							var idNum = $(this).attr("id").substring(4);
-							currentCat = removeCategoryFilter(idNum, currentCat);
+							removeCategoryFilter(idNum);
 						}
 					});
 					$("#child_"+catID).hide();
@@ -790,8 +491,7 @@ function changeTopBottom(direction)
 				var catID = this.id.substring(4);
 				
 				//the list of categories we're currently showing
-				currentCat = $("#currentCat").val();
-				numOfCategoriesSelected = currentCat.split(",").length;
+				numOfCategoriesSelected = gCategoryId.length;
 				 
 				 
 				//First we check if the "All Categories" button was pressed. If so unselect everything else
@@ -800,11 +500,11 @@ function changeTopBottom(direction)
 					if( !$("#cat_0").hasClass("active")) //it's being activated so unselect everything else
 					{
 						//unselect all other selected categories
-						var activeIDs = currentCat.split(",");
-						for (var i=0; i < activeIDs.length; i++)
+						while (gCategoryId.length > 1)
 						{
-							currentCat = removeCategoryFilter(activeIDs[i], currentCat);
+							removeCategoryFilter(gCategoryId[0]);
 						}
+						gCategoryId = ['0'];
 					}
 				}
 				else
@@ -822,7 +522,7 @@ function changeTopBottom(direction)
 							{
 								//remove this category ID from the list of IDs to show
 								var idNum = $(this).attr("id").substring(4);
-								currentCat = removeCategoryFilter(idNum, currentCat);
+								removeCategoryFilter(idNum);
 							}
 						});
 					
@@ -837,7 +537,7 @@ function changeTopBottom(direction)
 						//first check and see if we're adding or removing this category
 						if($("#cat_"+parentID).hasClass("active")) //it is active so make it unactive and remove this category from the list of categories we're looking at.
 						{ 
-							currentCat = removeCategoryFilter(parentID, currentCat);
+							removeCategoryFilter(parentID);
 						}
 						
 					}//end of dealing with kids
@@ -845,7 +545,7 @@ function changeTopBottom(direction)
 					//first check and see if we're adding or removing this category
 					if($("#cat_"+catID).hasClass("active")) //it is active so make it unactive and remove this category from the list of categories we're looking at.
 					{ 
-						currentCat = removeCategoryFilter(catID, currentCat);
+						removeCategoryFilter(catID);
 					}
 					else //it isn't active so make it active
 					{ 
@@ -855,12 +555,9 @@ function changeTopBottom(direction)
 							$("#cat_"+catID).addClass("active");
 							
 							//make sure the "all categories" button isn't active
-							currentCat = removeCategoryFilter("0", currentCat);
+							removeCategoryFilter("0");
 							
-							//add this category ID from the list of IDs to show
-							var toAdd = catID+","; //we use , as the delimiter bewteen categories
-
-							currentCat = currentCat + toAdd;
+							gCategoryId.push(catID);
 						}
 						else
 						{
@@ -871,15 +568,12 @@ function changeTopBottom(direction)
 				
 				
 				//check to make sure something is selected. If nothing is selected then select "all gategories"
-				if( currentCat.length == 0)
+				if( gCategoryId.length == 0)
 				{
 					$("#cat_0").addClass("active");
-					currentCat = currentCat + "0,";
-
+					gCategoryId.push("0");
 				}
-				$("#currentCat").val(currentCat);
-				
-				
+
 				// Destroy any open popups
 				onPopupClose();
 				
@@ -889,16 +583,10 @@ function changeTopBottom(direction)
 				// Get Current Center
 				currCenter = map.getCenter();
 				
-				// Get Current Status
-				currStatus = $("#currentStatus").val();
-				
-				//Get Current Logical Operator
-				currLogicalOperator = $("#currentLogicalOperator").val();
-				
-				gCategoryId = currentCat;
+
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
-				addMarkers(currentCat, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
+				addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 				
 				var startDate = $("#startDate").val();
 				var endDate = $("#endDate").val();
@@ -957,13 +645,7 @@ function changeTopBottom(direction)
 					return false;
 				}
 				
-				$("#currentStatus").val(currentStatus);
-				
-				//Get Logical Operator
-				currLogicalOperator = $("#currentLogicalOperator").val();
-
-	
-				
+			
 				// Destroy any open popups
 				onPopupClose();
 				
@@ -973,13 +655,10 @@ function changeTopBottom(direction)
 				// Get Current Center
 				currCenter = map.getCenter();
 
-				// Get Current Category
-				gCategoryId = currentCat;
-				var catID = currentCat;
 				
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
-				addMarkers(catID, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
+				addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 								
 				var startDate = $("#startDate").val();
 				var endDate = $("#endDate").val();
@@ -1011,9 +690,6 @@ function changeTopBottom(direction)
 					$("#color_status_1").addClass("active"); // make it active
 					colorCurrentStatus = 2;
 				}
-				$("#colorCurrentStatus").val(colorCurrentStatus);
-
-	
 				
 				// Destroy any open popups
 				onPopupClose();
@@ -1023,18 +699,11 @@ function changeTopBottom(direction)
 				
 				// Get Current Center
 				currCenter = map.getCenter();
-				
-				currentStatus  = $("#currentStatus").val();
-
-				currLogicalOperator = $("#currentLogicalOperator").val();
-
-				// Get Current Category
-				gCategoryId = currentCat;
-				var catID = currentCat;
+			
 				
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
-				addMarkers(catID, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
+				addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 								
 				var startDate = $("#startDate").val();
 				var endDate = $("#endDate").val();
@@ -1066,9 +735,6 @@ function changeTopBottom(direction)
 					currentLogicalOperator = "or";
 				}
 
-
-				$("#currentLogicalOperator").val(currentLogicalOperator);
-
 				// Destroy any open popups
 				onPopupClose();
 				
@@ -1078,16 +744,9 @@ function changeTopBottom(direction)
 				// Get Current Center
 				currCenter = map.getCenter();
 				
-				currentStatus  = $("#currentStatus").val();
-
-				// Get Current Category
-				gCategoryId = currentCat;
-				var catID = currentCat;
-
-				
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
-				addMarkers(catID, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
+				addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 								
 				var startDate = $("#startDate").val();
 				var endDate = $("#endDate").val();
@@ -1146,10 +805,6 @@ function changeTopBottom(direction)
 					{
 						var startDate = $("#startDate").val();
 						var endDate = $("#endDate").val();
-						var currentCat = gCategoryId;
-						
-						// Get Current Category
-						currCat = currentCat;
 						
 						// Get Current Zoom
 						currZoom = map.getZoom();
@@ -1171,7 +826,7 @@ function changeTopBottom(direction)
 						}
 						
 						// Refresh Map
-						addMarkers(currCat, startDate, endDate, '', '', gMediaType);
+						addMarkers(gCategoryId, startDate, endDate, '', '', gMediaType);
 						
 						refreshGraph(startDate, endDate);
 					}
@@ -1224,7 +879,7 @@ function changeTopBottom(direction)
 			  return newVal >= endTime;
 			})[0];
 			
-			gCategoryId = '0';
+
 			gMediaType = 0;
 			//$("#startDate").val(startTime);
 			//$("#endDate").val(endTime);
@@ -1249,7 +904,7 @@ function changeTopBottom(direction)
 				currCenter = map.getCenter();
 				
 				// Refresh Map
-				addMarkers(currentCat, startTimestamp, endTimestamp, 
+				addMarkers(gCategoryId, startTimestamp, endTimestamp, 
 				           currZoom, currCenter, gMediaType);
 				
 				$('.filters li a').attr('class', '');
@@ -1268,25 +923,8 @@ function changeTopBottom(direction)
 					gMap.getCenter(),null,null,null,null,"json");
 				gTimeline.playOrPause('raindrops');
 			});
-			
-			
-			
-			
-			
-			
 		});
 		
 
-		
-		
-		
-		
-		
-		
-		
-		
-		
-	
-	
-	
-	
+</script>
+<script type="text/javascript">
