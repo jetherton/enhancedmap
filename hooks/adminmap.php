@@ -44,11 +44,48 @@ class adminmap {
 			
 			Event::add('ushahidi_action.header_scripts', array($this, '_add_report_filter_js'));
 		}
+		//make sure the filters are in place for these controllers
 		if(Router::$controller == "json" || Router::$controller == "densitymap"|| Router::$controller == "bigmap" || 
-			Router::$controller = 'bigmap_json') //any time the map is brought up
+			Router::$controller == 'bigmap_json' || Router::$controller == 'adminmap_json' ||
+			Router::$controller == 'iframemap_json') //any time the map is brought up
 		{
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_logical_operator_filter'));
 		}
+		
+		//add the "all_reports" flag to the query if we're on the backend
+		if(Router::$controller == 'adminmap_json')
+		{
+			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_all_reports_filter'));
+		}
+		//only add the all reports filter if we're on the back end
+		if(Router::$controller == "reports" AND strpos(Router::$controller_path, 'admin/reports.php') !== false)
+		{
+			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_all_reports_filter'));
+		}
+	}
+	
+	/**
+	 * This function adds a flag that'll cause the incident::get_incidents to show all reports
+	 */
+	public function _add_all_reports_filter()
+	{
+		$params = Event::$data;
+		$params["all_reports"] = TRUE;
+		//also check and see if we want to show maybe, online approved, or only unapproved, you never know.
+		if(isset($_GET['u']) AND intval($_GET['u']) > 0)
+		{
+			$show_unapproved = intval($_GET['u']);
+			if($show_unapproved == 1)
+			{
+				array_push($params, '(i.incident_active = 1)');
+			}
+			else if($show_unapproved == 2)
+			{
+				array_push($params, '(i.incident_active = 0)');
+			}
+			
+		}
+		Event::$data = $params;
 	}
 	
 	/**

@@ -17,7 +17,7 @@
 				<strong><?php echo Kohana::lang('adminmap.status_filters') ?>:</strong>
 				<ul id="status_switch" class="status-filters">
 					<!-- This was commented out to keep things simple for our users. I hate to cut out functionality,
-					       but we need to be aware of  overloading those who may not be tech savy
+					       but we need to be aware of  overloading those who may not be tech savy-->
 					<li>
 						<a class="active" id="status_1" href="#">
 							<div class="swatch" style="background-color:#000000"></div>
@@ -30,13 +30,15 @@
 							<div class="status-title">Approved Reports</div>
 						</a>
 					</li>
-					-->
+					<!-- /show approved reports-->
+					<!--  show unapproved as black
 					<li>
 						<a class="active" id="color_status_1" href="#">
 							<div class="swatch" style="background-color:#000000"></div>
 							<div class="status-title"><?php echo Kohana::lang('adminmap.unapproved_reports') ?></div>
 						</a>
 					</li>
+					 /show unapproved as black -->
 					
 				</ul>
 			</div>		       

@@ -57,16 +57,15 @@ class Adminmap_json_Controller extends Admin_Controller
     public function cluster()
     {
         adminmap_helper::json_cluster($this);
-
     }
 
 
      /**************************************************************
      * Retrieve timeline JSON
      */
-    public function timeline( $category_ids = "0," )
+    public function timeline()
     {
-	adminmap_helper::json_timeline($this, $category_ids);
+		adminmap_helper::json_timeline($this);
     }
 
 

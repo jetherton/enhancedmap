@@ -94,308 +94,46 @@ class Bigmap_Controller extends Template_Controller {
 
     public function index()
     {
-        $this->template->header->this_page = 'bigmap';
-        $this->template->content = new View('adminmap/big_mapview');
-	
-	//set the CSS for this
-	plugin::add_stylesheet("adminmap/css/big_adminmap");
-	plugin::add_stylesheet("adminmap/css/jquery.hovertip-1.0");
+    	//set the title of the page
+    	$this->template->header->this_page = 'bigmap';
+    	//javascript for the big map special features
+		plugin::add_javascript("adminmap/js/bigmap");
+    	
+    	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		// Setup the map
+		adminmap_helper::setup_adminmap($this, "adminmap/big_mapview", "adminmap/css/big_adminmap");
 
-	//make sure the right java script files are used.
-	plugin::add_javascript("adminmap/js/jquery.flot");
-	plugin::add_javascript("adminmap/js/excanvas.min");
-	plugin::add_javascript("adminmap/js/timeline");
-	plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
-	//javascript for the big map special features
-	plugin::add_javascript("adminmap/js/bigmap");
-	
-		// Cacheable Main Controller
-		$this->is_cachable = TRUE;
-
-		// Map and Slider Blocks
-		$div_map = new View('adminmap/big_main_map');
-		$div_timeline = new View('adminmap/big_main_timeline');
-			// Filter::map_main - Modify Main Map Block
-			Event::run('ushahidi_filter.map_main', $div_map);
-			// Filter::map_timeline - Modify Main Map Block
-			Event::run('ushahidi_filter.map_timeline', $div_timeline);
-		$this->template->content->div_map = $div_map;
-		$this->template->content->div_timeline = $div_timeline;
-
-		// Get locale
-		$l = Kohana::config('locale.language.0');
-
-        // Get all active top level categories
-		$parent_categories = array();
-		foreach (ORM::factory('category')
-				->where('category_visible', '1')
-				->where('parent_id', '0')
-				->orderby('category_position', 'asc')
-				->find_all() as $category)
-		{
-			// Get The Children
-			$children = array();
-			foreach ($category->children as $child)
-			{
-				// Check for localization of child category
-
-				$translated_title = Category_Lang_Model::category_title($child->id,$l);
-
-				if($translated_title)
-				{
-					$display_title = $translated_title;
-				}
-				else
-				{
-					$display_title = $child->category_title;
-				}
-
-				$children[$child->id] = array(
-					$display_title,
-					$child->category_color,
-					$child->category_image
-				);
-
-				if ($child->category_trusted)
-				{ // Get Trusted Category Count
-					$trusted = ORM::factory("incident")
-						->join("incident_category","incident.id","incident_category.incident_id")
-						->where("category_id",$child->id);
-					if ( ! $trusted->count_all())
-					{
-						unset($children[$child->id]);
-					}
-				}
-			}
-
-			// Check for localization of parent category
-
-			$translated_title = Category_Lang_Model::category_title($category->id,$l);
-
-			if($translated_title)
-			{
-				$display_title = $translated_title;
-			}else{
-				$display_title = $category->category_title;
-			}
-
-			// Put it all together
-			$parent_categories[$category->id] = array(
-				$display_title,
-				$category->category_color,
-				$category->category_image,
-				$children
-			);
-
-			if ($category->category_trusted)
-			{ // Get Trusted Category Count
-				$trusted = ORM::factory("incident")
-					->join("incident_category","incident.id","incident_category.incident_id")
-					->where("category_id",$category->id);
-				if ( ! $trusted->count_all())
-				{
-					unset($parent_categories[$category->id]);
-				}
-			}
-		}
-		$this->template->content->categories = $parent_categories;
-
-		// Get all active Layers (KMZ/KML)
-		$layers = array();
-		$config_layers = Kohana::config('map.layers'); // use config/map layers if set
-		if ($config_layers == $layers) {
-			foreach (ORM::factory('layer')
-					  ->where('layer_visible', 1)
-					  ->find_all() as $layer)
-			{
-				$layers[$layer->id] = array($layer->layer_name, $layer->layer_color,
-					$layer->layer_url, $layer->layer_file);
-			}
-		} else {
-			$layers = $config_layers;
-		}
-		$this->template->content->layers = $layers;
-
-		// Get all active Shares
-		$shares = array();
-		foreach (ORM::factory('sharing')
-				  ->where('sharing_active', 1)
-				  ->find_all() as $share)
-		{
-			$shares[$share->id] = array($share->sharing_name, $share->sharing_color);
-		}
-		$this->template->content->shares = $shares;
-
-		// Get Default Color
-		$this->template->content->default_map_all = Kohana::config('settings.default_map_all');
-
-
-        // Get The START, END and Incident Dates
-        $startDate = "";
-		$endDate = "";
-		$display_startDate = 0;
-		$display_endDate = 0;
-
-		$db = new Database();
-        // Next, Get the Range of Years
-		$query = $db->query('SELECT DATE_FORMAT(incident_date, \'%Y-%c\') AS dates FROM '.$this->table_prefix.'incident WHERE incident_active = 1 GROUP BY DATE_FORMAT(incident_date, \'%Y-%c\') ORDER BY incident_date');
-
-		$first_year = date('Y');
-		$last_year = date('Y');
-		$first_month = 1;
-		$last_month = 12;
-		$i = 0;
-
-		foreach ($query as $data)
-		{
-			$date = explode('-',$data->dates);
-
-			$year = $date[0];
-			$month = $date[1];
-
-			// Set first year
-			if($i == 0)
-			{
-				$first_year = $year;
-				$first_month = $month;
-			}
-
-			// Set last dates
-			$last_year = $year;
-			$last_month = $month;
-
-			$i++;
-		}
-
-		$show_year = $first_year;
-		$selected_start_flag = TRUE;
-		while($show_year <= $last_year)
-		{
-			$startDate .= "<optgroup label=\"".$show_year."\">";
-
-			$s_m = 1;
-			if($show_year == $first_year)
-			{
-				// If we are showing the first year, the starting month may not be January
-				$s_m = $first_month;
-			}
-
-			$l_m = 12;
-			if($show_year == $last_year)
-			{
-				// If we are showing the last year, the ending month may not be December
-				$l_m = $last_month;
-			}
-
-			for ( $i=$s_m; $i <= $l_m; $i++ )
-			{
-				if ( $i < 10 )
-				{
-					// All months need to be two digits
-					$i = "0".$i;
-				}
-				$startDate .= "<option value=\"".strtotime($show_year."-".$i."-01")."\"";
-				if($selected_start_flag == TRUE)
-				{
-					$display_startDate = strtotime($show_year."-".$i."-01");
-					$startDate .= " selected=\"selected\" ";
-					$selected_start_flag = FALSE;
-				}
-				$startDate .= ">".date('M', mktime(0,0,0,$i,1))." ".$show_year."</option>";
-			}
-			$startDate .= "</optgroup>";
-
-			$endDate .= "<optgroup label=\"".$show_year."\">";
-			for ( $i=$s_m; $i <= $l_m; $i++ )
-			{
-				if ( $i < 10 )
-				{
-					// All months need to be two digits
-					$i = "0".$i;
-				}
-				$endDate .= "<option value=\"".strtotime($show_year."-".$i."-".date('t', mktime(0,0,0,$i,1))." 23:59:59")."\"";
-
-                if($i == $l_m AND $show_year == $last_year)
-				{
-					$display_endDate = strtotime($show_year."-".$i."-".date('t', mktime(0,0,0,$i,1))." 23:59:59");
-					$endDate .= " selected=\"selected\" ";
-				}
-				$endDate .= ">".date('M', mktime(0,0,0,$i,1))." ".$show_year."</option>";
-			}
-			$endDate .= "</optgroup>";
-
-			// Show next year
-			$show_year++;
-		}
-
-		Event::run('ushahidi_filter.active_startDate', $display_startDate);
-		Event::run('ushahidi_filter.active_endDate', $display_endDate);
-		Event::run('ushahidi_filter.startDate', $startDate);
-		Event::run('ushahidi_filter.endDate', $endDate);
 		
-		$this->template->content->div_timeline->startDate = $startDate;
-		$this->template->content->div_timeline->endDate = $endDate;
-
-		// Javascript Header
-		$this->themes->map_enabled = true;
-		$this->themes->main_page = true;
-
-		// Map Settings
+		//ARE WE CLUSTERING?
 		$clustering = Kohana::config('settings.allow_clustering');
-		$marker_radius = Kohana::config('map.marker_radius');
-		$marker_opacity = Kohana::config('map.marker_opacity');
-		$marker_stroke_width = Kohana::config('map.marker_stroke_width');
-		$marker_stroke_opacity = Kohana::config('map.marker_stroke_opacity');
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////		
+		//get the CATEGORIES
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-        // pdestefanis - allows to restrict the number of zoomlevels available
-		$numZoomLevels = Kohana::config('map.numZoomLevels');
-		$minZoomLevel = Kohana::config('map.minZoomLevel');
-	   	$maxZoomLevel = Kohana::config('map.maxZoomLevel');
-
-		// pdestefanis - allows to limit the extents of the map
-		$lonFrom = Kohana::config('map.lonFrom');
-		$latFrom = Kohana::config('map.latFrom');
-		$lonTo = Kohana::config('map.lonTo');
-		$latTo = Kohana::config('map.latTo');
-
-		$this->themes->js = new View('adminmap/adminmap_js');
-		$this->themes->js->json_url = ($clustering == 1) ?
-			"bigmap_json/cluster" : "bigmap_json";
-		$this->themes->js->marker_radius =
-			($marker_radius >=1 && $marker_radius <= 10 ) ? $marker_radius : 5;
-		$this->themes->js->marker_opacity =
-			($marker_opacity >=1 && $marker_opacity <= 10 )
-			? $marker_opacity * 0.1  : 0.9;
-		$this->themes->js->marker_stroke_width =
-			($marker_stroke_width >=1 && $marker_stroke_width <= 5 ) ? $marker_stroke_width : 2;
-		$this->themes->js->marker_stroke_opacity =
-			($marker_stroke_opacity >=1 && $marker_stroke_opacity <= 10 )
-			? $marker_stroke_opacity * 0.1  : 0.9;
-
-		// pdestefanis - allows to restrict the number of zoomlevels available
-		$this->themes->js->numZoomLevels = $numZoomLevels;
-		$this->themes->js->minZoomLevel = $minZoomLevel;
-		$this->themes->js->maxZoomLevel = $maxZoomLevel;
-
-		// pdestefanis - allows to limit the extents of the map
-		$this->themes->js->lonFrom = $lonFrom;
-		$this->themes->js->latFrom = $latFrom;
-		$this->themes->js->lonTo = $lonTo;
-		$this->themes->js->latTo = $latTo;
-
-		$this->themes->js->default_map = Kohana::config('settings.default_map');
-		$this->themes->js->default_zoom = Kohana::config('settings.default_zoom');
-		$this->themes->js->latitude = Kohana::config('settings.default_lat');
-		$this->themes->js->longitude = Kohana::config('settings.default_lon');
-		$this->themes->js->default_map_all = Kohana::config('settings.default_map_all');
-		//
-		$this->themes->js->active_startDate = $display_startDate;
-		$this->themes->js->active_endDate = $display_endDate;
-		//$myPacker = new javascriptpacker($js , 'Normal', false, false);
-		//$js = $myPacker->pack();
-
+		//get the categories
+		adminmap_helper::set_categories($this, false);
+		$json_url = ($clustering == 1) ? "bigmap_json/cluster" : "bigmap_json";
+		$json_timeline_url = "bigmap_json/timeline/";
+		
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//setup the map
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+		adminmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url, 'adminmap/adminmap_js',
+								'adminmap/big_main_map', 'adminmap/big_main_timeline');
+		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//setup the overlays and shares
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		adminmap_helper::set_overlays_shares($this);
+		plugin::add_stylesheet("adminmap/css/jquery.hovertip-1.0");
+		plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
+		
+		
 		// Rebuild Header Block
 		$this->template->header->header_block = $this->themes->header_block();
-	}
+    	
+	}//end 
 
 } // End Main

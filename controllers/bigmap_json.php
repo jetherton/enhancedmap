@@ -60,7 +60,7 @@ class Bigmap_json_Controller extends Template_Controller
      */
     public function timeline()
     {
-	adminmap_helper::json_timeline($this, false);
+		adminmap_helper::json_timeline($this, false);
     }
 
 

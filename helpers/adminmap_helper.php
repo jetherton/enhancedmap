@@ -74,9 +74,16 @@ class adminmap_helper_Core {
 	/*
 	* this makes the map for this plugin
 	*/
-	public static function set_map($template, $themes, $json_url, $json_timeline_url, $javascript_view = 'adminmap/mapview_js',
+	public static function set_map($template, $themes, $json_url, $json_timeline_url, $javascript_view = 'adminmap/adminmap_js',
 							$div_map_view = 'adminmap/main_map', $div_timeline_view = 'adminmap/main_timeline')
 	{
+		
+		//are we on the backend?
+		$on_back_end = false;
+		if (stripos($json_url, 'admin/') === 0)
+		{
+			$on_back_end = true;	
+		}
 	
 		////////////////////////////////////////////////////////////////Map and Slider Blocks////////////////////////////////////////////////////////////////////////////
 		$div_map = new View($div_map_view);
@@ -210,6 +217,10 @@ class adminmap_helper_Core {
 		$themes->js = new View($javascript_view);
 		$themes->js->default_map = Kohana::config('settings.default_map');
 		$themes->js->default_zoom = Kohana::config('settings.default_zoom');
+		if($on_back_end)
+		{
+			$themes->js->show_unapproved = '3';	
+		}
 		
 
 		// Map Settings
@@ -484,6 +495,14 @@ class adminmap_helper_Core {
 			$color = self::merge_colors_for_dots($colors);	
 		}
 		
+		//since we're on the back end, wana do anything special?
+		$admin_path = '';
+		$view_or_edit = 'view';
+		if($on_the_back_end)
+		{
+			$admin_path = 'admin/';
+			$view_or_edit = 'edit';
+		}
 		
 		// Fetch the incidents
 		$markers = (isset($_GET['page']) AND intval($_GET['page']) > 0)? reports::fetch_incidents(TRUE) : reports::fetch_incidents();
@@ -522,8 +541,8 @@ class adminmap_helper_Core {
 			$encoded_title = str_ireplace('"', '', $encoded_title);
 
 			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target
-					. " href='".url::base()."reports/view/".$marker->incident_id."'>".$encoded_title)."</a>") . "\","
-					. "\"link\": \"".url::base()."reports/view/".$marker->incident_id."\", ";
+					. " href='".url::base().$admin_path."reports/".$view_or_edit."/".$marker->incident_id."'>".$encoded_title)."</a>") . "\","
+					. "\"link\": \"".url::base().$admin_path."reports/".$view_or_edit."/".$marker->incident_id."\", ";
 
 			$json_item .= (isset($category))
 				? "\"category\":[" . $category_id . "], "
@@ -937,15 +956,22 @@ class adminmap_helper_Core {
 			// Number of Items in Cluster
 			$cluster_count = count($cluster);
 			
-
+			//since we're on the back end, wana do anything special?
+			$admin_path = '';
+			$view_or_edit = 'view';
+			if($on_the_back_end)
+			{
+				$admin_path = 'admin/';
+				$view_or_edit = 'edit';
+			}
 			
 			// Build out the JSON string
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
-			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base()
+			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path
 				 . "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " Reports</a>")) . "\",";
-			$json_item .= "\"link\": \"".url::base()."reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast."\", ";
+			$json_item .= "\"link\": \"".url::base().$admin_path. "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast."\", ";
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$color."\", ";
 			$json_item .= "\"icon\": \"".$icon."\", ";
@@ -967,9 +993,9 @@ class adminmap_helper_Core {
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
-			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base()
-					. "reports/view/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "\",";
-			$json_item .= "\"link\": \"".url::base()."reports/view/".$single['id']."\", ";
+			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path
+					. "reports/".$view_or_edit."/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "\",";
+			$json_item .= "\"link\": \"".url::base().$admin_path."reports/".$view_or_edit."/".$single['id']."\", ";
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$color."\", ";
 			$json_item .= "\"icon\": \"".$icon."\", ";
@@ -1040,44 +1066,7 @@ class adminmap_helper_Core {
         $db = new Database();
 	
 	
-	
-		$show_unapproved="3"; //1 show only approved, 2 show only unapproved, 3 show all
-		$approved_text = " (1=1) ";
-		if($on_the_back_end)
-		{
-			//figure out if we're showing unapproved stuff or what.
-			if (isset($_GET['u']) AND !empty($_GET['u']))
-			{
-			    $show_unapproved = (int) $_GET['u'];
-			}
-			$approved_text = "";
-			if($show_unapproved == 1)
-			{
-				$approved_text = "incident.incident_active = 1 ";
-			}
-			else if ($show_unapproved == 2)
-			{
-				$approved_text = "incident.incident_active = 0 ";
-			}
-			else if ($show_unapproved == 3)
-			{
-				$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
-			}
-		}
-		else
-		{
-			$approved_text = "incident.incident_active = 1 ";
-		}
-	
-		$logical_operator = "or";
-		if (isset($_GET['lo']) AND !empty($_GET['lo']))
-	        {
-		    $logical_operator =  $_GET['lo'];
-	        }
-
-
-        $interval = (isset($_GET["i"]) AND !empty($_GET["i"])) ?
-            $_GET["i"] : "month";
+	    $interval = (isset($_GET["i"]) AND !empty($_GET["i"])) ? $_GET["i"] : "month";
 
 
         // Get the Counts
@@ -1106,17 +1095,9 @@ class adminmap_helper_Core {
         $graph_data[0]['label'] = "Category Title"; //is this used for anything?        
         $graph_data[0]['color'] = '#'. self::merge_colors($category_ids, $custom_category_to_table_mapping);
         $graph_data[0]['data'] = array();
-	
-	$incidents = adminmap_reports::get_reports($category_ids, 
-		$approved_text, 
-		" ".$extra_where_text, 
-		$logical_operator,
-		"incident.incident_date",
-		"asc",
-		-1, 
-		-1,
-		$joins,
-		$custom_category_to_table_mapping);
+
+		
+	$incidents = reports::fetch_incidents();
 	
 	
 	$approved_IDs_str = "('-1')";
@@ -1128,7 +1109,7 @@ class adminmap_helper_Core {
 		{
 			$i++;
 			$approved_IDs_str = ($i > 1) ? $approved_IDs_str.', ' : $approved_IDs_str;
-			$approved_IDs_str = $approved_IDs_str."'".$incident->id."'";
+			$approved_IDs_str = $approved_IDs_str."'".$incident->incident_id."'";
 		}
 		$approved_IDs_str = $approved_IDs_str.") ";
 	}

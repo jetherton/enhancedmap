@@ -32,7 +32,7 @@
 		// Selected Category
 		var gCategoryId = ['0']; //default to all
 		// Selected Status
-		var currentStatus = '1';
+		var currentStatus = '<?php echo isset($show_unapproved) ? $show_unapproved : '1'; ?>';
 		// color the reports who's status is unapproved black?
 		var colorCurrentStatus = '1';
 		//logical operator to use
@@ -49,6 +49,8 @@
 		var default_json_url = "<?php echo $json_url;?>";
 		// Current json_url, if map is switched dynamically between json and json_cluster
 		var json_url = default_json_url;
+
+		var time_line_url = "<?php echo isset($json_timeline_url) ? $json_timeline_url : 'bigmap_json/timeline/'; ?>";
 		
 		// Global list for current KML overlays in display
 		var kmlOverlays = [];
@@ -270,7 +272,7 @@
 				categoriesStr += "c%5B%5D=" + gCategoryId[i];
 			}
 
-			$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>?"+categoriesStr+iValue+"&u="+currentStatus + 
+			$.getJSON("<?php echo url::site(); ?>" + time_line_url + "?"+categoriesStr+iValue+"&u="+currentStatus + 
 			"&lo="+ currentLogicalOperator, function(data) {
 				graphData = data[0];
 
@@ -282,21 +284,7 @@
 				});
 				gTimeline.plot();
 			});
-		 
-
-			/* I don't think we need this
-			// Get dailyGraphData for All Categories
-			$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>?"+categoriesStr+iValue+"&u="+currentStatus + 
-			"&lo="+ currentLogicalOperator, function(data) {
-				dailyGraphData = data[0];
-			});
-
-			// Get allGraphData for All Categories
-			$.getJSON("<?php echo url::site()."bigmap_json/timeline/"?>?"+categoriesStr+iValue+"&u="+currentStatus + 
-			"&lo="+ currentLogicalOperator, function(data) {
-				allGraphData = data[0];
-			});
-			*/
+		
 
 		}
 
