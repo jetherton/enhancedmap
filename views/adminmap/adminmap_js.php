@@ -807,7 +807,10 @@
 				map.setCenter(new OpenLayers.LonLat(<?php echo $longitude ?>, <?php echo $latitude ?>), 5);
 				return;
 			}
-			
+
+			//not sure how this happened, but we now have to check if the selectTuUISlider change event
+			//has been fired twice. 
+			var lastSliderChangeTimeStamp = 0;			
 			//Accessible Slider/Select Switch
 			$("select#startDate, select#endDate").selectToUISlider({
 				labels: 4,
@@ -815,6 +818,16 @@
 				sliderOptions: {
 					change: function(e, ui)
 					{
+						
+						//it seems that this event gets fired twice some times,
+						//so to keep that from happening, we check if the event
+						//has been fired in the last 100 miliseconds, if it has
+						//ignore it.
+						if((e.timeStamp - lastSliderChangeTimeStamp) < 100)
+						{
+							return;
+						}
+						lastSliderChangeTimeStamp = e.timeStamp;
 						var startDate = $("#startDate").val();
 						var endDate = $("#endDate").val();
 						
@@ -824,27 +837,17 @@
 						// Get Current Center
 						currCenter = map.getCenter();
 						
-						// If we're in a month date range, switch to
-						// non-clustered mode. Default interval is monthly
-						var startTime = new Date(startDate * 1000);
-						var endTime = new Date(endDate * 1000);
-						if ((endTime - startTime) / (1000 * 60 * 60 * 24) <= 32)
-						{
-							json_url = default_json_url;
-						} 
-						else
-						{
-							json_url = default_json_url;
-						}
+						
 												
 						refreshGraph(startDate, endDate);
 						// Refresh Map
-						console.log("time slider adjusted calling addMarkers");
+						
 						addMarkers(gCategoryId, startDate, endDate, currZoom, currCenter, gMediaType);
 						
 					}
 				}
 			});
+			
 			
 			var allGraphData = "";
 			var dailyGraphData = "";
