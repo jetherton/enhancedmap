@@ -26,6 +26,7 @@ class adminmap_Controller extends Admin_Controller
 	public function index()
 	{
 		
+		
 		adminmap_helper::setup_adminmap($this);
 		
 		//get the categories

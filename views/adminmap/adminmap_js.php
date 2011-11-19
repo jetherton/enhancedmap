@@ -19,6 +19,10 @@
 <script type="text/javascript">
 
 
+		$(function() {
+		    $('span[title]').hovertip();
+		});
+
 
 		var baseUrl = "<?php echo url::site(); ?>";		
 
@@ -75,7 +79,22 @@
 		function addMarkers(catID,startDate,endDate, currZoom, currCenter,
 			mediaType, thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor)
 		{
-		
+
+			console.log("-------Inside of addMarkers()----------");
+			/*console.log(catID);
+			console.log(startDate);
+			console.log(endDate);
+			console.log(mediaType);
+			console.log(gMap.getZoom());
+			console.log(gMap.getCenter());
+			console.log(thisLayerID);
+			console.log(thisLayerType);
+			console.log(thisLayerUrl);
+			console.log(thisLayerColor);
+			console.log(json_url);
+			console.log(currentStatus);
+			console.log(colorCurrentStatus);
+			console.log(currentLogicalOperator);*/
 				
 			return $.timeline({categoryId: catID,
 			                   startTime: new Date(startDate * 1000),
@@ -570,15 +589,16 @@
 				
 				// Get Current Center
 				currCenter = map.getCenter();
-				
+
+				var startDate = $("#startDate").val();
+				var endDate = $("#endDate").val();
+				refreshGraph(startDate, endDate);
 
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
 				addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 				
-				var startDate = $("#startDate").val();
-				var endDate = $("#endDate").val();
-				refreshGraph(startDate, endDate);	
+					
 				
 				return false;
 			});
@@ -643,14 +663,15 @@
 				// Get Current Center
 				currCenter = map.getCenter();
 
+				var startDate = $("#startDate").val();
+				var endDate = $("#endDate").val();
+				refreshGraph(startDate, endDate);
 				
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
 				addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 								
-				var startDate = $("#startDate").val();
-				var endDate = $("#endDate").val();
-				refreshGraph(startDate, endDate);	
+					
 				
 				return false;
 			});
@@ -687,15 +708,16 @@
 				
 				// Get Current Center
 				currCenter = map.getCenter();
-			
+
+				var startDate = $("#startDate").val();
+				var endDate = $("#endDate").val();
+				refreshGraph(startDate, endDate);
 				
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
 				addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 								
-				var startDate = $("#startDate").val();
-				var endDate = $("#endDate").val();
-				refreshGraph(startDate, endDate);	
+					
 
 				return false;
 			});
@@ -731,14 +753,16 @@
 				
 				// Get Current Center
 				currCenter = map.getCenter();
+
+				var startDate = $("#startDate").val();
+				var endDate = $("#endDate").val();
+				refreshGraph(startDate, endDate);	
 				
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
 				addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 								
-				var startDate = $("#startDate").val();
-				var endDate = $("#endDate").val();
-				refreshGraph(startDate, endDate);	
+				
 				
 				return false;
 			});
@@ -812,11 +836,12 @@
 						{
 							json_url = default_json_url;
 						}
-						
-						// Refresh Map
-						addMarkers(gCategoryId, startDate, endDate, '', '', gMediaType);
-						
+												
 						refreshGraph(startDate, endDate);
+						// Refresh Map
+						console.log("time slider adjusted calling addMarkers");
+						addMarkers(gCategoryId, startDate, endDate, currZoom, currCenter, gMediaType);
+						
 					}
 				}
 			});
@@ -873,8 +898,9 @@
 			//$("#endDate").val(endTime);
 			
 			// Initialize Map
-			addMarkers(gCategoryId, startTime, endTime, '', '', gMediaType);
 			refreshGraph(startTime, endTime);
+			addMarkers(gCategoryId, startTime, endTime, '', '', gMediaType);
+			
 			
 			// Media Filter Action
 			$('.filters li a').click(function()

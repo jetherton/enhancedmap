@@ -99,7 +99,6 @@ class Iframemap_Controller extends Template_Controller {
    	    //set the title of the page
     	$this->template->header->this_page = 'bigmap';
     	//javascript for the big map special features
-		plugin::add_javascript("adminmap/js/iframemap");
 		
     	
     	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////

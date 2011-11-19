@@ -1,7 +1,5 @@
 
-            $(function() {
-                $('span[title]').hovertip();
-            });
+
 
 
 //for toggling the windows on and off
