@@ -673,7 +673,7 @@
 		Create the Markers Layer
 		*/
 		this.addMarkers = function(startDate,endDate, currZoom, currCenter,
-			thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor, json_url, currStatus, currColorStatus, currLogicalOperator)
+			thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor, json_url, extraParams)
 		{
 
 			var	protocolUrl = baseUrl + json_url + "/"; // Default Json
@@ -746,32 +746,11 @@
 					map.removeLayer(markers[i]);
 				}
 			}
-
-			//markers = new OpenLayers.Layer.GML(thisLayer, protocolUrl + '?z='+ myZoom +'&sw='+ southwest +'&ne='+ northeast +'&' + params.join('&'),
-			/* ETHERTON Git rid of this if it works
-			markers = new OpenLayers.Layer.GML(thisLayer, protocolUrl + '?z=' +
-				myZoom + '&' + this.markerUrlParams(startDate, endDate).join('&') + "&u="+currStatus + "&uc="+currColorStatus
-				+ "&lo="+currLogicalOperator,
-				{
-					preFeatureInsert:preFeatureInsert,
-					format: protocolFormat,
-					projection: proj_4326,
-					formatOptions: {
-						extractStyles: true,
-						extractAttributes: true
-					},
-					styleMap: new OpenLayers.StyleMap({
-						"default":style,
-						"select": style
-					})
-				});
-			*/
-			
+		
 			// Build the URL for fetching the data
 			fetchUrl = (thisLayer && thisLayerType == 'layers')
 				? protocolUrl
-				: protocolUrl + '?z=' + myZoom + '&' + this.markerUrlParams(startDate, endDate).join('&') + "&u="+currStatus + "&uc="+currColorStatus
-					+ "&lo="+currLogicalOperator;
+				: protocolUrl + '?z=' + myZoom + '&' + this.markerUrlParams(startDate, endDate).join('&') + "&" + extraParams;
 			
 			// Create the reports layer
 			markers = new OpenLayers.Layer.Vector(thisLayer, {

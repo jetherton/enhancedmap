@@ -24,8 +24,71 @@
 		});
 
 
-		var baseUrl = "<?php echo url::site(); ?>";		
+		var urlParams = new Object();
 
+		<?php
+			if(isset($urlParams))
+			{
+				foreach($urlParams as $key=>$param)
+				{
+					echo 'urlParams["'.$key.'"] = "'.$param.'";';
+				}
+			}
+		?>
+
+		//initialize the defaults
+		urlParams['lo'] = 'or'; //logical operator
+		urlParams['uc'] = '1'; //color status
+		urlParams['u'] = '<?php echo isset($show_unapproved) ? $show_unapproved : '1'; ?>';
+		
+		/**
+		* Creates a url string of all the parameters
+		* in the urlParams variable
+		*/
+		function getUrlStringFromParams()
+		{
+			var returnStr = "";
+			var n = 0;
+			for(var i in urlParams)
+			{
+				n++;
+				if(n>1){returnStr += "&";}
+				if(typeof urlParams[i] == "object")
+				{
+					for(var j in urlParams[i])
+					{
+						n++;
+						if(n>1){returnStr += "&";}
+						returnStr += i + "%5B%5D=" + encodeURIComponent(urlParams[i][j]);	
+					}
+				}
+				else
+				{
+					returnStr += i + "=" + encodeURIComponent(urlParams[i]);
+				}
+				
+			}
+			return returnStr;
+		}//end getUrlStringFromParams
+
+		/**
+		 * Adds the url params in urlParams to your existing URL
+		 */
+		function addParamsToUrl(url)
+		{
+			if(url.indexOf("?")==-1)
+			{
+				url += "?";
+			}
+			else
+			{
+				url += "&";
+			}
+			return url + getUrlStringFromParams();
+		}//end addParamsToUrl
+
+
+		
 		// Map JS
 		//number of categories selcted
 		var numOfCategoriesSelected = 0;
@@ -35,12 +98,8 @@
 		var map;
 		// Selected Category
 		var gCategoryId = ['0']; //default to all
-		// Selected Status
-		var currentStatus = '<?php echo isset($show_unapproved) ? $show_unapproved : '1'; ?>';
 		// color the reports who's status is unapproved black?
 		var colorCurrentStatus = '1';
-		//logical operator to use
-		var currentLogicalOperator = 'or';
 		// Selected Layer
 		var thisLayer;
 		// WGS84 Datum
@@ -80,21 +139,7 @@
 			mediaType, thisLayerID, thisLayerType, thisLayerUrl, thisLayerColor)
 		{
 
-			console.log("-------Inside of addMarkers()----------");
-			/*console.log(catID);
-			console.log(startDate);
-			console.log(endDate);
-			console.log(mediaType);
-			console.log(gMap.getZoom());
-			console.log(gMap.getCenter());
-			console.log(thisLayerID);
-			console.log(thisLayerType);
-			console.log(thisLayerUrl);
-			console.log(thisLayerColor);
-			console.log(json_url);
-			console.log(currentStatus);
-			console.log(colorCurrentStatus);
-			console.log(currentLogicalOperator);*/
+			var extraParams = getUrlStringFromParams();
 				
 			return $.timeline({categoryId: catID,
 			                   startTime: new Date(startDate * 1000),
@@ -103,8 +148,7 @@
 							  }).addMarkers(
 								startDate, endDate, gMap.getZoom(),
 								gMap.getCenter(), thisLayerID, thisLayerType, 
-								thisLayerUrl, thisLayerColor, json_url, currentStatus, colorCurrentStatus,
-								currentLogicalOperator);
+								thisLayerUrl, thisLayerColor, json_url, extraParams);
 		}
 
 
@@ -291,8 +335,11 @@
 				categoriesStr += "c%5B%5D=" + gCategoryId[i];
 			}
 
-			$.getJSON("<?php echo url::site(); ?>" + time_line_url + "?"+categoriesStr+iValue+"&u="+currentStatus + 
-			"&lo="+ currentLogicalOperator, function(data) {
+			var fullUrl = "<?php echo url::site(); ?>" + time_line_url + "?"+categoriesStr+iValue;
+
+			fullUrl = addParamsToUrl(fullUrl); 
+
+			$.getJSON(fullUrl, function(data) {
 				graphData = data[0];
 
 				gTimeline = $.timeline({categoryId: gCategoryId,
@@ -507,11 +554,10 @@
 					if( !$("#cat_0").hasClass("active")) //it's being activated so unselect everything else
 					{
 						//unselect all other selected categories
-						while (gCategoryId.length > 1)
+						while (gCategoryId.length > 0)
 						{
 							removeCategoryFilter(gCategoryId[0]);
-						}
-						gCategoryId = ['0'];
+						}				
 					}
 				}
 				else
@@ -628,15 +674,15 @@
 				//both are active
 				if($("#status_1").hasClass("active") && $("#status_2").hasClass("active"))
 				{
-					currentStatus = 3;
+					urlParams['u'] = 3;
 				}
 				else if($("#status_1").hasClass("active") && !($("#status_2").hasClass("active")))
 				{
-					currentStatus = 2;
+					urlParams['u'] = 2;
 				}
 				else if(!($("#status_1").hasClass("active")) && $("#status_2").hasClass("active"))
 				{
-					currentStatus = 1;
+					urlParams['u'] = 1;
 				}
 				else //this shouldn't happen, so undo what was done above, can't have no reports showing. That's just silly
 				{
@@ -692,11 +738,12 @@
 				{
 					//we have it so remove it
 					$("#color_status_1").removeClass("active"); // make it not active
-					colorCurrentStatus = 1;
+					urlParams['uc'] = 1;					
 				}
 				else
 				{
 					$("#color_status_1").addClass("active"); // make it active
+					urlParams['uc'] = 2;
 					colorCurrentStatus = 2;
 				}
 				
@@ -735,14 +782,14 @@
 				if( $("#logicalOperator_1").hasClass("active")) //was OR, now make it AND
 				{
 					$("#logicalOperator_1").removeClass("active"); // not OR
-					$("#logicalOperator_2").addClass("active"); // is AND
-					currentLogicalOperator = "and";
+					$("#logicalOperator_2").addClass("active"); // is AND					
+					urlParams['lo'] = "and";
 				}
 				else //was AND, now make it OR
 				{
 					$("#logicalOperator_2").removeClass("active"); // not AND
 					$("#logicalOperator_1").addClass("active"); // is OR
-					currentLogicalOperator = "or";
+					urlParams['lo'] = "or";
 				}
 
 				// Destroy any open popups
@@ -926,9 +973,13 @@
 				
 				$('.filters li a').attr('class', '');
 				$(this).addClass('active');
+
+				var fullUrl = "<?php echo url::site(); ?>" + time_line_url + "?"+categoriesStr+iValue;
+				fullUrl = addParamsToUrl(fullUrl);
+				
 				gTimeline = $.timeline({categoryId: gCategoryId, startTime: startTime, 
 				    endTime: endTime, mediaType: gMediaType,
-					url: "<?php echo url::site(); ?>json_url+'/timeline/'"
+					url: fullUrl
 				});
 				gTimeline.plot();
 			});

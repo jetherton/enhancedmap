@@ -75,7 +75,7 @@ class adminmap_helper_Core {
 	* this makes the map for this plugin
 	*/
 	public static function set_map($template, $themes, $json_url, $json_timeline_url, $javascript_view = 'adminmap/adminmap_js',
-							$div_map_view = 'adminmap/main_map', $div_timeline_view = 'adminmap/main_timeline')
+							$div_map_view = 'adminmap/main_map', $div_timeline_view = 'adminmap/main_timeline', $urlParams = array())
 	{
 		
 		//are we on the backend?
@@ -215,6 +215,7 @@ class adminmap_helper_Core {
 		}
 		
 		$themes->js = new View($javascript_view);
+		$themes->js->urlParams = $urlParams;
 		$themes->js->default_map = Kohana::config('settings.default_map');
 		$themes->js->default_zoom = Kohana::config('settings.default_zoom');
 		if($on_back_end)
@@ -481,7 +482,7 @@ class adminmap_helper_Core {
 		// Get the category colour
 		if(count($category_id) == 1 AND intval($category_id[0]) == 0 )
 		{
-			$color = Kohana::config('settings.default_map_all');
+			$colors = array(Kohana::config('settings.default_map_all'));
 		}
 		
 		else 
@@ -491,9 +492,9 @@ class adminmap_helper_Core {
 			foreach($category_id as $cat)
 			{
 				$colors[] = ORM::factory('category', $cat)->category_color;
-			}
-			$color = self::merge_colors_for_dots($colors);	
+			}			
 		}
+		$color = self::merge_colors($colors);	
 		
 		//since we're on the back end, wana do anything special?
 		$admin_path = '';
@@ -597,146 +598,6 @@ class adminmap_helper_Core {
 	
 	
 	
-	/************************************************************************************************
-	* Function, this'll merge colors. Given an array of category IDs it'll return a hex string
-	* of all the colors merged together
-	*/
-	public static function merge_colors($category_ids_temp, $custom_category_to_table_mapping = array())
-	{
-		//because I might unset some of the values in the $category_ids array
-		$category_ids = adminmap_reports::array_copy($category_ids_temp);
-		
-		//check if we're looking at category 0
-		if(count($category_ids) == 0 || $category_ids[0] == '0')
-		{
-			return Kohana::config('settings.default_map_all');
-		}
-		
-		$red = 0;
-		$green = 0;
-		$blue = 0;
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//Lets handle custom categories
-		foreach($custom_category_to_table_mapping as $cat_name=>$custom_cats)
-		{
-			$where_str_color = ""; //to get the colors we're gonna use
-			$i = 0;
-			foreach($category_ids as $key=>$id)
-			{
-				//check if we have a custom cateogry ID
-				$delimiter_pos = strpos($id, "_");
-				if($delimiter_pos !== false)
-				{
-					//get the custom category name
-					$custom_cat_name = substr($id, 0, $delimiter_pos);
-					//get the custom category's numeric id
-					$custom_cat_id = substr($id,$delimiter_pos + 1);
-					
-					//does the custom_cat_name match our current custom cat
-					if($cat_name == $custom_cat_name)
-					{
-						$i++;
-						if($i > 1)
-						{
-							$where_str_color = $where_str_color . " OR ";
-						}
-						$where_str_color = $where_str_color . "id = ".$custom_cat_id;
-						
-						unset($category_ids[$key]);			
-					}
-				}
-			}
-			if($where_str_color != "")
-			{
-				//get the custom categories themselves and add up their colors:
-				// Retrieve all the categories with their colors
-				$categories = ORM::factory($custom_cats['child'])
-				    ->where($where_str_color)
-				    ->find_all();
-
-				//now for each color break it into RGB, add them up, then normalize
-				
-				foreach($categories as $category)
-				{
-					$color = $category->category_color;
-					$numeric_colors = self::_hex2RGB($color);
-					$red = $red + $numeric_colors['red'];
-					$green = $green + $numeric_colors['green'];
-					$blue = $blue + $numeric_colors['blue'];
-				}
-			}
-		}//end loop through all custom categorie sources
-		
-		
-
-		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//Next lets handle regular categories		
-		//first lets figure out the composite color that we're gonna usehere
-		if(count($category_ids) > 0)
-		{
-			$where_str_color = ""; //to get the colors we're gonna use
-			$i = 0;
-			foreach($category_ids as $id)
-			{
-				$i++;
-				if($i > 1)
-				{
-					$where_str_color = $where_str_color . " OR ";
-				}
-				$where_str_color = $where_str_color . "id = ".$id;
-			}
-
-
-			// Retrieve all the categories with their colors
-			$categories = ORM::factory('category')
-			    ->where($where_str_color)
-			    ->find_all();
-
-			//now for each color break it into RGB, add them up, then normalize
-			
-			foreach($categories as $category)
-			{
-				$color = $category->category_color;
-				$numeric_colors = self::_hex2RGB($color);
-				$red = $red + $numeric_colors['red'];
-				$green = $green + $numeric_colors['green'];
-				$blue = $blue + $numeric_colors['blue'];
-			}
-		}
-		
-		//now normalize
-		$color_length = sqrt( ($red*$red) + ($green*$green) + ($blue*$blue));
-	
-		//make sure there's no divide by zero
-		if($color_length == 0)
-		{
-			$color_length = 255;
-		}
-		$red = ($red / $color_length) * 255;
-		$green = ($green / $color_length) * 255;
-		$blue = ($blue / $color_length) * 255;
-	
-		
-		//pad with zeros if there's too much space
-		$red = dechex($red);
-		if(strlen($red) < 2)
-		{
-			$red = "0".$red;
-		}
-		$green = dechex($green);
-		if(strlen($green) < 2)
-		{
-			$green = "0".$green;
-		}
-		$blue = dechex($blue);
-		if(strlen($blue) < 2)
-		{
-			$blue = "0".$blue;
-		}
-		//now put the color back together and return it
-		return $red.$green.$blue;
-		
-	}//end method merge colors
 
 
 
@@ -744,13 +605,14 @@ class adminmap_helper_Core {
 	* Function, this'll merge colors. Given an array of category IDs it'll return a hex string
 	* of all the colors merged together
 	*/
-	public static function merge_colors_for_dots($colors)
+	public static function merge_colors($colors)
 	{
 		//check if we're dealing with just one color
 		if(count($colors)==1)
 		{
 			foreach($colors as $color)
 			{
+				Event::run('adminmap_filter.features_color', $color);
 				return $color;
 			}
 		}
@@ -795,7 +657,10 @@ class adminmap_helper_Core {
 			$blue = "0".$blue;
 		}
 		//now put the color back together and return it
-		return $red.$green.$blue;
+		$color_str = $red.$green.$blue;
+		//in case other plugins have something to say about this
+		Event::run('adminmap_filter.features_color', $color_str);
+		return $color_str;
 		
 	}//end method merge colors
 
@@ -881,7 +746,7 @@ class adminmap_helper_Core {
 		//get color
   		if(count($category_id) == 1 AND intval($category_id[0]) == 0 )
 		{
-			$color = Kohana::config('settings.default_map_all');
+			$colors = array(Kohana::config('settings.default_map_all'));
 		}		
 		else 
 		{	
@@ -891,8 +756,8 @@ class adminmap_helper_Core {
 			{
 				$colors[] = ORM::factory('category', $cat)->category_color;
 			}
-			$color = self::merge_colors_for_dots($colors);	
 		}
+		$color = self::merge_colors($colors);	
 		
 
 		// Create markers by marrying the locations and incidents
@@ -943,6 +808,15 @@ class adminmap_helper_Core {
 				$singles[] = $marker;
 			}
 		}
+		
+    	//since we're on the back end, wana do anything special?
+		$admin_path = '';
+		$view_or_edit = 'view';
+		if($on_the_back_end)
+		{
+			$admin_path = 'admin/';
+			$view_or_edit = 'edit';
+		}
 
 		// Create Json
 		foreach ($clusters as $cluster)
@@ -956,14 +830,7 @@ class adminmap_helper_Core {
 			// Number of Items in Cluster
 			$cluster_count = count($cluster);
 			
-			//since we're on the back end, wana do anything special?
-			$admin_path = '';
-			$view_or_edit = 'view';
-			if($on_the_back_end)
-			{
-				$admin_path = 'admin/';
-				$view_or_edit = 'edit';
-			}
+		
 			
 			// Build out the JSON string
 			$json_item = "{";
@@ -1052,7 +919,15 @@ class adminmap_helper_Core {
     	
     	if (isset($_GET['c']) AND is_array($_GET['c']))
     	{
-    		$category_ids = $_GET['c'];
+    		$category_ids = array();
+    		//make sure we only hanlde numeric cat ids
+    		foreach($_GET['c'] as $cat)
+    		{
+    			if(is_numeric($cat))
+    			{
+    				$category_ids[] = $cat;
+    			}
+    		}
     	}
     	
     	
@@ -1089,11 +964,26 @@ class adminmap_helper_Core {
         }
 
 	
+        //more than one color
+    	if(count($category_ids) == 1 AND intval($category_ids[0]) == 0 )
+		{
+			$colors = array(Kohana::config('settings.default_map_all'));
+		}		
+		else 
+		{	
+			//more than one color
+			$colors = array();
+			foreach($category_ids as $cat)
+			{
+				$colors[] = ORM::factory('category', $cat)->category_color;
+			}
+		}	
+		$color = self::merge_colors($colors);
 	
         $graph_data = array();
         $graph_data[0] = array();
         $graph_data[0]['label'] = "Category Title"; //is this used for anything?        
-        $graph_data[0]['color'] = '#'. self::merge_colors($category_ids, $custom_category_to_table_mapping);
+        $graph_data[0]['color'] = '#'.$color;
         $graph_data[0]['data'] = array();
 
 		

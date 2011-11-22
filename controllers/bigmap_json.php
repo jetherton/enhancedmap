@@ -50,7 +50,7 @@ class Bigmap_json_Controller extends Template_Controller
      */
     public function cluster()
     {
-        adminmap_helper::json_cluster($this, "reports/view/", "reports", false );
+        adminmap_helper::json_cluster($this, false );
 
     }
 
