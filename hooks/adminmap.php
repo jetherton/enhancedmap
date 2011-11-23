@@ -54,8 +54,8 @@ class adminmap {
 		
 		
 		//only add the all reports filter if we're on the back end
-		if((Router::$controller == "reports" AND strpos(Router::$controller_path, 'admin/reports.php') !== false) OR 
-			Router::$controller == 'adminmap_json')
+		if((Router::$controller == "reports" AND strpos(url::current(), 'admin/') === 0) OR 
+		   (Router::$controller == "adminmap_json" AND strpos(url::current(), 'admin/') === 0))
 		{
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_all_reports_filter'));
 		}
@@ -73,11 +73,11 @@ class adminmap {
 		if(isset($_GET['u']) AND intval($_GET['u']) > 0)
 		{
 			$show_unapproved = intval($_GET['u']);
-			if($show_unapproved == 1)
+			if($show_unapproved == '1')
 			{
 				array_push($params, '(i.incident_active = 1)');
 			}
-			else if($show_unapproved == 2)
+			else if($show_unapproved == '2')
 			{
 				array_push($params, '(i.incident_active = 0)');
 			}
@@ -90,7 +90,8 @@ class adminmap {
 		
 		foreach($params as $key=>$value)
 		{
-			if ($value == 'c.category_visible = 1')
+
+			if (strcmp($value, 'c.category_visible = 1') == 0)
 			{
 				$found_it = true;
 				$i = $key;
@@ -101,6 +102,7 @@ class adminmap {
 		{
 			unset($params[$i]);
 		}
+		
 		Event::$data = $params;
 	}
 	
