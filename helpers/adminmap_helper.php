@@ -467,7 +467,8 @@ class adminmap_helper_Core {
 	* $on_the_back_end sets whether or not this user is viewing this data from the backend
 	*/
 	public static function json_index($json_controller,  $on_the_back_end = true,
-		$link_target = "_self")
+		$link_target = "_self",
+		$link_path_prefix = '')
 	{
 		$json = "";
 		$json_item = "";
@@ -542,8 +543,8 @@ class adminmap_helper_Core {
 			$encoded_title = str_ireplace('"', '', $encoded_title);
 
 			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target
-					. " href='".url::base().$admin_path."reports/".$view_or_edit."/".$marker->incident_id."'>".$encoded_title)."</a>") . "\","
-					. "\"link\": \"".url::base().$admin_path."reports/".$view_or_edit."/".$marker->incident_id."\", ";
+					. " href='".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->incident_id."'>".$encoded_title)."</a>") . "\","
+					. "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->incident_id."\", ";
 
 			$json_item .= (isset($category))
 				? "\"category\":[" . $category_id . "], "
@@ -708,7 +709,8 @@ class adminmap_helper_Core {
      */
     public static function json_cluster($controller, 	
 	$on_the_back_end = true,
-	$link_target = "_self")
+	$link_target = "_self",
+	$link_path_prefix = "")
     {
 		// Database
 		$db = new Database();
@@ -836,9 +838,9 @@ class adminmap_helper_Core {
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
-			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path
+			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
 				 . "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " Reports</a>")) . "\",";
-			$json_item .= "\"link\": \"".url::base().$admin_path. "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast."\", ";
+			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix. "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast."\", ";
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$color."\", ";
 			$json_item .= "\"icon\": \"".$icon."\", ";
@@ -860,9 +862,9 @@ class adminmap_helper_Core {
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
-			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path
+			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
 					. "reports/".$view_or_edit."/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "\",";
-			$json_item .= "\"link\": \"".url::base().$admin_path."reports/".$view_or_edit."/".$single['id']."\", ";
+			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$single['id']."\", ";
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$color."\", ";
 			$json_item .= "\"icon\": \"".$icon."\", ";

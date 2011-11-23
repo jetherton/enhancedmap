@@ -18,12 +18,12 @@
 </script>
 <script type="text/javascript">
 
-            $(function() {
-                $('span[title]').hovertip();
-            });
-
-            
+                     
             var canRedrawMapKey = false;
+
+
+
+    		
 /**
 *
 * From http://osgeo-org.1803224.n2.nabble.com/How-to-print-map-area-with-openlayers-td4901023.html
@@ -417,7 +417,8 @@ function changeTopBottom(direction)
             {
                 return;
             }
-           
+
+            var extraParams = getUrlStringFromParams();
            
             var retval = $.timeline({categoryId: catID,
                                startTime: new Date(startDate * 1000),
@@ -426,8 +427,7 @@ function changeTopBottom(direction)
                               }).addMarkers(
                                 startDate, endDate, gMap.getZoom(),
                                 gMap.getCenter(), thisLayerID, thisLayerType,
-                                thisLayerUrl, thisLayerColor, json_url, currentStatus, colorCurrentStatus,
-                                currentLogicalOperator);
+                                thisLayerUrl, thisLayerColor, json_url, extraParams);
            
             map.updateSize();
             return retval;                                                            

@@ -52,16 +52,14 @@ class adminmap {
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_logical_operator_filter'));
 		}
 		
-		//add the "all_reports" flag to the query if we're on the backend
-		if(Router::$controller == 'adminmap_json')
-		{
-			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_all_reports_filter'));
-		}
+		
 		//only add the all reports filter if we're on the back end
-		if(Router::$controller == "reports" AND strpos(Router::$controller_path, 'admin/reports.php') !== false)
+		if((Router::$controller == "reports" AND strpos(Router::$controller_path, 'admin/reports.php') !== false) OR 
+			Router::$controller == 'adminmap_json')
 		{
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_all_reports_filter'));
 		}
+		
 	}
 	
 	/**
@@ -84,6 +82,24 @@ class adminmap {
 				array_push($params, '(i.incident_active = 0)');
 			}
 			
+		}
+		
+		//also make it so you can see any categories, not just the visible ones
+		$i = null;
+		$found_it = false;
+		
+		foreach($params as $key=>$value)
+		{
+			if ($value == 'c.category_visible = 1')
+			{
+				$found_it = true;
+				$i = $key;
+				break;
+			}
+		}
+		if($found_it)
+		{
+			unset($params[$i]);
 		}
 		Event::$data = $params;
 	}
@@ -174,8 +190,8 @@ class adminmap {
 			if($found_it)
 			{
 				unset($params[$i]);
-				$after_base = substr(url::current(), strlen(url::base()));
-				$only_public = (strpos($after_base, "admin") === 0) ? "" : " AND amc.category_visible = 1 "; 
+				
+				$only_public = (strpos(url::current(), "admin/") === 0) ? "" : " AND amc.category_visible = 1 "; 
 				
 				//now replace it
 				$category_sql = "";
@@ -208,7 +224,7 @@ class adminmap {
 							array_push($params,
 							'i.id IN (SELECT DISTINCT incident_id FROM '.$table_prefix.'incident_category amic '.
 							'INNER JOIN '.$table_prefix.'category amc ON (amc.id = amic.category_id) '.
-							'WHERE ((amc.id = '. $c . ') OR amc.parent_id = (' . $c . '))'.$only_public.' ) ');
+							'WHERE ((amc.id = '. $c . ') OR amc.parent_id = (' . $c . '))'.$only_public.' )');
 						}
 					}
 				}//end it's an array
