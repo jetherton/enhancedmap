@@ -382,6 +382,10 @@ function changeTopBottom(direction)
 			$view->marker_opacity = $marker_opacity;
 			$view->active_startDate = $active_startDate;
 			$view->active_endDate = $active_endDate;
+			if(isset($urlParams))
+			{
+					$view->urlParams = $urlParams;
+			}
 			$view->render(TRUE);
 		?>
 

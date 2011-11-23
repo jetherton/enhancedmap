@@ -116,25 +116,26 @@ class Printmap_Controller extends Template_Controller {
 			$group_id = $this->group_id;
 			$group = ORM::factory('simplegroups_groups',$this->group_id)->find($this->group_id);
 			//get the categories
-			adminmap_helper::set_categories($this, false, $group);
-			$json_url = ($clustering == 1) ? "simplegroupmap_json/cluster/$group_id" : "simplegroupmap_json/index/$group_id";
-			$json_timeline_url = "simplegroupmap_json/timeline/$group_id/";
-			
+			adminmap_helper::set_categories($this, false, $group);		
+			$urlParams = array('sgid'=>$group_id);			
 		}
 		else
 		{
 			//get the categories
 			adminmap_helper::set_categories($this, false);
-			$json_url = ($clustering == 1) ? "bigmap_json/cluster" : "bigmap_json";
-			$json_timeline_url = "bigmap_json/timeline/";
-			
+			$urlParams = array();
 		}
+		
+		$json_url = ($clustering == 1) ? "bigmap_json/cluster" : "bigmap_json";
+		$json_timeline_url = "bigmap_json/timeline/";
+			
+		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the map
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
 		adminmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url, 'adminmap/print_mapview_js',
-								'adminmap/big_main_map', 'adminmap/print_main_timeline');
+								'adminmap/big_main_map', 'adminmap/print_main_timeline', $urlParams);
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the overlays and shares
@@ -166,7 +167,7 @@ class Printmap_Controller extends Template_Controller {
 		}
 		
 		$this->group_id = $id;
-		
+						
 		$this->index();
 	}
 	
