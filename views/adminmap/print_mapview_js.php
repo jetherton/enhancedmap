@@ -410,6 +410,7 @@ function changeTopBottom(direction)
             //a poor man's attempt at thread safety
             if(canRedrawMapKey)
             {
+            	var currentLogicalOperator = urlParams['lo'];
                 $.get("<?php echo url::site(); ?>printmapkey/getKey/" + catID + "/" + currentLogicalOperator + "/" + startDate + "/" + endDate,
                     function(data){
                         $("#key").html(data);                    
