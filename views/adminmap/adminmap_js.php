@@ -15,8 +15,6 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 ?>
-</script>
-<script type="text/javascript">
 
 
 		$(function() {
@@ -994,5 +992,3 @@
 		});
 		
 
-</script>
-<script type="text/javascript">

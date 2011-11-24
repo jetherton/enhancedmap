@@ -15,8 +15,7 @@
  * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
  */
 ?>
-</script>
-<script type="text/javascript">
+
 
                      
             var canRedrawMapKey = false;
@@ -625,5 +624,3 @@ function changeTopBottom(direction)
 		});
 		
 	
-		</script>
-		<script type="text/javascript">
