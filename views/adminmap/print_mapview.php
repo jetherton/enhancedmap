@@ -216,8 +216,8 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 			<strong>ORIENTATION</strong>
 			<div id="orientation" class="menuItem">					
 				<form>
-					<input type="radio" id="orientation_portrait" name="orientation" value="portrait" checked onchange="changeOrientation('portrait'); return false;" /> Portrait<br />
-					<input type="radio" id="orientation_landscape" name="orientation" value="landscape" onchange="changeOrientation('landscape'); return false;"/> Landscape
+					<input type="radio" id="orientation_portrait" name="orientation" value="portrait" checked onclick="this.blur();" onchange="changeOrientation('portrait'); return false;" /> Portrait<br />
+					<input type="radio" id="orientation_landscape" name="orientation" value="landscape"  onclick="this.blur();" onchange="changeOrientation('landscape'); return false;"/> Landscape
 				</form>
 			</div>
 			<!-- /Orientation chooser -->
@@ -227,15 +227,15 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 			<strong>KEY OPTIONS</strong>
 			<div id="keyoptions" class="menuItem">					
 				<form>
-					Show Key: <input type="checkbox" id="showKeyCheckbox" value="showKeyCheckbox" checked onchange="showHideKey(); return false;" />
+					Show Key: <input type="checkbox" id="showKeyCheckbox" value="showKeyCheckbox" checked onclick="this.blur();" onchange="showHideKey(); return false;" />
 					<br/>
 					<br/>
 					<div id="keyPlacement"> Key Placement:<br/>
-						<input type="radio" name="keyLeftRight" value="left"  id="leftPlacement" onchange="changeLeftRight('left'); return false;" /> Left 
-						<input type="radio" name="keyLeftRight" value="right" id="rightPlacement" checked onchange="changeLeftRight('right'); return false;" /> Right
+						<input type="radio" name="keyLeftRight" value="left"  id="leftPlacement" onclick="this.blur();" onchange="changeLeftRight('left'); return false;" /> Left 
+						<input type="radio" name="keyLeftRight" value="right" id="rightPlacement"  onclick="this.blur();" checked  onchange="changeLeftRight('right'); return false;" /> Right
 						<br/>
-						<input type="radio" name="keyUpDown" value="up"  id="topPlacement" onchange="changeTopBottom('top'); return false;" /> Up 
-						<input type="radio" name="keyUpDown" value="down" id="bottomePlacement" checked onchange="changeTopBottom('bottom'); return false;" /> Down
+						<input type="radio" name="keyUpDown" value="up"  id="topPlacement" onclick="this.blur();" onchange="changeTopBottom('top'); return false;" /> Up 
+						<input type="radio" name="keyUpDown" value="down" id="bottomePlacement" onclick="this.blur();" checked onchange="changeTopBottom('bottom'); return false;" /> Down
 					</div>
 				</form>
 			</div>

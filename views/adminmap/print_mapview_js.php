@@ -350,6 +350,7 @@ function changeLeftRight(direction)
 		$("#key").removeClass("left");
 		$("#key").addClass("right");
 	}
+	return false;
 }
 
 /**
@@ -368,6 +369,7 @@ function changeTopBottom(direction)
 		$("#key").removeClass("top");
 		$("#key").addClass("bottom");
 	}
+	return false;
 }
 
 
