@@ -236,9 +236,12 @@ function setURL()
 	{
 		$.address.parameter("orientation", "portrait");
 	}
-			
-	$.address.parameter("currStatus", currentStatus);
-	$.address.parameter("currColorStatus", colorCurrentStatus);
+	
+		
+	//these don't matter since we're not on the backend	
+	//$.address.parameter("currStatus", currentStatus);
+	//$.address.parameter("currColorStatus", colorCurrentStatus);
+	var currentLogicalOperator = urlParams['lo'];
 	$.address.parameter("logic", currentLogicalOperator);
 	
 	//setting the KML/KMZ layers, just search for all the "layer_" ids that have class active.
