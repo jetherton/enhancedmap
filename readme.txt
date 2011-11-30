@@ -1,11 +1,11 @@
 === About ===
 name: Admin Map
-website: http://apps.ushahidi.com
+website: https://github.com/jetherton/adminmap
 description: Shows a map on the backend that shows unapproved reports as well as approved reports.
-version: 1.6
-requires: 2.1
+version: 2.0
+requires: 2.1 - The bleeding edge version from the repo https://github.com/ushahidi/Ushahidi_Web, not form http://download.ushahidi.com/
 author: John Etherton
-author website: http://johnetherton.com
+author website: http://ethertontech.com
 
 == Description ==
 * Lets you see all reports (approved and unapproved) on a map on the backend of the website.
@@ -22,3 +22,4 @@ to manipulate the tiles on the server, you can print via the server. you can acc
 2. Activate the plugin.
 
 == Changelog ==
+2.0 -- 2011/11/30 -- Refactored the plugin to work with Ushahidi's new reports::fetch_incidents() helper method. This allows much tigher intergration with Ushahidi
