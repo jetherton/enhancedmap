@@ -1,13 +1,13 @@
-Admin Map Ushahidi Plugin
+Admin Map - Ushahidi Plugin
 =================
-Info
+About
 -----
-website: https://github.com/jetherton/adminmap
-description: Shows a map on the backend that shows unapproved reports as well as approved reports.
-version: 2.0
-requires: 2.1 - The bleeding edge version from the repo https://github.com/ushahidi/Ushahidi_Web, not form http://download.ushahidi.com/
-author: John Etherton
-author website: http://ethertontech.com
+* website: https://github.com/jetherton/adminmap
+* description: Shows a map on the backend that shows unapproved reports as well as approved reports.
+* version: 2.0
+* requires: 2.1 - The bleeding edge version from the repo https://github.com/ushahidi/Ushahidi_Web, not form http://download.ushahidi.com/
+* author: John Etherton
+* author website: http://ethertontech.com
 
 Description
 -----------------
