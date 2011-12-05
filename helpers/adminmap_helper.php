@@ -542,8 +542,8 @@ class adminmap_helper_Core {
 			$encoded_title = json_encode($encoded_title);
 			$encoded_title = str_ireplace('"', '', $encoded_title);
 
-			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target
-					. " href='".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->incident_id."'>".$encoded_title)."</a>") . "\","
+			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = '".$link_target
+					. "' href='".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->incident_id."'>".$encoded_title)."</a>") . "\","
 					. "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->incident_id."\", ";
 
 			$json_item .= (isset($category))

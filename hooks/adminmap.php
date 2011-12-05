@@ -219,15 +219,21 @@ class adminmap {
 					}
 					
 					// Check if there are any category ids
-					if (count($category_ids) > 0)
+					$cat_count = count($category_ids);
+					if ($cat_count > 0)
 					{
-						foreach($category_ids as $c)
-						{
-							array_push($params,
-							'i.id IN (SELECT DISTINCT incident_id FROM '.$table_prefix.'incident_category amic '.
+						$sql = 'i.id IN (SELECT DISTINCT incident_id FROM '.$table_prefix.'incident_category amic '.
 							'INNER JOIN '.$table_prefix.'category amc ON (amc.id = amic.category_id) '.
-							'WHERE ((amc.id = '. $c . ') OR amc.parent_id = (' . $c . '))'.$only_public.' )');
-						}
+							'WHERE ';
+						
+						
+						$category_ids = implode(",", $category_ids);
+							
+						$sql .=	'(amc.id IN ('.$category_ids.') OR amc.parent_id IN ('.$category_ids.'))';
+						$sql .= $only_public; 
+						$sql .= ' GROUP BY incident_id HAVING COUNT(*) = '. $cat_count. ')';
+						
+						array_push($params, $sql);
 					}
 				}//end it's an array
 				Event::$data = $params;				
