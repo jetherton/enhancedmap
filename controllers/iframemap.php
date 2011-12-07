@@ -1,16 +1,16 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * This is the controller for the main site.
+ * This is the map controller for the iFrame Map. Since the iFrame map has special needs
+ *
+ * This file is adapted from the file Ushahidi_Web/appliction/controllers/json.php
+ * Originally written by the Ushahidi Team
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license
  * that is available through the world-wide-web at the following URI:
  * http://www.gnu.org/copyleft/lesser.html
- * @author     Ushahidi Team <team@ushahidi.com>
- * @package    Ushahidi - http://source.ushahididev.com
- * @module     Main Controller
- * @copyright  Ushahidi - http://www.ushahidi.com
- * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
+ * @author     John Etherton <john@ethertontech.com>
+ * @package    Admin Map - https://github.com/jetherton/adminmap
  */
 class Iframemap_Controller extends Template_Controller {
 

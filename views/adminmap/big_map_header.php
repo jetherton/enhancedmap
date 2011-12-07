@@ -1,3 +1,19 @@
+<?php defined('SYSPATH') or die('No direct script access.');
+/**
+ * Header for the big map
+ * 
+ * This file is adapted from the file Ushahidi_Web/themes/default/views/header.php
+ * Originally written by the Ushahidi Team
+ *
+ * PHP version 5
+ * LICENSE: This source file is subject to LGPL license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.gnu.org/copyleft/lesser.html
+ * @author     John Etherton <john@ethertontech.com>
+ * @package    Admin Map, Ushahidi Plugin - https://github.com/jetherton/adminmap
+ */
+?>
+
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en">
 <head>

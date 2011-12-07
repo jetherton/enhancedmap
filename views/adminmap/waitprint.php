@@ -1,3 +1,15 @@
+<?php defined('SYSPATH') or die('No direct script access.');
+/**
+ * View for telling the user to wait while the server makes a bitmap map of the open layers map 
+ * 
+ * PHP version 5
+ * LICENSE: This source file is subject to LGPL license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.gnu.org/copyleft/lesser.html
+ * @author     John Etherton <john@ethertontech.com>
+ * @package    Admin Map, Ushahidi Plugin - https://github.com/jetherton/adminmap
+ */
+?>
 
 <!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd"> 
 <html xmlns="http://www.w3.org/1999/xhtml"> 

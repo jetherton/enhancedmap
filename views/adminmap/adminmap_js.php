@@ -1,18 +1,16 @@
-<?php
+<?php defined('SYSPATH') or die('No direct script access.');
 /**
- * Main cluster js file.
+ * Java Script for rendering and controlling a map
  * 
- * Server Side Map Clustering
+ * This file is adapted from the file Ushahidi_Web/appliction/vies/main_js.php
+ * Originally written by the Ushahidi Team
  *
  * PHP version 5
- * LICENSE: This source file is subject to LGPL license 
+ * LICENSE: This source file is subject to LGPL license
  * that is available through the world-wide-web at the following URI:
  * http://www.gnu.org/copyleft/lesser.html
- * @author     Ushahidi Team <team@ushahidi.com> 
- * @package    Ushahidi - http://source.ushahididev.com
- * @module     API Controller
- * @copyright  Ushahidi - http://www.ushahidi.com
- * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
+ * @author     John Etherton <john@ethertontech.com>
+ * @package    Admin Map, Ushahidi Plugin - https://github.com/jetherton/adminmap
  */
 ?>
 

@@ -1,16 +1,14 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * This is the controller for the main site.
+ * This is main map controller for the admin map plugin. Most all of the map
+ * rendering reququest go through this controller
  *
  * PHP version 5
  * LICENSE: This source file is subject to LGPL license
  * that is available through the world-wide-web at the following URI:
  * http://www.gnu.org/copyleft/lesser.html
- * @author     Ushahidi Team <team@ushahidi.com>
- * @package    Ushahidi - http://source.ushahididev.com
- * @module     Main Controller
- * @copyright  Ushahidi - http://www.ushahidi.com
- * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL)
+ * @author     John Etherton <john@ethertontech.com>
+ * @package    Admin Map - https://github.com/jetherton/adminmap
  */
 class Bigmap_Controller extends Template_Controller {
 

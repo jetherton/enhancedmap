@@ -1,7 +1,17 @@
-<?php
+<?php defined('SYSPATH') or die('No direct script access.');
 /**
- * Admin helper
+ * Where all the work is done. This file handles map rendering requests and requests for Geo JSON
  * 
+ * This file is adapted from the file Ushahidi_Web/appliction/controllers/json.php and
+ * Ushahidi_Web/application/controllers/main.php
+ * Originally written by the Ushahidi Team
+ *
+ * PHP version 5
+ * LICENSE: This source file is subject to LGPL license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.gnu.org/copyleft/lesser.html
+ * @author     John Etherton <john@ethertontech.com>
+ * @package    Admin Map - https://github.com/jetherton/adminmap
  */
 class adminmap_helper_Core {
 

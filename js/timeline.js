@@ -1,18 +1,17 @@
-
 /**
- * Plots a Timeline of Incidents for a specified period and category
+ * Timeline javascript, modified to allow extra parameters passed to the JSON controllers via HTTP GET 
  * 
+ * This file is adapted from the file Ushahidi_Web/media/js/timeline.js
+ * Originally written by the Ushahidi Team
  *
  * PHP version 5
- * LICENSE: This source file is subject to LGPL license 
+ * LICENSE: This source file is subject to LGPL license
  * that is available through the world-wide-web at the following URI:
  * http://www.gnu.org/copyleft/lesser.html
- * @author     Ushahidi Team <team@ushahidi.com> 
- * @package    Ushahidi - http://source.ushahididev.com
- * @module     Timeline 
- * @copyright  Ushahidi - http://www.ushahidi.com
- * @license    http://www.gnu.org/copyleft/lesser.html GNU Lesser General Public License (LGPL) 
+ * @author     John Etherton <john@ethertontech.com>
+ * @package    Admin Map, Ushahidi Plugin - https://github.com/jetherton/adminmap
  */
+
 
 (function($) { // hide the namespace
 

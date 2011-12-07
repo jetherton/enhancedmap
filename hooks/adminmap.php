@@ -1,11 +1,14 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * Time Span - sets up the hooks
+ * This file hooks into Ushahidi so the admin map plugin can do its thing.
  *
- * @author	   John Etherton
- * @package	   Admin Map
+ * PHP version 5
+ * LICENSE: This source file is subject to LGPL license
+ * that is available through the world-wide-web at the following URI:
+ * http://www.gnu.org/copyleft/lesser.html
+ * @author     John Etherton <john@ethertontech.com>
+ * @package    Admin Map - https://github.com/jetherton/adminmap
  */
-
 class adminmap {
 	
 	/**
