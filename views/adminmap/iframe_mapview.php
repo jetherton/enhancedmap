@@ -14,7 +14,7 @@
  */
 ?>
 <div id="title">
-<h1><?php echo $site_name;?></h1>
+<h1><a href="<?php echo url::base(); ?>"><?php echo $site_name;?></a></h1>
 </div>
 
 
