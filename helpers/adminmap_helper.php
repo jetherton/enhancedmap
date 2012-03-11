@@ -71,12 +71,14 @@ class adminmap_helper_Core {
 
 		// Get all active Shares
 		$shares = array();
+		/*
 		foreach (ORM::factory('sharing')
 				  ->where('sharing_active', 1)
 				  ->find_all() as $share)
 		{
 			$shares[$share->id] = array($share->sharing_name, $share->sharing_color);
 		}
+		*/
 		$map_controller->template->content->shares = $shares;
 	}
 	
