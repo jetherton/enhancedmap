@@ -517,37 +517,74 @@ class adminmap_helper_Core {
 			$admin_path = 'admin/';
 			$view_or_edit = 'edit';
 		}
+		//set approve text
+		$approved_text = "";
+		if( $on_the_back_end)
+		{
+			//figure out if we're showing unapproved stuff or what.
+			if (isset($_GET['u']) AND !empty($_GET['u']))
+			{
+			    $show_unapproved = (int) $_GET['u'];
+			}		
+			if($show_unapproved == 1)
+			{
+				$approved_text = "incident.incident_active = 1 ";
+			}
+			else if ($show_unapproved == 2)
+			{
+				$approved_text = "incident.incident_active = 0 ";
+			}
+			else if ($show_unapproved == 3)
+			{
+				$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
+			}
+		}
+		else
+		{
+			$approved_text = "incident.incident_active = 1 ";
+		}
+		
+		//Logical operator
+		$logical_operator = isset($_GET['lo'])  ? $_GET['lo'] : 'or';
+		
+		$where_text = '';
+		// Do we have a media id to filter by?
+		if (isset($_GET['m']) AND !empty($_GET['m']) AND $_GET['m'] != '0')
+		{
+		    $media_type = (int) $_GET['m'];
+		    $where_text .= " AND ".self::$table_prefix."media.media_type = " . $media_type;
+		}
+
+		if (isset($_GET['s']) AND !empty($_GET['s']))
+		{
+		    $start_date = (int) $_GET['s'];
+		    $where_text .= " AND UNIX_TIMESTAMP(".self::$table_prefix."incident.incident_date) >= '" . $start_date . "'";
+		}
+
+		if (isset($_GET['e']) AND !empty($_GET['e']))
+		{
+		    $end_date = (int) $_GET['e'];
+		    $where_text .= " AND UNIX_TIMESTAMP(".self::$table_prefix."incident.incident_date) <= '" . $end_date . "'";
+		}
 		
 		// Fetch the incidents
-		$markers = (isset($_GET['page']) AND intval($_GET['page']) > 0)? reports::fetch_incidents(TRUE) : reports::fetch_incidents();
+		$markers = adminmap_reports::get_reports_list_by_cat($category_id, 
+			$approved_text . '  '. $where_text,
+			$logical_operator,
+			"incident.id",
+			"asc");
 		
 		// Variable to store individual item for report detail page
 		$json_item_first = "";	
 		foreach ($markers as $marker)
 		{
 			$thumb = "";
-			if ($media_type == 1)
-			{
-				$media = ORM::factory('incident', $marker->incident_id)->media;
-				if ($media->count())
-				{
-					foreach ($media as $photo)
-					{
-						if ($photo->media_thumb)
-						{ 
-							// Get the first thumb
-							$prefix = url::base().Kohana::config('upload.relative_directory');
-							$thumb = $prefix."/".$photo->media_thumb;
-							break;
-						}
-					}
-				}
-			}
+			
 			
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
-			$json_item .= "\"id\": \"".$marker->incident_id."\", \n";
+			$json_item .= "\"id\": \"".$marker->id."\", \n";
 
 			$encoded_title = utf8tohtml::convert($marker->incident_title, TRUE);
 			$encoded_title = str_ireplace('"','&#34;',$encoded_title);
@@ -555,8 +592,8 @@ class adminmap_helper_Core {
 			$encoded_title = str_ireplace('"', '', $encoded_title);
 
 			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = '".$link_target
-					. "' href='".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->incident_id."'>".$encoded_title)."</a>") . "\","
-					. "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->incident_id."\", ";
+					. "' href='".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->id."'>".$encoded_title)."</a>") . "\","
+					. "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->id."\", ";
 
 			$json_item .= (isset($category))
 				? "\"category\":[" . $category_id . "], "
@@ -569,11 +606,11 @@ class adminmap_helper_Core {
 			$json_item .= "},";
 			$json_item .= "\"geometry\": {";
 			$json_item .= "\"type\":\"Point\", ";
-			$json_item .= "\"coordinates\":[" . $marker->longitude . ", " . $marker->latitude . "]";
+			$json_item .= "\"coordinates\":[" . $marker->lon . ", " . $marker->lat . "]";
 			$json_item .= "}";
 			$json_item .= "}";
 
-			if ($marker->incident_id == $incident_id)
+			if ($marker->id == $incident_id)
 			{
 				$json_item_first = $json_item;
 			}
@@ -742,11 +779,9 @@ class adminmap_helper_Core {
 		//$distance = 60;
 		$distance = (10000000 >> $zoomLevel) / 100000;
 		
-		// Fetch the incidents using the specified parameters
-		$incidents = reports::fetch_incidents();
-		
+   		
 		// Category ID
-		$category_id = (isset($_GET['c']) AND is_array($_GET['c'])) ? $_GET['c'] : array(0);
+		$category_ids = (isset($_GET['c']) AND is_array($_GET['c'])) ? $_GET['c'] : array(0);
 		
 		// Start date
 		$start_date = (isset($_GET['s']) AND intval($_GET['s']) > 0) ? intval($_GET['s']) : NULL;
@@ -755,10 +790,46 @@ class adminmap_helper_Core {
 		$end_date = (isset($_GET['e']) AND intval($_GET['e']) > 0) ? intval($_GET['e']) : NULL;
 		
 		//Logical operator
-		$logical_operator = isset($_GET['lo'])  ? intval($_GET['lo']) : 'or';
+		$logical_operator = isset($_GET['lo'])  ? $_GET['lo'] : 'or';
+		
+		 // SouthWest Bound
+	        $southwest = (isset($_GET['sw']) AND !empty($_GET['sw'])) ?
+	            $_GET['sw'] : "0";
+	
+	        $northeast = (isset($_GET['ne']) AND !empty($_GET['ne'])) ?
+	            $_GET['ne'] : "0";
+	
+		
+		//approve filter
+		if($on_the_back_end)
+		{
+			//figure out if we're showing unapproved stuff or what.
+			if (isset($_GET['u']) AND !empty($_GET['u']))
+			{
+			    $show_unapproved = (int) $_GET['u'];
+			}
+			$approved_text = "";
+			if($show_unapproved == 1)
+			{
+				$approved_text = "incident.incident_active = 1 ";
+			}
+			else if ($show_unapproved == 2)
+			{
+				$approved_text = "incident.incident_active = 0 ";
+			}
+			else if ($show_unapproved == 3)
+			{
+				$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
+			}	
+		}
+		else
+		{
+			$approved_text = "incident.incident_active = 1 ";
+			$show_unapproved = 1;
+		}
 		
 		//get color
-  		if(count($category_id) == 1 AND intval($category_id[0]) == 0 )
+  		if(count($category_ids) == 1 AND intval($category_ids[0]) == 0 )
 		{
 			$colors = array(Kohana::config('settings.default_map_all'));
 		}		
@@ -766,26 +837,54 @@ class adminmap_helper_Core {
 		{	
 			//more than one color
 			$colors = array();
-			foreach($category_id as $cat)
+			foreach($category_ids as $cat)
 			{
 				$colors[] = ORM::factory('category', $cat)->category_color;
 			}
 		}
 		$color = self::merge_colors($colors);	
 		
+		//make the filter text
+		$filter = "";
+	        $filter .= ($start_date) ?
+	            " AND incident.incident_date >= '" . date("Y-m-d H:i:s", $start_date) . "'" : "";
+	        $filter .= ($end_date) ?
+	            " AND incident.incident_date <= '" . date("Y-m-d H:i:s", $end_date) . "'" : "";
+	
+	        if ($southwest AND $northeast)
+	        {
+	            list($latitude_min, $longitude_min) = explode(',', $southwest);
+	            list($latitude_max, $longitude_max) = explode(',', $northeast);
+	
+	            $filter .= " AND location.latitude >=".(float) $latitude_min.
+	                " AND location.latitude <=".(float) $latitude_max;
+	            $filter .= " AND location.longitude >=".(float) $longitude_min.
+	                " AND location.longitude <=".(float) $longitude_max;
+	        }
+	
+		
+		// Fetch the incidents using the specified parameters
+		$incidents = adminmap_reports::get_reports_list_by_cat($category_ids, 
+			$approved_text. ' ' .$filter ,
+			$logical_operator,
+			"incident.id",
+			"asc");    
+		
+		/**
+		 * **********************************************************************************************************************
+		 * ********************************************************************************************************************** 
+		 * We have the incidents, now process them
+		 */
 
-		// Create markers by marrying the locations and incidents
+	
+		// Create markers by marrying the the stuff together
 		$markers = array();
-		foreach ($incidents as $incident)
+		//read all the data into an array
+		foreach($incidents as $incident)
 		{
-			$markers[] = array(
-				'id' => $incident->incident_id,
-				'incident_title' => $incident->incident_title,
-				'latitude' => $incident->latitude,
-				'longitude' => $incident->longitude,
-				'thumb' => ''
-				);
+			$markers[$incident->id] = $incident;
 		}
+		
 
 		$clusters = array();	// Clustered
 		$singles = array();		// Non Clustered
@@ -793,30 +892,56 @@ class adminmap_helper_Core {
 		// Loop until all markers have been compared
 		while (count($markers))
 		{
-			$marker	 = array_pop($markers);
+			$marker  = array_pop($markers);
+	        	//to keep track of the geometry of a cluster
+	        	$lat = $marker->lat;
+	        	$lon = $marker->lon;
+	        	$north = $south = $marker->lat;
+	        	$east = $west = $marker->lon;
+	        	$count = 1;
+	        	
 			$cluster = array();
-
 			// Compare marker against all remaining markers.
 			foreach ($markers as $key => $target)
 			{
-				$pixels = abs($marker['longitude']-$target['longitude']) +
-					abs($marker['latitude']-$target['latitude']);
+				$pixels = abs($marker->lon - $target->lon) + abs($marker->lat - $target->lat);
 					
 				// If two markers are closer than defined distance, remove compareMarker from array and add to cluster.
 				if ($pixels < $distance)
 				{
 					unset($markers[$key]);
-					$target['distance'] = $pixels;
-					$cluster[] = $target;
-				}
-			}
+					//update the gemetry
+					$lat += $target->lat;
+					$lon += $target->lon;
+					if($target->lat < $south)
+						$south = $target->lat;
+					if($target->lat > $north)
+						$north = $target->lat;
+					if($target->lon < $west)
+						$west = $target->lon;
+					if($target->lon > $east)
+						$east = $target->lon;
+					$count++;
+					
+				}//end if the the two points are close
+				//trying to minizmie memory use
+				unset($target);
+			}//end for loop
 
 			// If a marker was added to cluster, also add the marker we were comparing to.
-			if (count($cluster) > 0)
+			//if (count($cluster) > 0)
+			if ($count > 1)
 			{
-				$cluster[] = $marker;
+				$lat = $lat / $count;
+				$lon = $lon / $count;
+				//geometry
+				$cluster['center'] = $lon.','.$lat;
+				$cluster['sw'] = $west.','.$south;
+				$cluster['ne'] = $east.','.$north;
+				$cluster['count'] = $count;
 				$clusters[] = $cluster;
 			}
+			//it's a loner
 			else
 			{
 				$singles[] = $marker;
@@ -835,14 +960,13 @@ class adminmap_helper_Core {
 		// Create Json
 		foreach ($clusters as $cluster)
 		{
-			// Calculate cluster center
-			$bounds = self::_calculateCenter($cluster);
-			$cluster_center = $bounds['center'];
-			$southwest = $bounds['sw'];
-			$northeast = $bounds['ne'];
+			// get cluster center
+			$cluster_center = $cluster['center'];
+			$southwest = $cluster['sw'];
+			$northeast = $cluster['ne'];
 
 			// Number of Items in Cluster
-			$cluster_count = count($cluster);
+			$cluster_count = $cluster['count'];
 			
 		
 			
@@ -871,12 +995,15 @@ class adminmap_helper_Core {
 
 		foreach ($singles as $single)
 		{
+			$lon = $single->lon ? $single->lon : "0";
+			$lat = $single->lat ? $single->lat : "0";
+			
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
 			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
-					. "reports/".$view_or_edit."/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "\",";
-			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$single['id']."\", ";
+					. "reports/".$view_or_edit."/" . $single->id . "/>".str_replace('"','\"',$single->incident_title)."</a>")) . "\",";
+			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$single->id."\", ";
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$color."\", ";
 			$json_item .= "\"icon\": \"".$icon."\", ";
@@ -886,7 +1013,7 @@ class adminmap_helper_Core {
 			$json_item .= "},";
 			$json_item .= "\"geometry\": {";
 			$json_item .= "\"type\":\"Point\", ";
-			$json_item .= "\"coordinates\":[" . $single['longitude'] . ", " . $single['latitude'] . "]";
+			$json_item .= "\"coordinates\":[" . $lon . ", " . $lat . "]";
 			$json_item .= "}";
 			$json_item .= "}";
 

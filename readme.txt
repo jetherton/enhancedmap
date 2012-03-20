@@ -1,5 +1,5 @@
 === About ===
-name: Admin Map
+name: Admin Map (High Performance)
 website: https://github.com/jetherton/adminmap
 description: Shows a map on the backend that shows unapproved reports as well as approved reports.
 version: 2.0
@@ -15,6 +15,8 @@ to manipulate the tiles on the server, you can print via the server. you can acc
 /printmap. It's still under development, so please give feed back and keep checking in
 
 * Lets you embedd your map. It'll create a text box on the home page that has the embedd HTML.
+
+* This is the high performance flavor of the Admin Map. This version will handle large data sets a lot better, but does not intergrate with the Ushahidi helper reports::fetch_incidents(). So this will not play nicely with other plugins that alter the results of that method.
 
 
 == Installation ==
