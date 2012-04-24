@@ -34,9 +34,12 @@ class adminmap {
 		{
 			Event::add('ushahidi_action.map_main_filters', array($this, '_add_big_map_main_button'));	 //adds the big map  tab
 			//use sneaky JS
-			plugin::add_javascript("adminmap/js/embedd_setup");
-			plugin::add_stylesheet("adminmap/css/embedd_setup");
-			Event::add('ushahidi_action.main_sidebar', array($this, '_add_embedd'));
+			if (Kohana::config('adminmap.show_embed_code'))
+			{
+				plugin::add_javascript("adminmap/js/embedd_setup");
+				plugin::add_stylesheet("adminmap/css/embedd_setup");
+				Event::add('ushahidi_action.main_sidebar', array($this, '_add_embedd'));
+			}
 		}
 		//if dealing with the
 		if(Router::$controller == "reports")
