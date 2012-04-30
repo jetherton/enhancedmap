@@ -108,7 +108,7 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 						if(count($category_info[3]) > 0)
 						{
 							echo '<li>';
-							echo '<a style="float:right; text-align:center; width:15px; padding:2px 0px 1px 0px; border-left:none;" href="#" id="drop_cat_'.$category.'">+</a>';
+							echo '<a style="float:right; text-align:center; width:15px; padding:2px 0px 1px 0px;" href="#" id="drop_cat_'.$category.'">+</a>';
 							echo '<a  href="#" id="cat_'. $category .'"><div '.$color_css.'>'.$category_image.'</div><div class="category-title">'.$category_title.'</div></a>';
 							
 						}
