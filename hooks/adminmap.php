@@ -40,6 +40,8 @@ class adminmap {
 				plugin::add_stylesheet("adminmap/css/embedd_setup");
 				Event::add('ushahidi_action.main_sidebar', array($this, '_add_embedd'));
 			}
+			plugin::add_stylesheet("adminmap/css/printmap_link");
+			Event::add('ushahidi_filter.map_main', array($this, '_add_printmap'));
 		}
 		//if dealing with the
 		if(Router::$controller == "reports")
@@ -333,7 +335,12 @@ class adminmap {
 		echo $menu;
 	}
 	
-
+	public function _add_printmap()
+	{
+		$map = Event::$data;
+		$map = str_replace('<div id="mapOutput"></div>','<div id="mapOutput"></div><div id="printmap-link"><a href="'.url::site('printmap').'">Print a map</a></div>', $map);
+		Event::$data = $map;
+	}
 	
 }//end class
 
