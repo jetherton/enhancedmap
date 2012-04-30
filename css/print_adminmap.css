@@ -19,7 +19,7 @@
 #printpage{
 	position: relative;
 	margin: 20px;
-	margin-left:300px;
+	margin-left:400px;
 
 	}
 	
@@ -69,6 +69,7 @@
 #controls{
 	width: 300px;
 	float: left;
+	padding: 5px;
 	}
 
 body{
@@ -319,7 +320,7 @@ ul.category-filters{
 	border: none;
 	margin: 0px;
 	margin: 0px;
-	height: 200px;
+	
 	overflow: auto;
 	position: relative;
 	border-top:solid 1px black;
@@ -348,6 +349,8 @@ ul.category-filters li a{
     position: relative;
     line-height: 17px;
     overflow: hidden;
+    width: 250px;
+    clear: left;
 }
 
 
