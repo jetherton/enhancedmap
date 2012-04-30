@@ -1027,6 +1027,7 @@ class adminmap_helper_Core {
                 array($items->time * 1000, $items->number));
         }
 
+        header('Content-type: application/json; charset=utf-8');
         echo json_encode($graph_data);
     }
 

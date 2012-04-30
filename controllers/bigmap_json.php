@@ -19,7 +19,7 @@ class Bigmap_json_Controller extends Template_Controller
     public $auto_render = TRUE;
 
     // Main template
-    public $template = 'json';
+    public $template = 'bigmap_json';
 
     // Table Prefix
     protected $table_prefix;
