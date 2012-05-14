@@ -319,7 +319,6 @@ ul.category-filters{
     padding: 0xp;
 	border: none;
 	margin: 0px;
-	margin: 0px;
 	
 	overflow: auto;
 	position: relative;
@@ -349,8 +348,6 @@ ul.category-filters li a{
     position: relative;
     line-height: 17px;
     overflow: hidden;
-    width: 250px;
-    clear: left;
 }
 
 
