@@ -24,10 +24,17 @@ class adminmap_Controller extends Admin_Controller
 			url::redirect('admin/dashboard');
 		}
 		
+		//this page only works if it's allowed:
+		if(ORM::factory('enhancedmap_settings')->where('key', 'enable_adminmap')->find()->value != "true")
+		{
+			url::redirect('admin/dashboard');
+		}
+		
 	}
 	
 	public function index()
 	{
+		
 		
 		
 		enhancedmap_helper::setup_enhancedmap($this);

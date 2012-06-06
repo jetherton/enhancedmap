@@ -309,9 +309,13 @@ class enhancedmap {
 	
 	public function _admin_nav_tab()
 	{
-		$tabs = Event::$data;
-		$tabs['adminmap'] = Kohana::lang('enhancedmap.admin_map_main_menu_tab');
-		Event::$data = $tabs;
+		//only show this if the settings allow it
+		if(ORM::factory('enhancedmap_settings')->where('key', 'enable_adminmap')->find()->value == "true")
+		{
+			$tabs = Event::$data;
+			$tabs['adminmap'] = Kohana::lang('enhancedmap.admin_map_main_menu_tab');
+			Event::$data = $tabs;
+		}
 	}
 	
 	//adds the "Full Screen Map" button on the main page

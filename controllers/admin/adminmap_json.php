@@ -25,12 +25,18 @@ class Adminmap_json_Controller extends Admin_Controller
     {
         parent::__construct();
 	
-	
-	// If this is not a super-user account, redirect to dashboard
-	if(!$this->auth->logged_in('admin') && !$this->auth->logged_in('superadmin'))
-	{
-		url::redirect('admin/dashboard');
-	}
+		
+		// If this is not a super-user account, redirect to dashboard
+		if(!$this->auth->logged_in('admin') && !$this->auth->logged_in('superadmin'))
+		{
+			url::redirect('admin/dashboard');
+		}
+		
+		//this page only works if it's allowed:
+		if(ORM::factory('enhancedmap_settings')->where('key', 'enable_adminmap')->find()->value != "true")
+		{
+			url::redirect('admin/dashboard');
+		}
 
         // Set Table Prefix
         $this->table_prefix = Kohana::config('database.default.table_prefix');
