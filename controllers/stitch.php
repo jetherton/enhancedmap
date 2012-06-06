@@ -2,12 +2,9 @@
 /**
  * This renders the a static bitmap map
  *
- * PHP version 5
- * LICENSE: This source file is subject to LGPL license
- * that is available through the world-wide-web at the following URI:
- * http://www.gnu.org/copyleft/lesser.html
+ *
  * @author     John Etherton <john@ethertontech.com>
- * @package    Admin Map - https://github.com/jetherton/adminmap
+ * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 
 //TODO: Way more error checking!!!!!! and some graceful failing.
@@ -311,7 +308,7 @@
 		
 		public function wait()
 		{
-			$view = new View("adminmap/waitprint");
+			$view = new View("enhancedmap/waitprint");
 			$view->render(true);
 		
 		}

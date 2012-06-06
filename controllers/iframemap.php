@@ -5,12 +5,10 @@
  * This file is adapted from the file Ushahidi_Web/appliction/controllers/json.php
  * Originally written by the Ushahidi Team
  *
- * PHP version 5
- * LICENSE: This source file is subject to LGPL license
- * that is available through the world-wide-web at the following URI:
- * http://www.gnu.org/copyleft/lesser.html
+ * 
+ *
  * @author     John Etherton <john@ethertontech.com>
- * @package    Admin Map - https://github.com/jetherton/adminmap
+ * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 class Iframemap_Controller extends Template_Controller {
 
@@ -45,8 +43,8 @@ class Iframemap_Controller extends Template_Controller {
 		$this->session = Session::instance();
 
         // Load Header & Footer
-		$this->template->header  = new View('adminmap/iframe_map_header');
-		$this->template->footer  = new View('adminmap/iframe_map_footer');
+		$this->template->header  = new View('enhancedmap/iframe_map_header');
+		$this->template->footer  = new View('enhancedmap/iframe_map_footer');
 
 		// Themes Helper
 		$this->themes = new Themes();
@@ -103,7 +101,7 @@ class Iframemap_Controller extends Template_Controller {
     	
     	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Setup the map
-		adminmap_helper::setup_adminmap($this, "adminmap/iframe_mapview", "adminmap/css/iframe_adminmap");
+		enhancedmap_helper::setup_enhancedmap($this, "enhancedmap/iframe_mapview", "enhancedmap/css/iframe_adminmap");
 		//set the site name
 		$this->template->content->site_name = $this->template->header->site_name;
 		//set the width of the map
@@ -117,7 +115,7 @@ class Iframemap_Controller extends Template_Controller {
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//get the categories
-		adminmap_helper::set_categories($this, false);
+		enhancedmap_helper::set_categories($this, false);
 		$json_url = ($clustering == 1) ? "iframemap_json/cluster" : "iframemap_json";
 		$json_timeline_url = "bigmap_json/timeline/";
 		
@@ -125,15 +123,15 @@ class Iframemap_Controller extends Template_Controller {
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the map
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
-		adminmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url, 'adminmap/adminmap_js',
-								'adminmap/big_main_map', 'adminmap/iframe_main_timeline');
+		enhancedmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url, 'enhancedmap/adminmap_js',
+								'enhancedmap/big_main_map', 'enhancedmap/iframe_main_timeline');
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the overlays and shares
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		adminmap_helper::set_overlays_shares($this);
-		plugin::add_stylesheet("adminmap/css/jquery.hovertip-1.0");
-		plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
+		enhancedmap_helper::set_overlays_shares($this);
+		plugin::add_stylesheet("enhancedmap/css/jquery.hovertip-1.0");
+		plugin::add_javascript("enhancedmap/js/jquery.hovertip-1.0");
 		
 		
 		// Rebuild Header Block
@@ -144,7 +142,7 @@ class Iframemap_Controller extends Template_Controller {
 	public function setup()
 	{
 		$this->auto_render = FALSE;
-		$view = View::factory("adminmap/iframemap_setup");
+		$view = View::factory("enhancedmap/iframemap_setup");
 		$view->html = htmlentities('<iframe src="'. url::base().'iframemap" width="515px" height="430px"></iframe>');
 		$view->render(true);
 				

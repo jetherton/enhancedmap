@@ -1,3 +1,10 @@
+/*
+ * CSS for the hovertips
+ *
+ * @author     John Etherton <john@ethertontech.com>
+ * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
+ */
+
 .hovertip {
     position: absolute;
     padding: 10px 13px;

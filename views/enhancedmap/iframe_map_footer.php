@@ -1,11 +1,14 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * View for the big map json 
+ * Footer for the iFrame map
  * 
+ *
  *
  * @author     John Etherton <john@ethertontech.com>
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 ?>
-{"type": "FeatureCollection","features": [<?php echo $json; ?>]}
+	<?php echo $google_analytics; ?>
+</body>
 
+</html>

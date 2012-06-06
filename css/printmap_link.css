@@ -1,3 +1,10 @@
+/*
+ * Makes the link to the print map look good
+ *
+ * @author     John Etherton <john@ethertontech.com>
+ * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
+ */
+
 div#printmap-link {
 	float: right;
 	text-transform: uppercase;

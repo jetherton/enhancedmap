@@ -1,89 +1,14 @@
 /**
- * iFramemap CSS for the admin map plugin
+ * CSS for admin map
  *
  *
  * @author     John Etherton <john@ethertontech.com>
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 
-.menuItem{
-	border-top: 1px solid black;
-	padding-top:10px;
-	margin-bottom:20px;
-	}
-
-#printpage{
-	position: relative;
-	margin: 20px;
-	margin-left:300px;
-
-	}
-	
-.portrait{
-	width:750px;
-	height: 900px;
-}
-.landscape{
-	width: 950px;
-	height:650px;
-}
-
-#key{
-	z-index: 5000;
-	position: absolute;
-	background-image: url('../images/opacity60.png');
-	border: solid 1px black;
-	padding: 10px;
-	width:300px;
-	margin:10px;
-}
-
-#key ul{
-
-	margin: 10px;
-}
-
-#key ul li{
-	list-style-type:none;
-	margin-bottom: 10px;
-}
-
-.bottom{
-	bottom:1px;
-}
-.top{
-	top: 1px;
-}
-.right{
-	right:1px;
-}
-.left{
-	left:1px;
-}
-	
-	
-#controls{
-	width: 100px;
-	font-size: 8pt;
-	}
-
-body{
-
-}
-
-body#page{
-	background: white;
-}
-
 div.big_wrapper{
 	background-color:white;
 }
-
-td{
-	vertical-align:top;
-}
-
-
 
 
 /*stuff john added*/
@@ -97,18 +22,27 @@ td{
 }
 
 div.slider-holder fieldset{
-	padding-bottom: 5px;
+	padding-bottom: 37px;
 	padding-left: 20px;
 	padding-right: 20px;
 	
 }
 
 
-.infowindow ul
-{
-	font-weight: normal;
+/*right column*/
+div#right{
+	width:250px;
+	float:right;
 }
 
+#mapcontent{
+	width:auto;
+	overflow: visible;
+	clear: none;
+	background: #ffffff;
+	margin-right: 250px;
+	
+}
 
 
 
@@ -163,22 +97,19 @@ a.share{
 
 /* map */
 div.map {
-    border: black solid 1px;
+    border: #999 1px solid;
+    height: 500px;
+    position:relative;
 }
 #mapStatus
 {
-	display: none;
-	position: absolute;
-	z-index: 50;
 	float: left;
 	background-color: #e1e1e1;
 	border-left: solid 1px #999;
 	border-right: solid 1px #999;
 	border-bottom: solid 1px #999;
 	font-size: 10px;
-	width: 325px;
-	bottom: 1px;
-	right: 1px;
+	width: 99%;
 }
 #mapStatus div
 {
@@ -198,34 +129,17 @@ div.map {
 
 
 div.graph-holder {
-	display:none;
     height:150px;
     overflow:hidden;
     width:600px;
 }
 
-
-div#timeline_holder
-{
-	background-image: url('../images/opacity60.png');
-	width: 220px;
-	hight:200px;
-	position: relative;
-	border: 1px solid grey;
-	
-}
-
-div#timeline_colapse
-{
-	height:220px;
-}
-
-
 div.slider-holder {
     font-size:70%;
-    height:25px;
-    width: 300px;
-    margin: 0 auto;
+    height:70px;
+    margin-top:15px;
+    width: 600px;
+    padding-left: 11px;
 }
 
 div.slider-holder label{
@@ -234,13 +148,22 @@ div.slider-holder label{
 
 /*Status filtes*/
 div.stat-filters{
+    font-size: 85%;
     text-transform: uppercase;
-    margin: 0 0 0px 0;
-
+    margin: 0 0 15px 0;
 }
 
 
+ul.status-filters{
+    background: #E7E3DA;
+    border-top: #C7C2BC 7px solid;
+    border-bottom: #C7C2BC 7px solid;
+    list-style: none;
+    padding: 12px 15px;
+	margin-left: 0px;
+	margin-top: 0px;
 
+}
 
 ul.status-filters li{
     padding: 0;
@@ -252,15 +175,14 @@ ul.status-filters li a{
     display: block;
     padding-top:1px;
     padding-bottom:1px;
-    font-size: 11px;
+    font-size: 10px;
     text-transform: uppercase;
     font-weight: bold;
     text-decoration: none;
     color: #3F3F3F;
-    border: #97938A 1px solid;
+    border: #E7E3DA 1px solid;
     position: relative;
     overflow: hidden;
-	text-align:center;
 }
 
 ul.status-filters li a.active{
@@ -308,39 +230,35 @@ div.cat-filters span a{
 }
 
 ul.category-filters{
-    background: none;
+    background: #E7E3DA;
+    border-top: #C7C2BC 7px solid;
+    border-bottom: #C7C2BC 7px solid;
     list-style: none;
-    padding: 0px;
-	border: none;
-	margin: 0px;
-	height: 170px;
-	overflow: auto;
-	position: relative;
-	border-top:solid 1px black;
+    padding: 12px 15px;
+	margin-top:0px;
+	margin-left:0px;
+	overflow:auto;
+	height: 250px;
+	position:relative;
 }
-
-ul#kml_switch{
-	height: 80px;
-}
-
 
 ul.category-filters li{
     padding: 0;
-    margin-bottom: 0px;
+    margin-bottom: 2px;
 	list-style-type:none;
 }
 
 ul.category-filters li a{
     display: block;
-    padding: 2px 2px 2px 2px;
-    font-size: 8px;
+    padding: 8px 10px 8px 5px;
+    font-size: 13px;
     text-transform: uppercase;
     font-weight: bold;
     text-decoration: none;
     color: #3F3F3F;
-    border: #97938A 1px solid;
+    border: #E7E3DA 1px solid;
     position: relative;
-    line-height: 12px;
+    line-height: 15px;
     overflow: hidden;
 }
 
@@ -366,10 +284,6 @@ ul.category-filters li a.active:hover {
 
 ul.category-filters li.child{
 	display:none;
-}
-
-ul.category-filters li ul{
-    margin-top:10px;
 }
 
 /* media files */
@@ -398,12 +312,12 @@ ul.category-filters li ul{
 }
 
 .category-title {
-   
+    padding-left: 24px;
 }
 
 
 /*-----UI Slider CSS-----*/
-.ui-slider {clear: both; top: 5px; display:none;}
+.ui-slider {clear: both; top: 5px;}
 .ui-slider  {
 	text-decoration: none !important;
 }
@@ -479,9 +393,8 @@ ul.category-filters li ul{
 	margin-top: 20px;
 }
 .ui-slider dt span {
-	background: #0f0;
+	background: #fff;
 	padding: 0 .5em;
-	visibility: hidden;
 }
 .ui-slider li, .ui-slider dd {
 	position: absolute;
@@ -538,9 +451,3 @@ ul.category-filters li ul{
 .slider-holder .play a:hover{
 	text-decoration:underline;
 }
-h1{
-	margin:2px;
-	text-align:center;
-	
-}
-	

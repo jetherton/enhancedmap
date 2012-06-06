@@ -2,12 +2,8 @@
 /**
  * This is the controller print map map, since it has special needs
  *
- * PHP version 5
- * LICENSE: This source file is subject to LGPL license
- * that is available through the world-wide-web at the following URI:
- * http://www.gnu.org/copyleft/lesser.html
  * @author     John Etherton <john@ethertontech.com>
- * @package    Admin Map - https://github.com/jetherton/adminmap
+ * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 class Printmap_Controller extends Template_Controller {
 
@@ -42,8 +38,8 @@ class Printmap_Controller extends Template_Controller {
 		$this->session = Session::instance();
 
         // Load Header & Footer
-		$this->template->header  = new View('adminmap/print_map_header');
-		$this->template->footer  = new View('adminmap/big_map_footer');
+		$this->template->header  = new View('enhancedmap/print_map_header');
+		$this->template->footer  = new View('enhancedmap/big_map_footer');
 
 		// Themes Helper
 		$this->themes = new Themes();
@@ -95,11 +91,11 @@ class Printmap_Controller extends Template_Controller {
     	
     	////////////////////////////////////////////////////////////////////////////////////////////////
     	// custom JS that the print map needs
-    	plugin::add_javascript("adminmap/js/jquery.address-1.4.min.js");
+    	plugin::add_javascript("enhancedmap/js/jquery.address-1.4.min.js");
     	
     	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Setup the map
-		adminmap_helper::setup_adminmap($this, "adminmap/print_mapview", "adminmap/css/print_adminmap");
+		enhancedmap_helper::setup_enhancedmap($this, "enhancedmap/print_mapview", "enhancedmap/css/print_enhancedmap");
 
 		
 		//ARE WE CLUSTERING?
@@ -113,13 +109,13 @@ class Printmap_Controller extends Template_Controller {
 			$group_id = $this->group_id;
 			$group = ORM::factory('simplegroups_groups',$this->group_id)->find($this->group_id);
 			//get the categories
-			adminmap_helper::set_categories($this, false, $group);		
+			enhancedmap_helper::set_categories($this, false, $group);		
 			$urlParams = array('sgid'=>$group_id);			
 		}
 		else
 		{
 			//get the categories
-			adminmap_helper::set_categories($this, false);
+			enhancedmap_helper::set_categories($this, false);
 			$urlParams = array();
 		}
 		
@@ -131,19 +127,19 @@ class Printmap_Controller extends Template_Controller {
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the map
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
-		adminmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url, 'adminmap/print_mapview_js',
-								'adminmap/big_main_map', 'adminmap/print_main_timeline', $urlParams);
+		enhancedmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url, 'enhancedmap/print_mapview_js',
+								'enhancedmap/big_main_map', 'enhancedmap/print_main_timeline', $urlParams);
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the overlays and shares
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		adminmap_helper::set_overlays_shares($this);
-		plugin::add_stylesheet("adminmap/css/jquery.hovertip-1.0");
-		plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
+		enhancedmap_helper::set_overlays_shares($this);
+		plugin::add_stylesheet("enhancedmap/css/jquery.hovertip-1.0");
+		plugin::add_javascript("enhancedmap/js/jquery.hovertip-1.0");
 		
 
 
-		$this->template->header  = new View('adminmap/print_map_header');
+		$this->template->header  = new View('enhancedmap/print_map_header');
 		$this->template->header->site_name = $this->site_name;
 		$this->template->header->this_page = "";
 		// Rebuild Header Block

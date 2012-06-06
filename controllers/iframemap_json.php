@@ -5,12 +5,8 @@
  * This file is adapted from the file Ushahidi_Web/appliction/controllers/json.php
  * Originally written by the Ushahidi Team
  *
- * PHP version 5
- * LICENSE: This source file is subject to LGPL license
- * that is available through the world-wide-web at the following URI:
- * http://www.gnu.org/copyleft/lesser.html
  * @author     John Etherton <john@ethertontech.com>
- * @package    Admin Map - https://github.com/jetherton/adminmap
+ * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 
 class Iframemap_json_Controller extends Template_Controller
@@ -41,7 +37,7 @@ class Iframemap_json_Controller extends Template_Controller
      */
     function index()
     {
-		adminmap_helper::json_index($this, false,  "_blank");
+		enhancedmap_helper::json_index($this, false,  "_blank");
     }
 
     /***************************************************************************************************************
@@ -49,7 +45,7 @@ class Iframemap_json_Controller extends Template_Controller
      */
     public function cluster()
     {
-        adminmap_helper::json_cluster($this, false, "_blank");      
+        enhancedmap_helper::json_cluster($this, false, "_blank");      
     }
 
 
@@ -58,7 +54,7 @@ class Iframemap_json_Controller extends Template_Controller
      */
     public function timeline( $category_ids = "0," )
     {
-	adminmap_helper::json_timeline($this, $category_ids, false);
+		enhancedmap_helper::json_timeline($this, $category_ids, false);
     }
 
 

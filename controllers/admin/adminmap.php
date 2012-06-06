@@ -4,12 +4,9 @@
  *
  * This file is adapted from the file Ushahidi_Web/appliction/controllers/main.php
  * Originally written by the Ushahidi Team
- * PHP version 5
- * LICENSE: This source file is subject to LGPL license
- * that is available through the world-wide-web at the following URI:
- * http://www.gnu.org/copyleft/lesser.html
+ * 
  * @author     John Etherton <john@ethertontech.com>
- * @package    Admin Map - https://github.com/jetherton/adminmap
+ * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 
 class adminmap_Controller extends Admin_Controller
@@ -33,19 +30,19 @@ class adminmap_Controller extends Admin_Controller
 	{
 		
 		
-		adminmap_helper::setup_adminmap($this);
+		enhancedmap_helper::setup_enhancedmap($this);
 		
 		//get the categories
-		adminmap_helper::set_categories($this, true);
+		enhancedmap_helper::set_categories($this, true);
 		
 		//setup the map
 		$clustering = Kohana::config('settings.allow_clustering');
 		$json_url = ($clustering == 1) ? "admin/adminmap_json/cluster" : "admin/adminmap_json";
 		$json_timeline_url = "admin/adminmap_json/timeline/";
-		adminmap_helper::set_map($this->template, $this->template, $json_url, $json_timeline_url);
+		enhancedmap_helper::set_map($this->template, $this->template, $json_url, $json_timeline_url);
 		
 		//setup the overlays and shares
-		adminmap_helper::set_overlays_shares($this);
+		enhancedmap_helper::set_overlays_shares($this);
 		
 	}//end index method
 

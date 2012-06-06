@@ -1,89 +1,21 @@
 /**
- * iFramemap CSS for the admin map plugin
+ * CSS for the big map
  *
  *
  * @author     John Etherton <john@ethertontech.com>
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 
-.menuItem{
-	border-top: 1px solid black;
-	padding-top:10px;
-	margin-bottom:20px;
-	}
-
-#printpage{
-	position: relative;
-	margin: 20px;
-	margin-left:300px;
-
-	}
-	
-.portrait{
-	width:750px;
-	height: 900px;
-}
-.landscape{
-	width: 950px;
-	height:650px;
-}
-
-#key{
-	z-index: 5000;
-	position: absolute;
-	background-image: url('../images/opacity60.png');
-	border: solid 1px black;
-	padding: 10px;
-	width:300px;
-	margin:10px;
-}
-
-#key ul{
-
-	margin: 10px;
-}
-
-#key ul li{
-	list-style-type:none;
-	margin-bottom: 10px;
-}
-
-.bottom{
-	bottom:1px;
-}
-.top{
-	top: 1px;
-}
-.right{
-	right:1px;
-}
-.left{
-	left:1px;
-}
-	
-	
-#controls{
-	width: 100px;
-	font-size: 8pt;
-	}
 
 body{
-
-}
-
-body#page{
-	background: white;
+	width: 100%;
+	height: 100%;
+	overflow:hidden;
 }
 
 div.big_wrapper{
 	background-color:white;
 }
-
-td{
-	vertical-align:top;
-}
-
-
 
 
 /*stuff john added*/
@@ -97,7 +29,7 @@ td{
 }
 
 div.slider-holder fieldset{
-	padding-bottom: 5px;
+	padding-bottom: 37px;
 	padding-left: 20px;
 	padding-right: 20px;
 	
@@ -109,6 +41,39 @@ div.slider-holder fieldset{
 	font-weight: normal;
 }
 
+
+/*right column*/
+div#right{
+	display: none;
+	position: absolute;
+	float: none;
+	width:250px;
+	z-index: 50;
+	background-image: url('../images/opacity60.png');
+	border:1px solid black;
+}
+
+div#right_colapse{
+	
+}
+
+div#timeline_drag{
+	background-image: url('../images/opacitygrey60.png');
+	border:1px solid black;
+}
+
+div#right_move{
+	background-image: url('../images/opacitygrey60.png');
+}
+
+#mapcontent{
+	width:auto;
+	overflow: visible;
+	clear: none;
+	background: #ffffff;
+	margin-right: 250px;
+	
+}
 
 
 
@@ -163,11 +128,13 @@ a.share{
 
 /* map */
 div.map {
-    border: black solid 1px;
+    border: #999 1px solid;
+    height: 100%;
+	width: 100%;
+    position:absolute;
 }
 #mapStatus
 {
-	display: none;
 	position: absolute;
 	z-index: 50;
 	float: left;
@@ -198,7 +165,6 @@ div.map {
 
 
 div.graph-holder {
-	display:none;
     height:150px;
     overflow:hidden;
     width:600px;
@@ -208,9 +174,10 @@ div.graph-holder {
 div#timeline_holder
 {
 	background-image: url('../images/opacity60.png');
-	width: 220px;
-	hight:200px;
-	position: relative;
+	width: 620px;
+	z-index: 50;
+	position: absolute;
+	float: right;
 	border: 1px solid grey;
 	
 }
@@ -223,9 +190,10 @@ div#timeline_colapse
 
 div.slider-holder {
     font-size:70%;
-    height:25px;
-    width: 300px;
-    margin: 0 auto;
+    height:60px;
+    width: 600px;
+    padding-left: 11px;
+	margin-top: 0px;
 }
 
 div.slider-holder label{
@@ -234,13 +202,22 @@ div.slider-holder label{
 
 /*Status filtes*/
 div.stat-filters{
+    font-size: 85%;
     text-transform: uppercase;
     margin: 0 0 0px 0;
-
 }
 
 
+ul.status-filters{
+    background-color: rgba(231,227, 218, 0.5);
+    border-top: none;
+    border-bottom: #C7C2BC 7px solid;
+    list-style: none;
+    padding: 12px 15px 0px 15px;
+	margin-left: 0px;
+	margin-top: 0px;
 
+}
 
 ul.status-filters li{
     padding: 0;
@@ -310,37 +287,37 @@ div.cat-filters span a{
 ul.category-filters{
     background: none;
     list-style: none;
-    padding: 0px;
+    padding: 0xp;
 	border: none;
 	margin: 0px;
-	height: 170px;
+	margin: 0px;
+	height: 500px;
 	overflow: auto;
 	position: relative;
-	border-top:solid 1px black;
 }
 
 ul#kml_switch{
-	height: 80px;
+	height: 75px;
 }
 
 
 ul.category-filters li{
     padding: 0;
-    margin-bottom: 0px;
+    margin-bottom: 10px;
 	list-style-type:none;
 }
 
 ul.category-filters li a{
     display: block;
-    padding: 2px 2px 2px 2px;
-    font-size: 8px;
+    padding: 1px 10px 1px 5px;
+    font-size: 11px;
     text-transform: uppercase;
     font-weight: bold;
     text-decoration: none;
     color: #3F3F3F;
     border: #97938A 1px solid;
     position: relative;
-    line-height: 12px;
+    line-height: 17px;
     overflow: hidden;
 }
 
@@ -398,12 +375,12 @@ ul.category-filters li ul{
 }
 
 .category-title {
-   
+    padding-left: 24px;
 }
 
 
 /*-----UI Slider CSS-----*/
-.ui-slider {clear: both; top: 5px; display:none;}
+.ui-slider {clear: both; top: 5px;}
 .ui-slider  {
 	text-decoration: none !important;
 }
@@ -538,9 +515,3 @@ ul.category-filters li ul{
 .slider-holder .play a:hover{
 	text-decoration:underline;
 }
-h1{
-	margin:2px;
-	text-align:center;
-	
-}
-	

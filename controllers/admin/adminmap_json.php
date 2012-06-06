@@ -6,12 +6,9 @@
  * This file is adapted from the file Ushahidi_Web/appliction/controllers/json.php
  * Originally written by the Ushahidi Team
  * 
- * PHP version 5
- * LICENSE: This source file is subject to LGPL license
- * that is available through the world-wide-web at the following URI:
- * http://www.gnu.org/copyleft/lesser.html
+ *
  * @author     John Etherton <john@ethertontech.com>
- * @package    Admin Map - https://github.com/jetherton/adminmap
+ * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 
 class Adminmap_json_Controller extends Admin_Controller
@@ -48,7 +45,7 @@ class Adminmap_json_Controller extends Admin_Controller
      */
     function index()
     {
-	adminmap_helper::json_index($this);
+		enhancedmap_helper::json_index($this);
     }
 
     /***************************************************************************************************************
@@ -56,7 +53,7 @@ class Adminmap_json_Controller extends Admin_Controller
      */
     public function cluster()
     {
-        adminmap_helper::json_cluster($this);
+        enhancedmap_helper::json_cluster($this);
     }
 
 
@@ -65,7 +62,7 @@ class Adminmap_json_Controller extends Admin_Controller
      */
     public function timeline()
     {
-		adminmap_helper::json_timeline($this);
+		enhancedmap_helper::json_timeline($this);
     }
 
 

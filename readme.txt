@@ -1,9 +1,9 @@
 === About ===
-name: Admin Map
-website: https://github.com/jetherton/adminmap
-description: Shows a map on the backend that shows unapproved reports as well as approved reports.
-version: 2.0
-requires: 2.1 - The bleeding edge version from the repo https://github.com/ushahidi/Ushahidi_Web, not form http://download.ushahidi.com/
+name: Enhanced Map
+website: https://github.com/jetherton/enhancedmap
+description: Adds a full screen map on the front end and a map on the back end that shows non-approved reports. Also allows for more complex boolean AND and OR filtering operations. Formerly Admin Map.
+version: 2.1
+requires: 2.1 or higher
 author: John Etherton
 author website: http://ethertontech.com
 
@@ -18,8 +18,9 @@ to manipulate the tiles on the server, you can print via the server. you can acc
 
 
 == Installation ==
-1. Copy the entire /adminmap/ directory into your /plugins/ directory.
+1. Copy the entire /enhancedmap/ directory into your /plugins/ directory.
 2. Activate the plugin.
 
 == Changelog ==
-2.0 -- 2011/11/30 -- Refactored the plugin to work with Ushahidi's new reports::fetch_incidents() helper method. This allows much tigher intergration with Ushahidi
+* 2.0 -- 2011/11/30 -- Refactored the plugin to work with Ushahidi's new reports::fetch_incidents() helper method. This allows much tigher intergration with Ushahidi. Though this will get slow when there are more than 3 or 4 thousand reports.
+* 2.1 -- 2012/06/06 -- Renamed to Enhanced Map to reflect all that this plugin has become.

@@ -1,14 +1,12 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * This is main map controller for the admin map plugin. Most all of the map
+ * This is main map controller for the enhanced map plugin. Most all of the map
  * rendering reququest go through this controller
  *
- * PHP version 5
- * LICENSE: This source file is subject to LGPL license
- * that is available through the world-wide-web at the following URI:
- * http://www.gnu.org/copyleft/lesser.html
+ * 
+ *
  * @author     John Etherton <john@ethertontech.com>
- * @package    Admin Map - https://github.com/jetherton/adminmap
+ * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 class Bigmap_Controller extends Template_Controller {
 
@@ -43,8 +41,8 @@ class Bigmap_Controller extends Template_Controller {
 		$this->session = Session::instance();
 
         // Load Header & Footer
-		$this->template->header  = new View('adminmap/big_map_header');
-		$this->template->footer  = new View('adminmap/big_map_footer');
+		$this->template->header  = new View('enhancedmap/big_map_header');
+		$this->template->footer  = new View('enhancedmap/big_map_footer');
 
 		// Themes Helper
 		$this->themes = new Themes();
@@ -95,11 +93,11 @@ class Bigmap_Controller extends Template_Controller {
     	//set the title of the page
     	$this->template->header->this_page = 'bigmap';
     	//javascript for the big map special features
-		plugin::add_javascript("adminmap/js/bigmap");
+		plugin::add_javascript("enhancedmap/js/bigmap");
     	
     	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Setup the map
-		adminmap_helper::setup_adminmap($this, "adminmap/big_mapview", "adminmap/css/big_adminmap");
+		enhancedmap_helper::setup_enhancedmap($this, "enhancedmap/big_mapview", "enhancedmap/css/big_enhancedmap");
 
 		
 		//ARE WE CLUSTERING?
@@ -110,7 +108,7 @@ class Bigmap_Controller extends Template_Controller {
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 		//get the categories
-		adminmap_helper::set_categories($this, false);
+		enhancedmap_helper::set_categories($this, false);
 		$json_url = ($clustering == 1) ? "bigmap_json/cluster" : "bigmap_json";
 		$json_timeline_url = "bigmap_json/timeline/";
 		
@@ -118,15 +116,15 @@ class Bigmap_Controller extends Template_Controller {
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the map
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
-		adminmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url, 'adminmap/adminmap_js',
-								'adminmap/big_main_map', 'adminmap/big_main_timeline');
+		enhancedmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url, 'enhancedmap/adminmap_js',
+								'enhancedmap/big_main_map', 'enhancedmap/big_main_timeline');
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the overlays and shares
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		adminmap_helper::set_overlays_shares($this);
-		plugin::add_stylesheet("adminmap/css/jquery.hovertip-1.0");
-		plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
+		enhancedmap_helper::set_overlays_shares($this);
+		plugin::add_stylesheet("enhancedmap/css/jquery.hovertip-1.0");
+		plugin::add_javascript("enhancedmap/js/jquery.hovertip-1.0");
 		
 		
 		// Rebuild Header Block

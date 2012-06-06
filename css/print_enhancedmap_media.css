@@ -1,0 +1,39 @@
+/**
+ * Makes the print map, look pretty good when being printed
+ *
+ *
+ * @author     John Etherton <john@ethertontech.com>
+ * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
+ */
+
+#title{
+	display: none;
+	}
+
+#printpage{
+
+	margin: 0px;
+	position: absolute;
+}
+
+#controls
+{
+	display: none;
+}
+
+#mainmenu{
+	display: none;
+}
+
+
+.olControlPanZoomBar{
+	display: none;
+}
+
+#mapStatus{
+	display:none;
+}
+
+.maximizeDiv{
+	display:none;
+}
