@@ -31,7 +31,7 @@ class enhancedmap {
 		{
 			Event::add('ushahidi_action.map_main_filters', array($this, '_add_big_map_main_button'));	 //adds the big map  tab
 			//use sneaky JS
-			if (Kohana::config('enhancedmap.show_embed_code'))
+			if (ORM::factory('enhancedmap_settings')->where('key', 'enable_iframemap')->find()->value == "true")
 			{
 				plugin::add_javascript("enhancedmap/js/embedd_setup");
 				plugin::add_stylesheet("enhancedmap/css/embedd_setup");
