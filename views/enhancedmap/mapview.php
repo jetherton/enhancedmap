@@ -26,6 +26,7 @@
 					<input type = "hidden" value="2" name="colorCurrentStatus" id="colorCurrentStatus">
 				</form>
 
+				<?php if(ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_backend')->find()->value == 'true') {?>
 				<strong><?php echo Kohana::lang('enhancedmap.status_filters') ?>:</strong>
 				<ul id="status_switch" class="status-filters">
 					<!-- This was commented out to keep things simple for our users. I hate to cut out functionality,
@@ -53,6 +54,7 @@
 					 /show unapproved as black -->
 					
 				</ul>
+				<?php } //end if show_unapproved_backend?>
 			</div>		       
 		       <!-- /status filters -->
 		

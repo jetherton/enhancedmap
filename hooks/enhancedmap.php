@@ -75,18 +75,26 @@ class enhancedmap {
 		$params = Event::$data;
 		$params["all_reports"] = TRUE;
 		//also check and see if we want to show maybe, online approved, or only unapproved, you never know.
-		if(isset($_GET['u']) AND intval($_GET['u']) > 0)
+		//but check against the settings first
+		if(ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_backend')->find()->value == 'true') 
 		{
-			$show_unapproved = intval($_GET['u']);
-			if($show_unapproved == '1')
+			if(isset($_GET['u']) AND intval($_GET['u']) > 0)
 			{
-				array_push($params, '(i.incident_active = 1)');
+				$show_unapproved = intval($_GET['u']);
+				if($show_unapproved == '1')
+				{
+					array_push($params, '(i.incident_active = 1)');
+				}
+				else if($show_unapproved == '2')
+				{
+					array_push($params, '(i.incident_active = 0)');
+				}
+				
 			}
-			else if($show_unapproved == '2')
-			{
-				array_push($params, '(i.incident_active = 0)');
-			}
-			
+		}
+		else //make sure you can only see approved incidents
+		{
+			array_push($params, '(i.incident_active = 1)');
 		}
 		
 		//also make it so you can see any categories, not just the visible ones
