@@ -314,7 +314,7 @@ class enhancedmap_helper_Core {
 			}
 		
 			$cats = ORM::factory('simplegroups_category');
-			if(!$on_backend)
+			if(!$on_backend OR ORM::factory('enhancedmap_settings')->where('key', 'show_hidden_categories_backend')->find()->value != 'true')
 			{	
 				$cats = $cats->where('category_visible', '1');
 			}
@@ -377,7 +377,7 @@ class enhancedmap_helper_Core {
 		/////////////////////////////////////////////////////////////////////////////////////////////
 		
 		$cats = ORM::factory('category');
-		if(!$on_backend)
+		if(!$on_backend OR ORM::factory('enhancedmap_settings')->where('key', 'show_hidden_categories_backend')->find()->value != 'true')
 		{	
 			$cats = $cats->where('category_visible', '1');
 		}

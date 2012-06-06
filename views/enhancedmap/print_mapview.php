@@ -34,6 +34,40 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 		
 	
 		<INPUT style="width: auto; padding:6px; margin:6px; font-size:18px;" TYPE="BUTTON" VALUE="Print this map" ONCLICK="window.print()"/>
+		
+					<!-- Show unapproved -->
+			<?php 
+				//see if the user we're dealing with can see reports
+				// If user doesn't have access, redirect to dashboard
+				if(isset($_SESSION['auth_user']))
+				{
+				$user = new User_Model($_SESSION['auth_user']->id);
+				$user_view_reports = admin::permissions($user, "reports_view");
+				if(ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_frontend')->find()->value == 'true' AND $user_view_reports) 
+				{
+			?>
+			<div class="stat-filters clearingfix">				
+			<strong><?php echo Kohana::lang('enhancedmap.status_filters') ?>:</strong>	
+				<ul id="status_switch" class="category-filters">					
+					<li>
+						<a  id="status_1" href="#">
+							<div class="swatch" style="background-color:#000000"></div>
+							<div class="status-title">Unapproved Reports</div>
+						</a>
+					</li>
+					<li>
+						<a class="active" id="status_2" href="#">
+							<div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div>
+							<div class="status-title">Approved Reports</div>
+						</a>
+					</li>								
+				</ul>
+				</div>
+				<br/>
+				
+				<?php }} //end if show_unapproved_backend?>
+			<!-- /Show unapproved -->
+		
 		   <!-- logic filters -->
 		   
 			<div class="stat-filters clearingfix">

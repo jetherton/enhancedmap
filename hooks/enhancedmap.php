@@ -58,12 +58,9 @@ class enhancedmap {
 		}
 		
 		
-		//only add the all reports filter if we're on the back end
-		if((Router::$controller == "reports" AND strpos(url::current(), 'admin/') === 0) OR 
-		   (Router::$controller == "adminmap_json" AND strpos(url::current(), 'admin/') === 0))
-		{
-			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_all_reports_filter'));
-		}
+		//adds the ability to see all approved and unapproved reports
+		Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_all_reports_filter'));
+		
 		
 	}
 	
@@ -72,14 +69,30 @@ class enhancedmap {
 	 */
 	public function _add_all_reports_filter()
 	{
+		//check if we're on the backend or not
+		$on_backend = $this->_on_back_end();
+		//see if the user we're dealing with can see reports
+		// If user doesn't have access, redirect to dashboard
+		if(isset($_SESSION['auth_user']))
+		{		
+			$user = new User_Model($_SESSION['auth_user']->id);
+			$user_view_reports = admin::permissions($user, "reports_view");
+		} 
+		else
+		{
+			$user_view_reports = false;
+		}
+		
 		$params = Event::$data;
-		$params["all_reports"] = TRUE;
+		
 		//also check and see if we want to show maybe, online approved, or only unapproved, you never know.
 		//but check against the settings first
-		if(ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_backend')->find()->value == 'true') 
+		if((ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_backend')->find()->value == 'true' AND $on_backend)
+				OR (ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_frontend')->find()->value == 'true' AND !$on_backend AND $user_view_reports)) 
 		{
 			if(isset($_GET['u']) AND intval($_GET['u']) > 0)
 			{
+				$params["all_reports"] = TRUE;
 				$show_unapproved = intval($_GET['u']);
 				if($show_unapproved == '1')
 				{
@@ -92,28 +105,28 @@ class enhancedmap {
 				
 			}
 		}
-		else //make sure you can only see approved incidents
-		{
-			array_push($params, '(i.incident_active = 1)');
-		}
-		
-		//also make it so you can see any categories, not just the visible ones
-		$i = null;
-		$found_it = false;
-		
-		foreach($params as $key=>$value)
-		{
 
-			if (strcmp($value, 'c.category_visible = 1') == 0)
-			{
-				$found_it = true;
-				$i = $key;
-				break;
-			}
-		}
-		if($found_it)
+		//only show hidden cats if the user is on the backend
+		if($on_backend AND ORM::factory('enhancedmap_settings')->where('key', 'show_hidden_categories_backend')->find()->value == 'true')
 		{
-			unset($params[$i]);
+			//also make it so you can see any categories, not just the visible ones
+			$i = null;
+			$found_it = false;
+			
+			foreach($params as $key=>$value)
+			{
+	
+				if (strcmp($value, 'c.category_visible = 1') == 0)
+				{
+					$found_it = true;
+					$i = $key;
+					break;
+				}
+			}
+			if($found_it)
+			{
+				unset($params[$i]);
+			}
 		}
 		
 		Event::$data = $params;
@@ -365,6 +378,15 @@ class enhancedmap {
 		$map = Event::$data;
 		$map = str_replace('<div id="mapOutput"></div>','<div id="mapOutput"></div><div id="printmap-link"><a href="'.url::site('printmap').'">Print a map</a></div>', $map);
 		Event::$data = $map;
+	}
+	
+	/**
+	 * Return true if we're on the backend
+	 * false otherwise.
+	 */
+	private function _on_back_end()
+	{
+		return strpos(url::current(), 'admin/') === 0;
 	}
 	
 }//end class

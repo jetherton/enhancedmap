@@ -27,7 +27,38 @@
 		</div>
 		<div id="right_colapse">
 		
-				       <!-- logic filters -->
+			<!-- Show unapproved -->
+			<?php 
+				//see if the user we're dealing with can see reports
+				// If user doesn't have access, redirect to dashboard
+				if(isset($_SESSION['auth_user']))
+				{
+				$user = new User_Model($_SESSION['auth_user']->id);
+				$user_view_reports = admin::permissions($user, "reports_view");
+				if(ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_frontend')->find()->value == 'true' AND $user_view_reports) 
+				{
+			?>
+			<div class="stat-filters clearingfix">					
+				<ul id="status_switch" class="status-filters">
+					<strong><?php echo Kohana::lang('enhancedmap.status_filters') ?>:</strong>
+					<li>
+						<a  id="status_1" href="#">
+							<div class="swatch" style="background-color:#000000"></div>
+							<div class="status-title">Unapproved Reports</div>
+						</a>
+					</li>
+					<li>
+						<a class="active" id="status_2" href="#">
+							<div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div>
+							<div class="status-title">Approved Reports</div>
+						</a>
+					</li>								
+				</ul>
+				</div>
+				<?php }} //end if show_unapproved_backend?>
+			<!-- /Show unapproved -->
+		
+			<!-- logic filters -->
 			<div class="stat-filters clearingfix">
 				<!-- keep track of what status we're looking at -->
 				<form action="">
@@ -39,17 +70,15 @@
 				
 					<li>
 						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
-							<h3><?php echo Kohana::lang("enhancedmap.ORHEADER"); ?></h3>
-							<?php echo Kohana::lang("enhancedmap.ORBODY"); ?>
-						">What's this?</span></div>
+							<?php echo '<h3>'.Kohana::lang("enhancedmap.ORHEADER"). '</h3>'. Kohana::lang("enhancedmap.ORBODY"); ?>
+							">What's this?</span></div>
 						<a class="active" id="logicalOperator_1" href="#">							
 						<?php echo Kohana::lang("enhancedmap.OR"); ?>
 						</a>
 					</li>
 					<li>
 						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
-							<h3><?php echo Kohana::lang("enhancedmap.ANDHEADER"); ?></h3>
-							<?php echo Kohana::lang("enhancedmap.ANDBODY"); ?>
+							<?php echo '<h3>'.Kohana::lang("enhancedmap.ANDHEADER").'</h3>'.Kohana::lang("enhancedmap.ANDBODY"); ?>							
 						">What's this?</span></div>
 						
 						<a  id="logicalOperator_2" href="#">
