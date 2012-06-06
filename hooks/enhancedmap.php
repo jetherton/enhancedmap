@@ -334,6 +334,18 @@ class enhancedmap {
 			$menu .= ">". Kohana::lang('enhancedmap.big_map_main_menu_tab')."</a></li>";
 			echo $menu;
 		}
+		//now add a print map button, but only if the settings allow it
+		if(ORM::factory('enhancedmap_settings')->where('key', 'enable_printmap')->find()->value == "true")
+		{
+			$this_page = Event::$data;
+				
+			$menu = "";
+			$menu .= "<li><a href=\"".url::site()."printmap\" ";
+			$menu .= ($this_page == 'printmap') ? " class=\"active\"" : "";
+			$menu .= ">". Kohana::lang('enhancedmap.print_map_main_menu_tab')."</a></li>";
+			echo $menu;
+		}
+		
 	}
 	
 	public function _add_printmap()

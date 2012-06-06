@@ -12,6 +12,7 @@
 	$lang = array(
 	'admin_map_main_menu_tab' => 'Admin Map',
 	'big_map_main_menu_tab' => 'Big Map',
+	'print_map_main_menu_tab'=>'Print Map',			
 	'boolean_operators' => 'Boolean Operators:',
 	'FILTERS' => 'FILTERS',
 	'Categories' => 'Categories',

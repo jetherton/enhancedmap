@@ -141,7 +141,7 @@ class Printmap_Controller extends Template_Controller {
 
 		$this->template->header  = new View('enhancedmap/print_map_header');
 		$this->template->header->site_name = $this->site_name;
-		$this->template->header->this_page = "";
+		$this->template->header->this_page = "printmap";
 		// Rebuild Header Block
 		$this->template->header->header_block = $this->themes->header_block();
 	}
