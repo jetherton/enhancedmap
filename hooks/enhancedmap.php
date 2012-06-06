@@ -323,13 +323,17 @@ class enhancedmap {
 	//adds a tab for the big map on the front end
 	public function _add_big_map_tab()
 	{
-		$this_page = Event::$data;
-		
-		$menu = "";
-		$menu .= "<li><a href=\"".url::site()."bigmap\" ";
-		$menu .= ($this_page == 'bigmap') ? " class=\"active\"" : "";
-		$menu .= ">". Kohana::lang('enhancedmap.big_map_main_menu_tab')."</a></li>";
-		echo $menu;
+		//only do this if the settings allow it
+		if(ORM::factory('enhancedmap_settings')->where('key', 'enable_bigmap')->find()->value == "true")
+		{
+			$this_page = Event::$data;
+			
+			$menu = "";
+			$menu .= "<li><a href=\"".url::site()."bigmap\" ";
+			$menu .= ($this_page == 'bigmap') ? " class=\"active\"" : "";
+			$menu .= ">". Kohana::lang('enhancedmap.big_map_main_menu_tab')."</a></li>";
+			echo $menu;
+		}
 	}
 	
 	public function _add_printmap()
