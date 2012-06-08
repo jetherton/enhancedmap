@@ -115,7 +115,18 @@ class Bigmap_Controller extends Template_Controller {
 		$this->template->content->div_boolean_filter = enhancedmap_helper::get_boolean_filter();
 		
 		//category filter
-		$this->template->content->div_category_filter = enhancedmap_helper::set_categories(false); 
+		$this->template->content->div_category_filter = enhancedmap_helper::set_categories(false);
+
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		//setup the overlays and shares
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
+		
+		//layers
+		$this->template->content->div_layers_filter = enhancedmap_helper::set_layers();
+		
+		//shares
+		$this->template->content->div_shares_filter = enhancedmap_helper::set_shares(false, false);
 		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,10 +137,7 @@ class Bigmap_Controller extends Template_Controller {
 		enhancedmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url, 'enhancedmap/adminmap_js',
 								'enhancedmap/big_main_map', 'enhancedmap/big_main_timeline');
 		
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		//setup the overlays and shares
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		enhancedmap_helper::set_overlays_shares($this);
+
 		plugin::add_stylesheet("enhancedmap/css/jquery.hovertip-1.0");
 		plugin::add_javascript("enhancedmap/js/jquery.hovertip-1.0");
 		

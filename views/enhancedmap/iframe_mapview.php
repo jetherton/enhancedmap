@@ -31,62 +31,14 @@
 		
 	
 		
-		 <?php echo $div_boolean_filter;?>
-		 
-		 <?php echo $div_categories_filter;?>
+		<?php echo $div_boolean_filter;?>
+				 
+		<?php echo $div_categories_filter;?>
 		
+		<?php echo $div_layers_filter; ?>
 		
-			
-			<?php
-			if ($layers)
-			{
-				?>
-				<br/>
-				<strong><?php echo strtoupper(Kohana::lang('ui_main.layers_filter'));?> </strong>
-				<ul id="kml_switch" class="category-filters" >
-					<?php
-					foreach ($layers as $layer => $layer_info)
-					{
-						$layer_name = $layer_info[0];
-						$layer_color = $layer_info[1];
-						$layer_url = $layer_info[2];
-						$layer_file = $layer_info[3];
-						$layer_link = (!$layer_url) ?
-							url::base().Kohana::config('upload.relative_directory').'/'.$layer_file :
-							$layer_url;
-						echo '<li><a href="#" id="layer_'. $layer .'"
-						onclick="switchLayer(\''.$layer.'\',\''.$layer_link.'\',\''.$layer_color.'\'); return false;">
-						<div>'.$layer_name.'</div></a></li>';
-					}
-					?>
-				</ul>
-				<!-- /Layers -->
-				<?php
-			}
-			?>
-			
-			
-			<?php
-			if ($shares)
-			{
-				?>
-				<!-- Layers (Other Ushahidi Layers) -->
-				<strong><?php echo strtoupper(Kohana::lang('ui_main.other_ushahidi_instances'));?></strong>
-				<ul id="sharing_switch" class="category-filters">
-					<?php
-					foreach ($shares as $share => $share_info)
-					{
-						$sharing_name = $share_info[0];
-						$sharing_color = $share_info[1];
-						echo '<li><a href="#" id="share_'. $share .'"><div class="swatch" style="background-color:#'.$sharing_color.'"></div>
-						<div>'.$sharing_name.'</div></a></li>';
-					}
-					?>
-				</ul>
-				<!-- /Layers -->
-				<?php
-			}
-			?>
+		<?php echo $div_shares_filter; ?>
+		
 	</div>
 	</td>
 	

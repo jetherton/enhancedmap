@@ -141,7 +141,15 @@ class Printmap_Controller extends Template_Controller {
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the overlays and shares
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-		enhancedmap_helper::set_overlays_shares($this);
+		
+		//layers
+		$this->template->content->div_layers_filter = enhancedmap_helper::set_layers();
+
+		//shares
+		$this->template->content->div_shares_filter = enhancedmap_helper::set_shares(false, false);
+		
+
+		
 		plugin::add_stylesheet("enhancedmap/css/jquery.hovertip-1.0");
 		plugin::add_javascript("enhancedmap/js/jquery.hovertip-1.0");
 		

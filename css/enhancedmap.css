@@ -206,11 +206,11 @@ ul.status-filters li a.active:hover {
 /* category filters */
 div.cat-filters{
     font-size: 85%;
-    margin: 0 0 15px 0;
+    margin: 0 0 0px 0;
 }
 
 div.cat-filters strong{
-    float: left;
+    
     margin: 0 10px 0 0;
     padding: 0 0 0 10px;
 }
@@ -446,4 +446,8 @@ ul.category-filters li.child{
 }
 .slider-holder .play a:hover{
 	text-decoration:underline;
+}
+
+div.layer-filters_header{
+	margin-bottom:0px;
 }

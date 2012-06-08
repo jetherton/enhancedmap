@@ -48,7 +48,8 @@ class enhancedmap_helper_Core {
 	/****
 	* Sets up the overlays and shares
 	*/
-	public static function set_overlays_shares($map_controller)
+	public static function set_layers($on_backend = false, $show_on_load = false,
+			$layers_filter_view = 'enhancedmap/layers_filter', $layers_filter_id = "layer_filter")
 	{
 				// Get all active Layers (KMZ/KML)
 		$layers = array();
@@ -64,19 +65,38 @@ class enhancedmap_helper_Core {
 		} else {
 			$layers = $config_layers;
 		}
-		$map_controller->template->content->layers = $layers;
-
-		// Get all active Shares
+		$view = new View($layers_filter_view);
+		$view->show_on_load = $show_on_load;
+		$view->layer_id = $layers_filter_id;
+		$view->layers = $layers;
+		
+		return $view;
+		
+		
+	}
+	
+	
+	/****
+	 * Sets up the overlays and shares
+	*/
+	public static function set_shares($on_backend = false, $show_on_load = false,
+			$shares_filter_view = 'enhancedmap/shares_filter', $shares_filter_id = "shares_filter")
+	{
+	
 		$shares = array();
-		/*
 		foreach (ORM::factory('sharing')
-				  ->where('sharing_active', 1)
-				  ->find_all() as $share)
+				->where('sharing_active', 1)
+				->find_all() as $share)
 		{
 			$shares[$share->id] = array($share->sharing_name, $share->sharing_color);
 		}
-		*/
-		$map_controller->template->content->shares = $shares;
+
+		$view = new View($shares_filter_view);
+		$view->share_id = $shares_filter_id;
+		$view->show_on_load = $show_on_load;
+		$view->shares = $shares;
+		
+		return $view;
 	}
 	
 	

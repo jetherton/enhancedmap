@@ -57,8 +57,11 @@ class adminmap_Controller extends Admin_Controller
 		$json_timeline_url = "admin/adminmap_json/timeline/";
 		enhancedmap_helper::set_map($this->template, $this->template, $json_url, $json_timeline_url);
 		
-		//setup the overlays and shares
-		enhancedmap_helper::set_overlays_shares($this);
+		//layers
+		$this->template->content->div_layers_filter = enhancedmap_helper::set_layers(true);
+		
+		//shares
+		$this->template->content->div_shares_filter = enhancedmap_helper::set_shares(true, false);
 		
 	}//end index method
 

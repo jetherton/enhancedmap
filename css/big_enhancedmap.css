@@ -529,3 +529,11 @@ ul.category-filters li ul{
 .slider-holder .play a:hover{
 	text-decoration:underline;
 }
+
+div.layer-filters_header{
+	margin-bottom: 0px;
+}
+
+div.shares_filters_header{
+	margin-bottom:0px;
+}
