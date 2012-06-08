@@ -106,11 +106,7 @@ class Bigmap_Controller extends Template_Controller {
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////		
 		//get the CATEGORIES
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
-
-		//get the categories
-		enhancedmap_helper::set_categories($this, false);
-		$json_url = ($clustering == 1) ? "bigmap_json/cluster" : "bigmap_json";
-		$json_timeline_url = "bigmap_json/timeline/";
+		
 		
 		//status filter
 		$this->template->content->div_status_filter = enhancedmap_helper::get_status_filter();
@@ -118,10 +114,15 @@ class Bigmap_Controller extends Template_Controller {
 		//boolean filter
 		$this->template->content->div_boolean_filter = enhancedmap_helper::get_boolean_filter();
 		
+		//category filter
+		$this->template->content->div_category_filter = enhancedmap_helper::set_categories(false); 
+		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the map
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		$json_url = ($clustering == 1) ? "bigmap_json/cluster" : "bigmap_json";
+		$json_timeline_url = "bigmap_json/timeline/";
 		enhancedmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url, 'enhancedmap/adminmap_js',
 								'enhancedmap/big_main_map', 'enhancedmap/big_main_timeline');
 		

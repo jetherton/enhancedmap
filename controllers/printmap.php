@@ -104,23 +104,22 @@ class Printmap_Controller extends Template_Controller {
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////		
 		//get the CATEGORIES
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////
+		
 		if(isset($this->group_id) && $this->group_id)
 		{
 			$group_id = $this->group_id;
 			$group = ORM::factory('simplegroups_groups',$this->group_id)->find($this->group_id);
-			//get the categories
-			enhancedmap_helper::set_categories($this, false, $group);		
+			$this->template->content->div_categories_filter = enhancedmap_helper::set_categories(false, $group);
 			$urlParams = array('sgid'=>$group_id);			
 		}
 		else
 		{
 			//get the categories
-			enhancedmap_helper::set_categories($this, false);
+			$this->template->content->div_categories_filter = enhancedmap_helper::set_categories();
 			$urlParams = array();
 		}
 		
-		$json_url = ($clustering == 1) ? "bigmap_json/cluster" : "bigmap_json";
-		$json_timeline_url = "bigmap_json/timeline/";
+		
 			
 		
 		//status filter
@@ -129,9 +128,13 @@ class Printmap_Controller extends Template_Controller {
 		//boolean filter
 		$this->template->content->div_boolean_filter = enhancedmap_helper::get_boolean_filter();
 		
+
+		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the map
-		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////		
+		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+		$json_url = ($clustering == 1) ? "bigmap_json/cluster" : "bigmap_json";
+		$json_timeline_url = "bigmap_json/timeline/";
 		enhancedmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url, 'enhancedmap/print_mapview_js',
 								'enhancedmap/big_main_map', 'enhancedmap/print_main_timeline', $urlParams);
 		

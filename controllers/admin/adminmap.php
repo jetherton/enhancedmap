@@ -40,7 +40,7 @@ class adminmap_Controller extends Admin_Controller
 		enhancedmap_helper::setup_enhancedmap($this);
 		
 		//get the categories
-		enhancedmap_helper::set_categories($this, true);
+		$this->template->content->div_categories_filter = enhancedmap_helper::set_categories($on_backend = true);
 		
 		//set the status filter
 		$this->template->content->div_status_filter = enhancedmap_helper::get_status_filter($on_backend = true, 

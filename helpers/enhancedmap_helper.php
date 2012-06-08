@@ -323,8 +323,11 @@ class enhancedmap_helper_Core {
 	
 	
 	
-	public static function set_categories($map_controller, $on_backend = false, $group = false)
+	public static function set_categories($on_backend = false, $group = false, $categories_view = "enhancedmap/categories_filter",
+			$categories_view_id = "category_switch")
 	{
+		
+		$view = new View($categories_view);
 	
 		// Check for localization of parent category
 		// Get locale
@@ -492,7 +495,9 @@ class enhancedmap_helper_Core {
 		
 		
 		
-		$map_controller->template->content->categories = $parent_categories;
+		$view->categories = $parent_categories;
+		$view->categories_view_id = $categories_view_id;
+		return $view;
 	}//end method
 	
 	

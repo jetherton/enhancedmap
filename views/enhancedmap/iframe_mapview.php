@@ -32,45 +32,10 @@
 	
 		
 		 <?php echo $div_boolean_filter;?>
+		 
+		 <?php echo $div_categories_filter;?>
 		
 		
-		
-		
-			<strong><?php echo Kohana::lang("enhancedmap.Categories"); ?></strong>
-			<ul id="category_switch" class="category-filters">
-				
-				<li><a class="active" id="cat_0" href="#"><div class="category-title"><?php echo Kohana::lang('ui_main.all_categories');?></div></a></li>
-				<?php
-					foreach ($categories as $category => $category_info)
-					{
-						$category_title = $category_info[0];
-
-						//check if this category has kids
-						if(count($category_info[3]) > 0)
-						{
-							echo '<li>';
-							echo '<a style="float:right; text-align:center; width:15px; padding:2px 0px 1px 0px; border-left:none;" href="#" id="drop_cat_'.$category.'">+</a>';
-							echo '<a  href="#" id="cat_'. $category .'"><div class="category-title">'.$category_title.'</div></a>';
-							
-						}
-						else
-						{
-							echo '<li><a href="#" id="cat_'. $category .'"><div class="category-title">'.$category_title.'</div></a>';
-						}
-						// Get Children
-						echo '<div class="hide" id="child_'. $category .'"><ul>';
-						
-						foreach ($category_info[3] as $child => $child_info)
-						{
-							$child_title = $child_info[0];
-						
-							echo '<li style="padding-left:20px;"><a href="#" id="cat_'. $child .'" cat_parent="'.$category.'"><div class="category-title">'.$child_title.'</div></a></li>';
-						}
-						echo '</ul></div></li>';
-					}
-				?>
-			</ul>
-			<!-- / category filters -->
 			
 			<?php
 			if ($layers)

@@ -124,6 +124,9 @@ class Iframemap_Controller extends Template_Controller {
 		//boolean filter
 		$this->template->content->div_boolean_filter = enhancedmap_helper::get_boolean_filter();
 		
+		//boolean filter
+		$this->template->content->div_categories_filter = enhancedmap_helper::set_categories();
+		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the map
