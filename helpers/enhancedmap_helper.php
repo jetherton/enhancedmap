@@ -527,6 +527,7 @@ class enhancedmap_helper_Core {
 		$json_item_first = "";	
 		foreach ($markers as $marker)
 		{
+			
 			$thumb = "";
 			if ($media_type == 1)
 			{
