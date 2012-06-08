@@ -24,8 +24,8 @@
 				{
 			?>
 			<!-- Show unapproved -->
-			<div id="<?php echo $status_filter_id;?>" class="stat-filters clearingfix">					
-				<ul id="status_switch" class="status-filters">
+	
+				<ul id="<?php echo $status_filter_id;?>" class="category-filters status-filters">
 					<strong><?php echo Kohana::lang('enhancedmap.status_filters') ?>:</strong>
 					<li>
 						<a <?php if($show_unapproved){echo 'class="active"';}?> id="status_1" href="#">
@@ -40,7 +40,6 @@
 						</a>
 					</li>								
 				</ul>
-				</div>
 				<!-- /Show unapproved -->
 				<?php }} //end if show_unapproved_backend?>
 			

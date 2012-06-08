@@ -14,7 +14,7 @@
 
 <!-- category filters -->
 			<ul id="<?php echo $categories_view_id;?>" class="category-filters">
-				<strong style="text-transform:uppercase;font-size:85%;"><?php echo Kohana::lang("enhancedmap.Categories"); ?></strong>
+				<strong ><?php echo Kohana::lang("enhancedmap.Categories"); ?></strong>
 				<li><a class="active" id="cat_0" href="#"><div class="swatch" style="background-color:#<?php echo Kohana::config('settings.default_map_all');?>"></div><div class="category-title"><?php echo Kohana::lang('ui_main.all_categories');?></div></a></li>
 				<?php
 					foreach ($categories as $category => $category_info)

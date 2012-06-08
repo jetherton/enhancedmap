@@ -9,12 +9,9 @@
 ?>
 
 <!-- logic filters -->
-			<div class="stat-filters clearingfix" id="<?php echo $boolean_filter_id; ?>">
-				<!-- keep track of what status we're looking at -->
-				<form action="">
-					<input type = "hidden" value="or" name="currentLogicalOperator" id="currentLogicalOperator">
-				</form>
-				<ul id="status_switch" class="status-filters">
+			
+
+				<ul id="<?php echo $boolean_filter_id; ?>"  class="category-filters boolean-filters">
 				
 				<strong><?php echo Kohana::lang("enhancedmap.boolean_operators"); ?></strong>				
 				
@@ -39,5 +36,5 @@
 						</a>
 					</li>
 				</ul>
-			</div>		       
+					       
 		       <!-- /logic filters -->

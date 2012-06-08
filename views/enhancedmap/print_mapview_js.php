@@ -370,6 +370,7 @@ function changeTopBottom(direction)
 		
 		<?php
 			$view = new View('enhancedmap/adminmap_js');  
+			$view->map_id = $map_id;
 			$view->json_url = $json_url;
 			$view->longitude = $longitude;
 			$view->latitude = $latitude;

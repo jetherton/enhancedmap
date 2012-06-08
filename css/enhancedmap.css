@@ -451,3 +451,7 @@ ul.category-filters li.child{
 div.layer-filters_header{
 	margin-bottom:0px;
 }
+
+ul.status-filters, ul.boolean-filters{
+	height:auto;
+}

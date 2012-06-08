@@ -537,3 +537,7 @@ div.layer-filters_header{
 div.shares_filters_header{
 	margin-bottom:0px;
 }
+
+ul.status-filters, ul.boolean-filters{
+	height:auto;
+}
