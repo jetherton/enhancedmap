@@ -11,12 +11,12 @@
  */
 ?>
 
-<div class="map" id="map"></div>
+<div class="map" id="<?php echo $map_id; ?>"></div>
 
-<div id="mapStatus">
-	<div id="mapScale" style="border-right: solid 1px #999"></div>
-	<div id="mapMousePosition" style="min-width: 135px;border-right: solid 1px #999;text-align: center"></div>
-	<div id="mapProjection" style="border-right: solid 1px #999"></div>
-	<div id="mapOutput"></div>
+<div id="<?php echo $map_status_id; ?>" class="mapStatus">
+	<div id="mapScale" class="mapScale"></div>
+	<div id="mapMousePosition" class="mapMousePosition" ></div>
+	<div id="mapProjection" class="mapProjection"></div>
+	<div id="mapOutput" class="mapOutput" ></div>
 </div>
 <!-- / map -->

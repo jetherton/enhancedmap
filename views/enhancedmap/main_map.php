@@ -10,7 +10,7 @@
  */
 ?>
 <!-- map -->
-<div class="map" id="map" <?php 
+<div class="map olMap" id="<?php echo $map_id; ?>" <?php 
 //setup if we're overriding the width or not
 $width = ORM::factory('enhancedmap_settings')->where('key', 'adminmap_width')->find()->value;
 $height =  ORM::factory('enhancedmap_settings')->where('key', 'adminmap_height')->find()->value;
@@ -32,7 +32,7 @@ if(strtolower($width) !=  'other' OR strtolower($height) !=  'other')
 } 
 
 ?>></div>
-<div id="mapStatus">
+<div id="<?php echo $map_status_id; ?>" class="mapStatus">
 	<div id="mapScale" style="border-right: solid 1px #999"></div>
 	<div id="mapMousePosition" style="min-width: 135px;border-right: solid 1px #999;text-align: center"></div>
 	<div id="mapProjection" style="border-right: solid 1px #999"></div>

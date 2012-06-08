@@ -84,7 +84,8 @@ class enhancedmap_helper_Core {
 	* this makes the map for this plugin
 	*/
 	public static function set_map($template, $themes, $json_url, $json_timeline_url, $javascript_view = 'enhancedmap/adminmap_js',
-							$div_map_view = 'enhancedmap/main_map', $div_timeline_view = 'enhancedmap/main_timeline', $urlParams = array())
+							$div_map_view = 'enhancedmap/main_map', $div_timeline_view = 'enhancedmap/main_timeline', 
+							$urlParams = array(), $map_id = "map", $map_status_id = "mapStatus", $graph_id = "graph", $slider_holder_id = "slider-holder")
 	{
 		
 		//are we on the backend?
@@ -96,7 +97,11 @@ class enhancedmap_helper_Core {
 	
 		////////////////////////////////////////////////////////////////Map and Slider Blocks////////////////////////////////////////////////////////////////////////////
 		$div_map = new View($div_map_view);
+		$div_map->map_id = $map_id;
+		$div_map->map_status_id = $map_status_id;
 		$div_timeline = new View($div_timeline_view);
+		$div_timeline->slider_holder_id = $slider_holder_id;
+		$div_timeline->graph_id = $graph_id;
 			// Filter::map_main - Modify Main Map Block
 			Event::run('ushahidi_filter.map_main', $div_map);
 			// Filter::map_timeline - Modify Main Map Block

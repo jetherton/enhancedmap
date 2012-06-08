@@ -133,7 +133,7 @@ div.map {
 	width: 100%;
     position:absolute;
 }
-#mapStatus
+.mapStatus
 {
 	position: absolute;
 	z-index: 50;
@@ -147,13 +147,13 @@ div.map {
 	bottom: 1px;
 	right: 1px;
 }
-#mapStatus div
+.mapStatus div
 {
 	float: left;
 	display: inline-block;
 	padding: 4px 6px 4px 6px;
 }
-#mapOutput sup
+.mapOutput sup
 {
 	height: 0;
 	line-height: 1;
@@ -163,11 +163,30 @@ div.map {
 	font-size: 8px;
 }
 
+.mapScale
+{
+	border-right: solid 1px #999;
+}
+
+.mapMousePosition
+{
+	min-width: 135px;
+	border-right: solid 1px #999;
+	text-align: center;
+}
+
+.mapProjection
+{
+	border-right: solid 1px #999;
+}
+
 
 div.graph-holder {
     height:150px;
     overflow:hidden;
     width:600px;
+    position:relative;
+    padding:0px;
 }
 
 

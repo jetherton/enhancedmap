@@ -132,6 +132,7 @@ div.graph-holder {
     height:150px;
     overflow:hidden;
     width:600px;
+    position:relative;
 }
 
 div.slider-holder {

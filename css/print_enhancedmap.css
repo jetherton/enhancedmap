@@ -201,9 +201,8 @@ div.map {
 
 
 div.graph-holder {
-    height:150px;
-    overflow:hidden;
-    width:600px;
+    display:none;
+    position:relative;
 }
 
 

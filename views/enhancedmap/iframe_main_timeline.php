@@ -10,7 +10,7 @@
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 ?>
-<div class="slider-holder">
+<div class="slider-holder" id="<?php echo $slider_holder_id; ?>">
 	<form action="">
 		<input type="hidden" value="0," name="currentCat" id="currentCat">
 		<fieldset>
@@ -21,4 +21,4 @@
 		</fieldset>
 	</form>
 </div>
-<div id="graph" class="graph-holder"></div>
+<div id="<?php echo $graph_id; ?>" class="graph-holder"></div>
