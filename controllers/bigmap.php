@@ -112,6 +112,12 @@ class Bigmap_Controller extends Template_Controller {
 		$json_url = ($clustering == 1) ? "bigmap_json/cluster" : "bigmap_json";
 		$json_timeline_url = "bigmap_json/timeline/";
 		
+		//status filter
+		$this->template->content->div_status_filter = enhancedmap_helper::get_status_filter();
+		
+		//boolean filter
+		$this->template->content->div_boolean_filter = enhancedmap_helper::get_boolean_filter();
+		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the map

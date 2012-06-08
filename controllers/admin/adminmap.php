@@ -42,6 +42,15 @@ class adminmap_Controller extends Admin_Controller
 		//get the categories
 		enhancedmap_helper::set_categories($this, true);
 		
+		//set the status filter
+		$this->template->content->div_status_filter = enhancedmap_helper::get_status_filter($on_backend = true, 
+			$status_filter_view = 'enhancedmap/status_filter', $status_filter_id = "status_filter",
+			$show_unapproved = true);
+		
+		//set the boolean filter
+		$this->template->content->div_boolean_filter = enhancedmap_helper::get_boolean_filter($on_backend = true,
+				$boolean_filter_view = 'enhancedmap/boolean_filter', $status_filter_id = "boolean_filter", $show_help = false);
+		
 		//setup the map
 		$clustering = Kohana::config('settings.allow_clustering');
 		$json_url = ($clustering == 1) ? "admin/adminmap_json/cluster" : "admin/adminmap_json";

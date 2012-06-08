@@ -115,7 +115,6 @@ div.slider-holder fieldset{
 /* filters */
 div.filters{
     font-size: 85%;
-    text-transform: uppercase;
     margin: 5px 0 15px;
 }
 
@@ -234,9 +233,7 @@ div.slider-holder label{
 
 /*Status filtes*/
 div.stat-filters{
-    text-transform: uppercase;
     margin: 0 0 0px 0;
-
 }
 
 
@@ -253,7 +250,6 @@ ul.status-filters li a{
     padding-top:1px;
     padding-bottom:1px;
     font-size: 11px;
-    text-transform: uppercase;
     font-weight: bold;
     text-decoration: none;
     color: #3F3F3F;
@@ -286,7 +282,6 @@ ul.status-filters li a.active:hover {
 /* category filters */
 div.cat-filters{
     font-size: 85%;
-    text-transform: uppercase;
     margin: 0 0 15px 0;
 }
 
@@ -334,7 +329,6 @@ ul.category-filters li a{
     display: block;
     padding: 2px 2px 2px 2px;
     font-size: 8px;
-    text-transform: uppercase;
     font-weight: bold;
     text-decoration: none;
     color: #3F3F3F;

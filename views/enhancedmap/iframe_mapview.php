@@ -31,35 +31,12 @@
 		
 	
 		
-		   <!-- logic filters -->
-		   
-			<div class="stat-filters clearingfix">
-				<!-- keep track of what status we're looking at -->
-				<form action="">
-					<input type = "hidden" value="or" name="currentLogicalOperator" id="currentLogicalOperator">
-				</form>
-				
-				<strong><?php echo Kohana::lang("enhancedmap.boolean_operators"); ?></strong>
-				<ul id="status_switch" class="category-filters" style="height:auto; overflow:visible;">
-					<li>
-						<a class="active" id="logicalOperator_1" href="#">							
-						<?php echo Kohana::lang("enhancedmap.OR"); ?>
-						</a>
-					</li>
-					<li>
-						<a  id="logicalOperator_2" href="#">
-							<div class="status-title"><?php echo Kohana::lang("enhancedmap.AND"); ?></div>
-						</a>
-					</li>
-				</ul>
-			</div>		       
-		       <!-- /logic filters -->
-
+		 <?php echo $div_boolean_filter;?>
 		
 		
 		
 		
-			<strong style="text-transform:uppercase;"><?php echo Kohana::lang("enhancedmap.Categories"); ?></strong>
+			<strong><?php echo Kohana::lang("enhancedmap.Categories"); ?></strong>
 			<ul id="category_switch" class="category-filters">
 				
 				<li><a class="active" id="cat_0" href="#"><div class="category-title"><?php echo Kohana::lang('ui_main.all_categories');?></div></a></li>

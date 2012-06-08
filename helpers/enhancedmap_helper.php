@@ -292,6 +292,36 @@ class enhancedmap_helper_Core {
 
 
 	}
+
+	/**
+	 * Use this to setup the status filter
+	 */
+	public static function get_status_filter($on_backend = false, 
+			$status_filter_view = 'enhancedmap/status_filter', $status_filter_id = "status_filter",
+			$show_unapproved = false)
+	{
+		$view = new View($status_filter_view);
+		$view->on_backend = $on_backend;
+		$view->status_filter_id = $status_filter_id;
+		$view->show_unapproved = $show_unapproved;
+		return $view;
+	}
+	
+	/**
+	 * Use this to setup the boolean filter
+	 */
+	public static function get_boolean_filter($on_backend = false,
+			$boolean_filter_view = 'enhancedmap/boolean_filter', $boolean_filter_id = "boolean_filter",
+			$show_help = true)
+	{
+		$view = new View($boolean_filter_view);
+		$view->on_backend = $on_backend;
+		$view->boolean_filter_id = $boolean_filter_id;
+		$view->show_help = $show_help;
+		return $view;
+	}
+	
+	
 	
 	public static function set_categories($map_controller, $on_backend = false, $group = false)
 	{

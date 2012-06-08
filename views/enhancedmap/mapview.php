@@ -10,7 +10,6 @@
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 ?>
-<?php echo Kohana::lang('enhancedmap.header_info') ?>
 </div> <!--class="bg"-->
 </div> <!--content-->
 </div> <!--holder-->
@@ -18,74 +17,14 @@
 <div id="bar"></div>
 		<!-- right column -->
 		<div id="right">
-		       <!-- status filters -->
-			<div class="stat-filters clearingfix">
-				<!-- keep track of what status we're looking at -->
-				<form action="">
-					<input type = "hidden" value="3" name="currentStatus" id="currentStatus">
-					<input type = "hidden" value="2" name="colorCurrentStatus" id="colorCurrentStatus">
-				</form>
-
-				<?php if(ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_backend')->find()->value == 'true') {?>
-				<strong><?php echo Kohana::lang('enhancedmap.status_filters') ?>:</strong>
-				<ul id="status_switch" class="status-filters">
-					<!-- This was commented out to keep things simple for our users. I hate to cut out functionality,
-					       but we need to be aware of  overloading those who may not be tech savy-->
-					<li>
-						<a class="active" id="status_1" href="#">
-							<div class="swatch" style="background-color:#000000"></div>
-							<div class="status-title">Unapproved Reports</div>
-						</a>
-					</li>
-					<li>
-						<a class="active" id="status_2" href="#">
-							<div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div>
-							<div class="status-title">Approved Reports</div>
-						</a>
-					</li>
-					<!-- /show approved reports-->
-					<!--  show unapproved as black
-					<li>
-						<a class="active" id="color_status_1" href="#">
-							<div class="swatch" style="background-color:#000000"></div>
-							<div class="status-title"><?php echo Kohana::lang('enhancedmap.unapproved_reports') ?></div>
-						</a>
-					</li>
-					 /show unapproved as black -->
-					
-				</ul>
-				<?php } //end if show_unapproved_backend?>
-			</div>		       
-		       <!-- /status filters -->
-		
-
-
-		       <!-- logic filters -->
-			<div class="stat-filters clearingfix">
-				<strong><?php echo Kohana::lang('enhancedmap.logical_operators') ?>:</strong>
-				<!-- keep track of what status we're looking at -->
-				<form action="">
-					<input type = "hidden" value="or" name="currentLogicalOperator" id="currentLogicalOperator">
-				</form>
-				<ul id="status_switch" class="status-filters">
-					<li>
-						<a class="active" id="logicalOperator_1" href="#">							
-							<div class="status-title"><?php echo Kohana::lang('enhancedmap.or') ?> - <span style="text-transform:none; font-size:85%;"><?php echo Kohana::lang('enhancedmap.or_details') ?></span> </div>
-						</a>
-					</li>
-					<li>
-						<a  id="logicalOperator_2" href="#">
-							<div class="status-title"><?php echo Kohana::lang('enhancedmap.and') ?> - <span style="text-transform:none; font-size:85%;"><?php echo Kohana::lang('enhancedmap.and_details') ?></span></div>
-						</a>
-					</li>
-				</ul>
-			</div>		       
-		       <!-- /logic filters -->
-
+		    
+		    <?php echo $div_status_filter;?>
+		    
+		    <?php echo $div_boolean_filter;?>
 
 
 			<!-- category filters -->
-				<strong><?php echo strtoupper(Kohana::lang('ui_main.category_filter'));?>: </strong>
+				<strong><?php echo Kohana::lang('ui_main.category_filter');?>: </strong>
 		
 			<ul id="category_switch" class="category-filters">
 				<li><a class="active" id="cat_0" href="#"><div class="swatch" style="background-color:#<?php echo $default_map_all;?>"></div><div class="category-title"><?php echo Kohana::lang('enhancedmap.show_all_reports') ?></div></a></li>

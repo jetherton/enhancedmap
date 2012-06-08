@@ -43,20 +43,20 @@ class enhancedmap {
 		//if dealing with the
 		if(Router::$controller == "reports")
 		{
-			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_logical_operator_filter'));
-			
 			Event::add('ushahidi_action.report_filters_ui', array($this,'_add_report_filter_ui'));
 			
 			Event::add('ushahidi_action.header_scripts', array($this, '_add_report_filter_js'));
 		}
-		//make sure the filters are in place for these controllers
-		if(Router::$controller == "json" || Router::$controller == "densitymap"|| Router::$controller == "bigmap" || 
-			Router::$controller == 'bigmap_json' || Router::$controller == 'adminmap_json' ||
-			Router::$controller == 'iframemap_json') //any time the map is brought up
-		{
-			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_logical_operator_filter'));
-		}
+
+		//always filter the fetch incidents params
+		Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_logical_operator_filter'));
+
 		
+		if(Router::$controller == "adminmap")
+		{
+			//hide the content div
+			Event::add('ushahidi_action.header_scripts_admin',array($this,'_hide_content_for_adminmap'));
+		}
 		
 		//adds the ability to see all approved and unapproved reports
 		Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_all_reports_filter'));
@@ -387,6 +387,11 @@ class enhancedmap {
 	private function _on_back_end()
 	{
 		return strpos(url::current(), 'admin/') === 0;
+	}
+	
+	public function _hide_content_for_adminmap()
+	{
+		echo '<style type="text/css"> #content{display:none;}</style>';
 	}
 	
 }//end class
