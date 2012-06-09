@@ -85,6 +85,7 @@
 		// Map JS
 		var featureSelectionEventRegistrants = new Array();
 		var featureUnSelectionEventRegistrants = new Array();
+		var categoryChangeEventRegistrants = new Array();
 		//number of categories selcted
 		var numOfCategoriesSelected = 0;
 		//Max number of categories to show at once, if you have more than 1000 reports with lots of categories you might want to turn this down
@@ -674,6 +675,15 @@
 
 				var startTime = new Date($("#startDate").val() * 1000);
 				var endTime = new Date($("#endDate").val() * 1000);
+				
+				//notify those who are registered
+				for(i in categoryChangeEventRegistrants)
+				{
+					var func = categoryChangeEventRegistrants[i];
+					func(gCategoryId);
+				}
+				
+				
 				addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 				
 				
@@ -1070,6 +1080,31 @@
 		}
 		
 		
+		
+		/*This function is used to register event handlers for category changes events*/
+		function registerCategoryChangeHandler(func)
+		{
+			categoryChangeEventRegistrants.push(func);
+		}
+		
+		/*This is used to unregister event handlers for category change events*/
+		function unregisterCategoryChangeHandler(func)
+		{
+			var tempArray = new Array();
+			for(i in categoryChangeEventRegistrants)
+			{
+				var t = categoryChangeEventRegistrants[i];
+				if(t != func)
+				{
+					tempArray.push(t);
+				}
+			}
+			categoryChangeEventRegistrants = tempArray;
+		}
+		
+		
+		
+
 		/**
 		 * creates an array that maps incident ids to markers
 		 */
