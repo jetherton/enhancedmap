@@ -83,6 +83,8 @@
 
 		
 		// Map JS
+		var featureSelectionEventRegistrants = new Array();
+		var featureUnSelectionEventRegistrants = new Array();
 		//number of categories selcted
 		var numOfCategoriesSelected = 0;
 		//Max number of categories to show at once, if you have more than 1000 reports with lots of categories you might want to turn this down
@@ -134,7 +136,7 @@
 
 			var extraParams = getUrlStringFromParams();
 				
-			return $.timeline({categoryId: catID,
+			var retVal = $.timeline({categoryId: catID,
 			                   startTime: new Date(startDate * 1000),
 			                   endTime: new Date(endDate * 1000),
 							   mediaType: mediaType
@@ -142,6 +144,10 @@
 								startDate, endDate, gMap.getZoom(),
 								gMap.getCenter(), thisLayerID, thisLayerType, 
 								thisLayerUrl, thisLayerColor, json_url, extraParams);
+								
+
+			
+			return retVal;								
 		}
 
 
@@ -200,12 +206,14 @@
 		Close Popup
 		*/
 		function onPopupClose(evt)
-		{
+		{			
 			if(selectedFeature != null)
 			{
 				selectControl.unselect(selectedFeature); //this seemed to change things.
 				selectedFeature = null;
 			}
+			
+			
 		}
 
 		/*
@@ -213,7 +221,10 @@
 		*/
 		function onFeatureSelect(event)
 		{
+					
+			
 			selectedFeature = event.feature;
+			var feature = event.feature;
 			// Since KML is user-generated, do naive protection against
 			// Javascript.
 
@@ -233,9 +244,26 @@
 					event.feature.geometry.getBounds().getCenterLonLat(),
 					new OpenLayers.Size(100,100),
 					content,
-					null, true, onPopupClose);
+					null, true, function(evt){ map.removePopup(feature.popup);
+				            feature.popup.destroy();
+				            feature.popup = null;
+				            
+				            
+							for(i in featureUnSelectionEventRegistrants)
+							{
+								var func = featureUnSelectionEventRegistrants[i];
+								func(feature);
+							}});
 			event.feature.popup = popup;
 			map.addPopup(popup);
+			
+			//let other JS items know that there was a feature select
+			
+			for(i in featureSelectionEventRegistrants)
+			{
+				var func = featureSelectionEventRegistrants[i];
+				func(selectedFeature);
+			}
 		}
 
 		/*
@@ -243,9 +271,18 @@
 		*/
         function onFeatureUnselect(event)
 		{
+			/*
             map.removePopup(event.feature.popup);
             event.feature.popup.destroy();
             event.feature.popup = null;
+            
+            
+			for(i in featureUnSelectionEventRegistrants)
+			{
+				var func = featureUnSelectionEventRegistrants[i];
+				func(event.feature);
+			}
+			*/
         }
 
 		// Refactor Clusters On Zoom
@@ -270,6 +307,8 @@
 
 				// Refresh Map
 				addMarkers(gCategoryId, currStartDate, currEndDate, currZoom, currCenter);
+				
+				
 			}
 		}
 
@@ -637,7 +676,8 @@
 				var endTime = new Date($("#endDate").val() * 1000);
 				addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
 				
-					
+				
+				
 				
 				return false;
 			});
@@ -985,5 +1025,74 @@
 				gTimeline.playOrPause('raindrops');
 			});
 		});
+
 		
+		/*This function is used to register event handlers for feature selection*/
+		function registerMapFeatureSelectionHandler(func)
+		{
+			featureSelectionEventRegistrants.push(func);
+		}
+		
+		/*This is used to unregister event handlers for feature selection*/
+		function unregisterMapFeatureSelectionHandler(func)
+		{
+			var tempArray = new Array();
+			for(i in featureSelectionEventRegistrants)
+			{
+				var t = featureSelectionEventRegistrants[i];
+				if(t != func)
+				{
+					tempArray.push(t);
+				}
+			}
+			featureSelectionEventRegistrants = tempArray;
+		}
+		
+		/*This function is used to register event handlers for feature unselection*/
+		function registerMapFeatureUnSelectionHandler(func)
+		{
+			featureUnSelectionEventRegistrants.push(func);
+		}
+		
+		/*This is used to unregister event handlers for feature unselection*/
+		function unregisterMapFeatureUnSelectionHandler(func)
+		{
+			var tempArray = new Array();
+			for(i in featureUnSelectionEventRegistrants)
+			{
+				var t = featureUnSelectionEventRegistrants[i];
+				if(t != func)
+				{
+					tempArray.push(t);
+				}
+			}
+			featureUnSelectionEventRegistrants = tempArray;
+		}
+		
+		
+		/**
+		 * creates an array that maps incident ids to markers
+		 */
+		function mapIncidentsToMarkers(markers)
+		{
+			//zero out the old array
+			var incidentsToMarkers = new Array();
+			
+			//get the features
+			var features = markers[0].features;
+			//loop over the features
+			for(i in features)
+			{
+				var feature = features[i];
+				//loop over the ids
+				for(j in feature.attributes.ids)
+				{
+					var id = feature.attributes.ids[j];
+					incidentsToMarkers[id] = feature;		
+				}
+			}
+			
+			return incidentsToMarkers;
+			
+		}		
 

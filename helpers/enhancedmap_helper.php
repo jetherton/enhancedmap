@@ -623,6 +623,7 @@ class enhancedmap_helper_Core {
 
 			$json_item .= "\"color\": \"".$color."\", \n";
 			$json_item .= "\"icon\": \"".$icon."\", \n";
+			$json_item .= "\"ids\": [".$marker->incident_id."], ";
 			$json_item .= "\"thumb\": \"".$thumb."\", \n";
 			$json_item .= "\"timestamp\": \"" . strtotime($marker->incident_date) . "\"";
 			$json_item .= "},";
@@ -903,6 +904,16 @@ class enhancedmap_helper_Core {
 			// Number of Items in Cluster
 			$cluster_count = count($cluster);
 			
+			//id string
+			$id_str = "";
+			foreach($cluster as $c)
+			{
+				if($id_str != "")
+				{
+					$id_str .= ",";
+				}
+				$id_str .= $c['id'];
+			}
 		
 			
 			// Build out the JSON string
@@ -915,6 +926,7 @@ class enhancedmap_helper_Core {
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$color."\", ";
 			$json_item .= "\"icon\": \"".$icon."\", ";
+			$json_item .= "\"ids\": [".$id_str."], ";
 			$json_item .= "\"thumb\": \"\", ";
 			$json_item .= "\"timestamp\": \"0\", ";
 			$json_item .= "\"count\": \"" . $cluster_count . "\"";
@@ -941,6 +953,7 @@ class enhancedmap_helper_Core {
 			$json_item .= "\"icon\": \"".$icon."\", ";
 			// $json_item .= "\"thumb\": \"".$single['thumb']."\", ";
 			$json_item .= "\"timestamp\": \"0\", ";
+			$json_item .= "\"ids\": [".$single['id']."], ";
 			$json_item .= "\"count\": \"" . 1 . "\"";
 			$json_item .= "},";
 			$json_item .= "\"geometry\": {";

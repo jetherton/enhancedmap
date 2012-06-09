@@ -18,7 +18,7 @@ if ($layers)
 {
 	?>
 				<!-- Layers (KML/KMZ) -->
-				<div id="<?php echo $layer_id;?>" class="layer-filters filters">
+				<div id="<?php echo $layer_id;?>" class="layer-filters ">
 					<div  class="cat-filters clearingfix layer-filters_header">
 						<strong><?php echo Kohana::lang('ui_main.layers_filter');?> 
 							<span>
