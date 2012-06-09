@@ -136,7 +136,7 @@
 
 			var extraParams = getUrlStringFromParams();
 				
-			var retVal = $.timeline({categoryId: catID,
+			var retVal = $.timeline("<?php echo $graph_id;?>", {categoryId: catID,
 			                   startTime: new Date(startDate * 1000),
 			                   endTime: new Date(endDate * 1000),
 							   mediaType: mediaType
@@ -374,7 +374,7 @@
 			$.getJSON(fullUrl, function(data) {
 				graphData = data[0];
 
-				gTimeline = $.timeline({categoryId: gCategoryId,
+				gTimeline = $.timeline("<?php echo $graph_id;?>",{categoryId: gCategoryId,
 					startTime: new Date(startDate * 1000),
 				    endTime: new Date(endDate * 1000), mediaType: gMediaType,
 					markerOptions: gMarkerOptions,

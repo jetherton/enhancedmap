@@ -12,8 +12,8 @@
 
 (function($) { // hide the namespace
 
-	function Timeline(options) {
-		this.elementId = 'graph';
+	function Timeline(divId, options) {
+		this.elementId = divId;
 		this.categoryId = '0';
 		this.startTime = null; //new Date(new Date().getFullYear() + '/01/01');
 		this.endTime = null; //new Date(this.startTime.getFullYear() + '/12/31');
@@ -835,9 +835,9 @@
 		};
 	}  
 
-	$.timeline = function(options)
+	$.timeline = function(div, options)
 	{
-		timeline = new Timeline(options);
+		timeline = new Timeline(div, options);
 		return timeline;
 	};
 	

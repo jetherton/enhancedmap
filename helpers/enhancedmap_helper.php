@@ -249,6 +249,7 @@ class enhancedmap_helper_Core {
 		}
 		
 		$themes->js = new View($javascript_view);
+		$themes->js->graph_id = $graph_id;
 		$themes->js->map_id = $map_id;
 		$themes->js->urlParams = $urlParams;
 		$themes->js->default_map = Kohana::config('settings.default_map');
