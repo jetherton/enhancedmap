@@ -83,15 +83,13 @@
 
 		
 		// Map JS
-		var featureSelectionEventRegistrants = new Array();
-		var featureUnSelectionEventRegistrants = new Array();
-		var categoryChangeEventRegistrants = new Array();
+
 		//number of categories selcted
 		var numOfCategoriesSelected = 0;
 		//Max number of categories to show at once, if you have more than 1000 reports with lots of categories you might want to turn this down
 		var maxCategories = 14;
 		// Map Object
-		var map;
+		var map;		
 		// Selected Category
 		var gCategoryId = ['0']; //default to all
 		// color the reports who's status is unapproved black?
@@ -250,9 +248,9 @@
 				            feature.popup = null;
 				            
 				            
-							for(i in featureUnSelectionEventRegistrants)
+							for(i in map.featureUnSelectionEventRegistrants)
 							{
-								var func = featureUnSelectionEventRegistrants[i];
+								var func = map.featureUnSelectionEventRegistrants[i];
 								func(feature);
 							}});
 			event.feature.popup = popup;
@@ -260,9 +258,9 @@
 			
 			//let other JS items know that there was a feature select
 			
-			for(i in featureSelectionEventRegistrants)
+			for(i in map.featureSelectionEventRegistrants)
 			{
-				var func = featureSelectionEventRegistrants[i];
+				var func = map.featureSelectionEventRegistrants[i];
 				func(selectedFeature);
 			}
 		}
@@ -278,9 +276,9 @@
             event.feature.popup = null;
             
             
-			for(i in featureUnSelectionEventRegistrants)
+			for(i in map.featureUnSelectionEventRegistrants)
 			{
-				var func = featureUnSelectionEventRegistrants[i];
+				var func = map.featureUnSelectionEventRegistrants[i];
 				func(event.feature);
 			}
 			*/
@@ -505,6 +503,10 @@
 				'theme': null
 				};
 			map = new OpenLayers.Map('<?php echo $map_id; ?>', options);
+			//the Enhanced map event system
+			map.featureSelectionEventRegistrants = new Array();
+			map.featureUnSelectionEventRegistrants = new Array();
+			map.categoryChangeEventRegistrants = new Array();
 			map.addControl( new OpenLayers.Control.LoadingPanel({minSize: new OpenLayers.Size(573, 366)}) );
 			
 			<?php echo map::layers_js(FALSE); ?>
@@ -677,9 +679,9 @@
 				var endTime = new Date($("#endDate").val() * 1000);
 				
 				//notify those who are registered
-				for(i in categoryChangeEventRegistrants)
+				for(i in map.categoryChangeEventRegistrants)
 				{
-					var func = categoryChangeEventRegistrants[i];
+					var func = map.categoryChangeEventRegistrants[i];
 					func(gCategoryId);
 				}
 				
@@ -1034,72 +1036,74 @@
 					gMap.getCenter(),null,null,null,null,"json");
 				gTimeline.playOrPause('raindrops');
 			});
-		});
-
+			
+			
+						
+			
 		
 		/*This function is used to register event handlers for feature selection*/
-		function registerMapFeatureSelectionHandler(func)
+		map.registerMapFeatureSelectionHandler = function(func)
 		{
-			featureSelectionEventRegistrants.push(func);
+			this.featureSelectionEventRegistrants.push(func);
 		}
 		
 		/*This is used to unregister event handlers for feature selection*/
-		function unregisterMapFeatureSelectionHandler(func)
+		map.unregisterMapFeatureSelectionHandler = function (func)
 		{
 			var tempArray = new Array();
-			for(i in featureSelectionEventRegistrants)
+			for(i in this.featureSelectionEventRegistrants)
 			{
-				var t = featureSelectionEventRegistrants[i];
+				var t = this.featureSelectionEventRegistrants[i];
 				if(t != func)
 				{
 					tempArray.push(t);
 				}
 			}
-			featureSelectionEventRegistrants = tempArray;
+			this.featureSelectionEventRegistrants = tempArray;
 		}
 		
 		/*This function is used to register event handlers for feature unselection*/
-		function registerMapFeatureUnSelectionHandler(func)
+		map.registerMapFeatureUnSelectionHandler = function (func)
 		{
-			featureUnSelectionEventRegistrants.push(func);
+			this.featureUnSelectionEventRegistrants.push(func);
 		}
 		
 		/*This is used to unregister event handlers for feature unselection*/
-		function unregisterMapFeatureUnSelectionHandler(func)
+		map.unregisterMapFeatureUnSelectionHandler = function (func)
 		{
 			var tempArray = new Array();
-			for(i in featureUnSelectionEventRegistrants)
+			for(i in this.featureUnSelectionEventRegistrants)
 			{
-				var t = featureUnSelectionEventRegistrants[i];
+				var t = this.featureUnSelectionEventRegistrants[i];
 				if(t != func)
 				{
 					tempArray.push(t);
 				}
 			}
-			featureUnSelectionEventRegistrants = tempArray;
+			this.featureUnSelectionEventRegistrants = tempArray;
 		}
 		
 		
 		
 		/*This function is used to register event handlers for category changes events*/
-		function registerCategoryChangeHandler(func)
+		map.registerCategoryChangeHandler = function (func)
 		{
-			categoryChangeEventRegistrants.push(func);
+			this.categoryChangeEventRegistrants.push(func);
 		}
 		
 		/*This is used to unregister event handlers for category change events*/
-		function unregisterCategoryChangeHandler(func)
+		map.unregisterCategoryChangeHandler = function (func)
 		{
 			var tempArray = new Array();
-			for(i in categoryChangeEventRegistrants)
+			for(i in this.categoryChangeEventRegistrants)
 			{
-				var t = categoryChangeEventRegistrants[i];
+				var t = this.categoryChangeEventRegistrants[i];
 				if(t != func)
 				{
 					tempArray.push(t);
 				}
 			}
-			categoryChangeEventRegistrants = tempArray;
+			this.categoryChangeEventRegistrants = tempArray;
 		}
 		
 		
@@ -1108,7 +1112,7 @@
 		/**
 		 * creates an array that maps incident ids to markers
 		 */
-		function mapIncidentsToMarkers(markers)
+		map.mapIncidentsToMarkers = function (markers)
 		{
 			//zero out the old array
 			var incidentsToMarkers = new Array();
@@ -1130,4 +1134,7 @@
 			return incidentsToMarkers;
 			
 		}		
+			
+			
+		});
 
