@@ -144,7 +144,23 @@
 							<span class="sel-holder">
 								<?php print form::dropdown('show_hidden_categories_backend', $yesno_array, $form['show_hidden_categories_backend']); ?>
 							</span>
-						</div>					
+						</div>		
+						
+						<div class="row">
+							<h4>
+								<a href="#" class="tooltip" title="<?php echo Kohana::lang("enhancedmap.color_options_description"); ?>">
+									<?php echo Kohana::lang('enhancedmap.color_options');?>
+								</a>
+							</h4>
+								<?php
+									print form::radio('color_mode', 'merge_all', $form['color_mode'] == 'merge_all');
+									print form::label('color_mode', Kohana::lang("enhancedmap.merge_all_description") ).'<br />';
+									print form::radio('color_mode', 'highest_first', $form['color_mode'] == 'highest_first');
+									print form::label('color_mode', Kohana::lang("enhancedmap.highest_first_description")).'<br />';
+
+									
+								?>
+						</div>			
 						
 						
 					<div class="simple_border"></div>

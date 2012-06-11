@@ -83,7 +83,13 @@
 	'enhancedmap_settings'=>'Enhanced Map Settings',
 	
 	'adminmap_width_required'=>'Width of Admin Map must not be empty',
-	'adminmap_height_required'=>'Height of Admin Map must not be empty'
+	'adminmap_height_required'=>'Height of Admin Map must not be empty',
+	
+	'color_options_description'=>'Determines how the dots of the map are colored when more than one category is being used as a filter.',
+	'color_options'=>'How should the dots be colored',
+	
+	'merge_all_description'=>' <strong>Merge all.</strong> All the colors of the selected categories will be merged together for the resultant color of all dots. Lowest database load.',
+	'highest_first_description'=>' <strong>Highest takes precedence</strong>. Colors will be assigned per dot, with the higest ranking category taking precedence. Highest database load.',
 	
 	
 

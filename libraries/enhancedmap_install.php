@@ -116,6 +116,17 @@ class Enhancedmap_Install {
 			$frontend->save();
 		}
 		
+		//configure how the colors are rendered when workingg from two or more categories
+		if(!ORM::factory('enhancedmap_settings')->where('key', 'color_mode')->find()->loaded)
+		{
+			$frontend = ORM::factory('enhancedmap_settings');
+			$frontend->key = 'color_mode';
+			$frontend->value = 'merge_all';
+			$frontend->save();
+		}
+		
+ 
+		
 		
 	}
 

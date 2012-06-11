@@ -792,6 +792,9 @@ class enhancedmap_helper_Core {
 		$json_item = "";
 		$json_array = array();
 		$geometry_array = array();
+		
+		//get the coloring mode
+		$color_mode = ORM::factory('enhancedmap_settings')->where('key', 'color_mode')->find()->value;
 
 		
 		$icon = "";
@@ -819,17 +822,23 @@ class enhancedmap_helper_Core {
 		$logical_operator = isset($_GET['lo'])  ? intval($_GET['lo']) : 'or';
 		
 		//get color
+		$cat_str = "";//only used by highest first coloring mode
+		$all_categories = false;
   		if(count($category_id) == 1 AND intval($category_id[0]) == 0 )
 		{
 			$colors = array(Kohana::config('settings.default_map_all'));
+			$all_categories = true;
 		}		
 		else 
 		{	
 			//more than one color
-			$colors = array();
+			$colors = array();			
 			foreach($category_id as $cat)
 			{
-				$colors[] = ORM::factory('category', $cat)->category_color;
+				$c = ORM::factory('category', $cat);
+				$colors[$c->category_position] = $c->category_color;
+				if($cat_str != ''){$cat_str .= ',';}
+				$cat_str .= $c->id;
 			}
 		}
 		$color = self::merge_colors($colors);	
@@ -837,6 +846,7 @@ class enhancedmap_helper_Core {
 
 		// Create markers by marrying the locations and incidents
 		$markers = array();
+		$ids_str = ""; //only used in highest first coloring mode
 		foreach ($incidents as $incident)
 		{
 			$markers[] = array(
@@ -846,7 +856,40 @@ class enhancedmap_helper_Core {
 				'longitude' => $incident->longitude,
 				'thumb' => ''
 				);
+			
+			if($color_mode=='highest_first')
+			{
+				if($ids_str != '')
+				{ 
+					$ids_str .= ',';
+				}
+				$ids_str .= $incident->incident_id;
+			}
+			
 		}
+		
+		//if the coloring mode is highest first
+		if($color_mode == 'highest_first' AND !$all_categories)
+		{
+			$position_map = array();
+			$query_str = 'SELECT incident_id, MIN( category.category_position ) AS position
+			FROM  `incident_category`
+			JOIN category ON incident_category.category_id = category.id
+			WHERE incident_id IN ('.$ids_str.')
+			AND category_id IN ('.$cat_str.')
+			GROUP BY incident_category.incident_id
+			ORDER BY incident_category.incident_id';
+			
+			$results = $db->query($query_str);
+				
+			//now build the map
+			foreach($results as $r)
+			{
+				$position_map[$r->incident_id] = $r->position;
+			}
+		}
+		
+		
 
 		$clusters = array();	// Clustered
 		$singles = array();		// Non Clustered
@@ -856,6 +899,15 @@ class enhancedmap_helper_Core {
 		{
 			$marker	 = array_pop($markers);
 			$cluster = array();
+			$cluster_data = array();			
+			$min_position = 9000000;
+			$south = 0;
+			$north = 0;
+			$east = 0;
+			$west = 0;
+			$lat_sum = 0;
+			$lon_sum = 0;
+			$id_str = "";
 
 			// Compare marker against all remaining markers.
 			foreach ($markers as $key => $target)
@@ -869,6 +921,61 @@ class enhancedmap_helper_Core {
 					unset($markers[$key]);
 					$target['distance'] = $pixels;
 					$cluster[] = $target;
+					
+					if($id_str != "")
+					{
+						$id_str .= ",";
+					}
+					$id_str .= $target['id'];
+					
+					if (!$south)
+					{
+						$south = $target['latitude'];
+					}
+					elseif ($target['latitude'] < $south)
+					{
+						$south = $target['latitude'];
+					}
+					
+					if (!$west)
+					{
+						$west = $target['longitude'];
+					}
+					elseif ($target['longitude'] < $west)
+					{
+						$west = $target['longitude'];
+					}
+					
+					if (!$north)
+					{
+						$north = $target['latitude'];
+					}
+					elseif ($target['latitude'] > $north)
+					{
+						$north = $target['latitude'];
+					}
+					
+					if (!$east)
+					{
+						$east = $target['longitude'];
+					}
+					elseif ($target['longitude'] > $east)
+					{
+						$east = $target['longitude'];
+					}
+					
+					$lat_sum += $target['latitude'];
+					$lon_sum += $target['longitude'];
+						
+					
+					//only if we're in the highes first color mode, do we keep track of the lowest position in a cluster
+					if($color_mode == 'highest_first' AND !$all_categories)
+					{
+						if($min_position > $position_map[$target['id']])
+						{
+							$min_position = $position_map[$target['id']];
+						}
+					}
 				}
 			}
 
@@ -876,7 +983,73 @@ class enhancedmap_helper_Core {
 			if (count($cluster) > 0)
 			{
 				$cluster[] = $marker;
-				$clusters[] = $cluster;
+				
+				//one last time setup everything
+				if($id_str != "")
+				{
+					$id_str .= ",";
+				}
+				$id_str .= $marker['id'];
+					
+				if (!$south)
+				{
+					$south = $marker['latitude'];
+				}
+				elseif ($marker['latitude'] < $south)
+				{
+					$south = $marker['latitude'];
+				}
+					
+				if (!$west)
+				{
+					$west = $marker['longitude'];
+				}
+				elseif ($marker['longitude'] < $west)
+				{
+					$west = $marker['longitude'];
+				}
+					
+				if (!$north)
+				{
+					$north = $marker['latitude'];
+				}
+				elseif ($marker['latitude'] > $north)
+				{
+					$north = $marker['latitude'];
+				}
+					
+				if (!$east)
+				{
+					$east = $marker['longitude'];
+				}
+				elseif ($marker['longitude'] > $east)
+				{
+					$east = $marker['longitude'];
+				}
+					
+				$lat_sum += $marker['latitude'];
+				$lon_sum += $marker['longitude'];
+				
+					
+			
+				
+				$cluster_data = array('count'=>count($cluster), 
+										'ids'=>$id_str,
+										'center' => ($lon_sum/count($cluster)).",".($lat_sum/count($cluster)),
+										'sw' => $west.",".$south,
+										'ne' => $east.",".$north);									
+				
+				//only if we're in the highes first color mode, do we keep track of the lowest position in a cluster
+				if($color_mode == 'highest_first' AND !$all_categories)
+				{
+					if($min_position > $position_map[$marker['id']])
+					{
+						$min_position = $position_map[$marker['id']];
+					}
+					$cluster_data['min_position'] = $min_position;
+				}
+				
+				$clusters[] = $cluster_data;
 			}
 			else
 			{
@@ -897,25 +1070,17 @@ class enhancedmap_helper_Core {
 		foreach ($clusters as $cluster)
 		{
 			// Calculate cluster center
-			$bounds = self::_calculateCenter($cluster);
-			$cluster_center = $bounds['center'];
-			$southwest = $bounds['sw'];
-			$northeast = $bounds['ne'];
+			
+			$cluster_center = $cluster['center'];
+			$southwest = $cluster['sw'];
+			$northeast = $cluster['ne'];
 
 			// Number of Items in Cluster
-			$cluster_count = count($cluster);
+			$cluster_count = $cluster['count'];
+			//id string					
+			$id_str = $cluster['ids'];
 			
-			//id string
-			$id_str = "";
-			foreach($cluster as $c)
-			{
-				if($id_str != "")
-				{
-					$id_str .= ",";
-				}
-				$id_str .= $c['id'];
-			}
-		
+			$dot_color = ($color_mode == 'highest_first' AND !$all_categories) ? $colors[$cluster['min_position']] : $color;
 			
 			// Build out the JSON string
 			$json_item = "{";
@@ -925,7 +1090,7 @@ class enhancedmap_helper_Core {
 				 . "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " Reports</a>")) . "\",";
 			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix. "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast."\", ";
 			$json_item .= "\"category\":[0], ";
-			$json_item .= "\"color\": \"".$color."\", ";
+			$json_item .= "\"color\": \"".$dot_color."\", ";
 			$json_item .= "\"icon\": \"".$icon."\", ";
 			$json_item .= "\"ids\": [".$id_str."], ";
 			$json_item .= "\"thumb\": \"\", ";
@@ -943,6 +1108,8 @@ class enhancedmap_helper_Core {
 
 		foreach ($singles as $single)
 		{
+			$dot_color = ($color_mode == 'highest_first' AND !$all_categories) ? $colors[$position_map[$single['id']]] : $color;
+			
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
@@ -950,7 +1117,7 @@ class enhancedmap_helper_Core {
 					. "reports/".$view_or_edit."/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "\",";
 			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$single['id']."\", ";
 			$json_item .= "\"category\":[0], ";
-			$json_item .= "\"color\": \"".$color."\", ";
+			$json_item .= "\"color\": \"".$dot_color."\", ";
 			$json_item .= "\"icon\": \"".$icon."\", ";
 			// $json_item .= "\"thumb\": \"".$single['thumb']."\", ";
 			$json_item .= "\"timestamp\": \"0\", ";

@@ -103,6 +103,10 @@ class Enhancedmap_settings_Controller extends Admin_Controller
 				$setting = ORM::factory('enhancedmap_settings')->where('key', 'show_hidden_categories_backend')->find();
 				$setting->value = $post->show_hidden_categories_backend;
 				$setting->save();	
+				
+				$setting = ORM::factory('enhancedmap_settings')->where('key', 'color_mode')->find();
+				$setting->value = $post->color_mode;
+				$setting->save();
 
 				$form = $_POST;
 				
@@ -143,6 +147,8 @@ class Enhancedmap_settings_Controller extends Admin_Controller
 			$form['show_unapproved_frontend'] = ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_frontend')->find()->value;
 			//Show hidden categories on the backend
 			$form['show_hidden_categories_backend'] = ORM::factory('enhancedmap_settings')->where('key', 'show_hidden_categories_backend')->find()->value;
+			//set the color mode
+			$form['color_mode'] = ORM::factory('enhancedmap_settings')->where('key', 'color_mode')->find()->value;
 		}		
 		
 		
