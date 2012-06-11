@@ -76,7 +76,7 @@ class Enhancedmap_Install {
 		{
 			$frontend = ORM::factory('enhancedmap_settings');
 			$frontend->key = 'adminmap_height';
-			$frontend->value = '500px';
+			$frontend->value = 'other';
 			$frontend->save();
 		}
 		
@@ -85,7 +85,7 @@ class Enhancedmap_Install {
 		{
 			$frontend = ORM::factory('enhancedmap_settings');
 			$frontend->key = 'adminmap_width';
-			$frontend->value = '100%';
+			$frontend->value = 'other';
 			$frontend->save();
 		}
 		

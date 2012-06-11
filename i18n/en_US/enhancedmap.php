@@ -66,10 +66,10 @@
 	'enable_adminmap_description'=>'Chosing \'Yes\' will cause a \'Admin Map\' menu item to appear on the back end. If you choose \'No\' both the menu item and the Admin Map page will be disabled. <br/> <br/> By default the Admin Map is enabled.',
 	
 	'adminmap_height'=>'Height of Admin Map',
-	'adminmap_height_description'=>'Sets the height of the Admin Map. Use CSS notation. If you want 3rd party CSS to determine the sizing set the value to \'other\'<br/><br/>By default the Admin Map height is set to 500px',
+	'adminmap_height_description'=>'Sets the height of the Admin Map. Use CSS notation. If you want 3rd party CSS to determine the sizing set the value to \'other\'<br/><br/>By default the Admin Map height is set to \'other\'',
 	
 	'adminmap_width'=>'Width of Admin Map',
-	'adminmap_width_description'=>'Sets the width of the Admin Map. Use CSS notation. If you want 3rd party CSS to determine the sizing set the value to \'other\'<br/><br/>By default the Admin Map height is set to 100%',
+	'adminmap_width_description'=>'Sets the width of the Admin Map. Use CSS notation. If you want 3rd party CSS to determine the sizing set the value to \'other\'<br/><br/>By default the Admin Map height is set to \'other\'',
 	
 	'show_unapproved_backend'=>'Allow users to see unapproved reports on the back end',
 	'show_unapproved_backend_description'=>'Chosing \'Yes\' will allow users on the back end to see unapproved reports on the map.<br/><br/>By default this is enabled.',
