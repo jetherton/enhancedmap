@@ -541,10 +541,17 @@ class enhancedmap_helper_Core {
 		$link_target = "_self",
 		$link_path_prefix = '')
 	{
+		
+		// Database
+		$db = new Database();
+		
 		$json = "";
 		$json_item = "";
 		$json_array = array();		
 		$icon = "";
+		
+		//get the coloring mode
+		$color_mode = ORM::factory('enhancedmap_settings')->where('key', 'color_mode')->find()->value;
 
 		$media_type = (isset($_GET['m']) AND intval($_GET['m']) > 0)? intval($_GET['m']) : 0;
 		
@@ -552,9 +559,12 @@ class enhancedmap_helper_Core {
 		$category_id = (isset($_GET['c']) AND is_array($_GET['c']))? $_GET['c'] : array('0');
 		$incident_id = (isset($_GET['i']) AND intval($_GET['i']) > 0)? intval($_GET['i']) : 0;
 		// Get the category colour
+		$cat_str = "";//only used by highest first coloring mode
+		$all_categories = false;
 		if(count($category_id) == 1 AND intval($category_id[0]) == 0 )
 		{
 			$colors = array(Kohana::config('settings.default_map_all'));
+			$all_categories = true;
 		}
 		
 		else 
@@ -563,7 +573,10 @@ class enhancedmap_helper_Core {
 			$colors = array();
 			foreach($category_id as $cat)
 			{
-				$colors[] = ORM::factory('category', $cat)->category_color;
+				$c = ORM::factory('category', $cat);
+				$colors[$c->category_position] = $c->category_color;
+				if($cat_str != ''){$cat_str .= ',';}
+				$cat_str .= $c->id;
 			}			
 		}
 		$color = self::merge_colors($colors);	
@@ -579,6 +592,38 @@ class enhancedmap_helper_Core {
 		
 		// Fetch the incidents
 		$markers = (isset($_GET['page']) AND intval($_GET['page']) > 0)? reports::fetch_incidents(TRUE) : reports::fetch_incidents();
+		
+		//only do this if highest_first
+		$position_map = array();
+		if($color_mode=='highest_first'  AND !$all_categories)
+		{
+			$ids_str = ""; //only used in highest first coloring mode
+			foreach ($markers as $incident)
+			{
+				if($ids_str != '')
+				{
+					$ids_str .= ',';
+				}
+				$ids_str .= $incident->incident_id;						
+			}
+			
+			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'category.category_position ) AS position
+			FROM  `'.self::$table_prefix.'incident_category`
+			JOIN '.self::$table_prefix.'category ON '.self::$table_prefix.'incident_category.category_id = '.self::$table_prefix.'category.id
+			WHERE incident_id IN ('.$ids_str.')
+			AND category_id IN ('.$cat_str.')
+			GROUP BY '.self::$table_prefix.'incident_category.incident_id
+			ORDER BY '.self::$table_prefix.'incident_category.incident_id';
+				
+			$results = $db->query($query_str);
+			
+			//now build the map
+			foreach($results as $r)
+			{
+				$position_map[$r->incident_id] = $r->position;
+			}	
+		}
+		
 		
 		// Variable to store individual item for report detail page
 		$json_item_first = "";	
@@ -621,8 +666,10 @@ class enhancedmap_helper_Core {
 			$json_item .= (isset($category))
 				? "\"category\":[" . $category_id . "], "
 				: "\"category\":[0], ";
+			
+			$dot_color = ($color_mode == 'highest_first' AND !$all_categories) ? $colors[$position_map[$marker->incident_id]] : $color; 
 
-			$json_item .= "\"color\": \"".$color."\", \n";
+			$json_item .= "\"color\": \"".$dot_color."\", \n";
 			$json_item .= "\"icon\": \"".$icon."\", \n";
 			$json_item .= "\"ids\": [".$marker->incident_id."], ";
 			$json_item .= "\"thumb\": \"".$thumb."\", \n";
@@ -857,7 +904,7 @@ class enhancedmap_helper_Core {
 				'thumb' => ''
 				);
 			
-			if($color_mode=='highest_first')
+			if($color_mode=='highest_first'  AND !$all_categories)
 			{
 				if($ids_str != '')
 				{ 
@@ -872,13 +919,13 @@ class enhancedmap_helper_Core {
 		if($color_mode == 'highest_first' AND !$all_categories)
 		{
 			$position_map = array();
-			$query_str = 'SELECT incident_id, MIN( category.category_position ) AS position
-			FROM  `incident_category`
-			JOIN category ON incident_category.category_id = category.id
+			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'category.category_position ) AS position
+			FROM  `'.self::$table_prefix.'incident_category`
+			JOIN '.self::$table_prefix.'category ON '.self::$table_prefix.'incident_category.category_id = '.self::$table_prefix.'category.id
 			WHERE incident_id IN ('.$ids_str.')
 			AND category_id IN ('.$cat_str.')
-			GROUP BY incident_category.incident_id
-			ORDER BY incident_category.incident_id';
+			GROUP BY '.self::$table_prefix.'incident_category.incident_id
+			ORDER BY '.self::$table_prefix.'incident_category.incident_id';
 			
 			$results = $db->query($query_str);
 				
