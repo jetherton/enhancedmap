@@ -82,21 +82,37 @@ class enhancedmap_helper_Core {
 	public static function set_shares($on_backend = false, $show_on_load = false,
 			$shares_filter_view = 'enhancedmap/shares_filter', $shares_filter_id = "shares_filter")
 	{
-	
-		$shares = array();
-		foreach (ORM::factory('sharing')
-				->where('sharing_active', 1)
-				->find_all() as $share)
-		{
-			$shares[$share->id] = array($share->sharing_name, $share->sharing_color);
-		}
-
-		$view = new View($shares_filter_view);
-		$view->share_id = $shares_filter_id;
-		$view->show_on_load = $show_on_load;
-		$view->shares = $shares;
 		
-		return $view;
+		//first of all make sure sharing is turned on.
+		$db = new Database();
+		
+		$result = $db->query('SHOW TABLES LIKE \''.self::$table_prefix.'sharing\'');
+		$table_exists = false;
+		foreach($result as $r)
+		{
+			$table_exists = true;
+		}
+		
+		
+		if($table_exists)
+		{	
+			$shares = array();
+			foreach (ORM::factory('sharing')
+					->where('sharing_active', 1)
+					->find_all() as $share)
+			{
+				$shares[$share->id] = array($share->sharing_name, $share->sharing_color);
+			}
+	
+			$view = new View($shares_filter_view);
+			$view->share_id = $shares_filter_id;
+			$view->show_on_load = $show_on_load;
+			$view->shares = $shares;
+			return $view;
+		}
+		return "";
+		
+		
 	}
 	
 	
