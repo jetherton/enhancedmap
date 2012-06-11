@@ -1234,6 +1234,9 @@ class enhancedmap_helper_Core {
     {
     	$category_ids = array('0');
     	
+    	//get the coloring mode
+    	$color_mode = ORM::factory('enhancedmap_settings')->where('key', 'color_mode')->find()->value;
+    	
     	if (isset($_GET['c']) AND is_array($_GET['c']))
     	{
     		$category_ids = array();
@@ -1282,11 +1285,13 @@ class enhancedmap_helper_Core {
 
 	
         //more than one color
-    	if(count($category_ids) == 1 AND intval($category_ids[0]) == 0 )
+        $color = Kohana::config('settings.default_map_all');
+        
+    	if($is_all_categories)
 		{
-			$colors = array(Kohana::config('settings.default_map_all'));
+			
 		}		
-		else 
+		else if($color_mode == 'merge_all')
 		{	
 			//more than one color
 			$colors = array();
@@ -1294,8 +1299,24 @@ class enhancedmap_helper_Core {
 			{
 				$colors[] = ORM::factory('category', $cat)->category_color;
 			}
-		}	
-		$color = self::merge_colors($colors);
+			
+			$color = self::merge_colors($colors);
+		}
+		else if($color_mode == 'highest_first')
+		{
+			$highest_color = null;			
+			foreach($category_ids as $cat)
+			{
+				$c = ORM::factory('category', $cat);
+				if($highest_color == null OR $highest_color->category_position > $c->category_position)
+				{
+					$highest_color = $c;
+				}
+			}
+			
+			$color = $highest_color->category_color;
+		}
+		
 	
         $graph_data = array();
         $graph_data[0] = array();
