@@ -379,6 +379,7 @@ function changeTopBottom(direction)
 			$view->marker_opacity = $marker_opacity;
 			$view->active_startDate = $active_startDate;
 			$view->active_endDate = $active_endDate;
+			$view->graph_id = $graph_id;
 			if(isset($urlParams))
 			{
 					$view->urlParams = $urlParams;
