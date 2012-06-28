@@ -611,7 +611,7 @@ class enhancedmap_helper_Core {
 		
 		//only do this if highest_first
 		$position_map = array();
-		if($color_mode=='highest_first'  AND !$all_categories)
+		if($color_mode=='highest_first'  AND !$all_categories AND count($markers) > 0)
 		{
 			$ids_str = ""; //only used in highest first coloring mode
 			foreach ($markers as $incident)
@@ -622,6 +622,7 @@ class enhancedmap_helper_Core {
 				}
 				$ids_str .= $incident->incident_id;						
 			}
+			
 			
 			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'category.category_position ) AS position
 			FROM  `'.self::$table_prefix.'incident_category`
