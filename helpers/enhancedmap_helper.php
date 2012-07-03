@@ -623,6 +623,7 @@ class enhancedmap_helper_Core {
 				$ids_str .= $incident->incident_id;						
 			}
 			
+			
 			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'category.category_position ) AS position
 			FROM  `'.self::$table_prefix.'incident_category`
 			JOIN '.self::$table_prefix.'category ON '.self::$table_prefix.'incident_category.category_id = '.self::$table_prefix.'category.id

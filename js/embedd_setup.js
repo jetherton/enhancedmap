@@ -12,6 +12,7 @@ $(document).ready(function(){
 	adminmap_embed_count++;
 	if( adminmap_embed_count == 1)
 	{
+		var baseUrl = $("#base_url").text();
 		$.get(baseUrl + 'iframemap/setup', 
 				function(data){			
 					$("#map").before(data);				
