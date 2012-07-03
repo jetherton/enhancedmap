@@ -611,7 +611,7 @@ class enhancedmap_helper_Core {
 		
 		//only do this if highest_first
 		$position_map = array();
-		if($color_mode=='highest_first'  AND !$all_categories)
+		if($color_mode=='highest_first'  AND !$all_categories AND $markers->count() > 0)
 		{
 			$ids_str = ""; //only used in highest first coloring mode
 			foreach ($markers as $incident)
@@ -642,10 +642,10 @@ class enhancedmap_helper_Core {
 		
 		
 		// Variable to store individual item for report detail page
-		$json_item_first = "";	
+		$json_item_first = "";
+		
 		foreach ($markers as $marker)
 		{
-			
 			$thumb = "";
 			if ($media_type == 1)
 			{
@@ -683,7 +683,7 @@ class enhancedmap_helper_Core {
 				? "\"category\":[" . $category_id . "], "
 				: "\"category\":[0], ";
 			
-			$dot_color = ($color_mode == 'highest_first' AND !$all_categories) ? $colors[$position_map[$marker->incident_id]] : $color; 
+			$dot_color = ($color_mode == 'highest_first' AND !$all_categories AND count($position_map) > 0 AND $markers->count() > 0) ? $colors[$position_map[$marker->incident_id]] : $color; 
 
 			$json_item .= "\"color\": \"".$dot_color."\", \n";
 			$json_item .= "\"icon\": \"".$icon."\", \n";
@@ -714,8 +714,8 @@ class enhancedmap_helper_Core {
 				$json_item = implode(",", $geometry);
 				array_push($json_array, $json_item);
 			}
-			*/
-		}
+			*/			
+		}//end for loop
 		
 		if ($json_item_first)
 		{
@@ -930,9 +930,9 @@ class enhancedmap_helper_Core {
 			}
 			
 		}
-		
+		$position_map = array();
 		//if the coloring mode is highest first
-		if($color_mode == 'highest_first' AND !$all_categories)
+		if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0)
 		{
 			$position_map = array();
 			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'category.category_position ) AS position
@@ -1032,7 +1032,7 @@ class enhancedmap_helper_Core {
 						
 					
 					//only if we're in the highes first color mode, do we keep track of the lowest position in a cluster
-					if($color_mode == 'highest_first' AND !$all_categories)
+					if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0 AND count($position_map) > 0)
 					{
 						if($min_position > $position_map[$target['id']])
 						{
