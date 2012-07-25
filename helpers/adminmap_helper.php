@@ -639,7 +639,7 @@ class adminmap_helper_Core {
 		$json = implode(",", $json_array);
 
 		header('Content-type: application/json; charset=utf-8');
-		$json_controller->template->json = $json;
+		$json_controller->template->json = '{"type":"FeatureCollection","features":['.$json.']}';
 	}
 	
 	
@@ -1033,7 +1033,7 @@ class adminmap_helper_Core {
 		// }
 		
 		header('Content-type: application/json; charset=utf-8');
-        $controller->template->json = $json;
+		$controller->template->json = '{"type":"FeatureCollection","features":['.$json.']}';
 
     }//end cluster method
 	    
