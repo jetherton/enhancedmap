@@ -48,8 +48,12 @@ class enhancedmap {
 			Event::add('ushahidi_action.header_scripts', array($this, '_add_report_filter_js'));
 		}
 
-		//always filter the fetch incidents params
-		Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_logical_operator_filter'));
+		//always filter the fetch incidents params, well don't use it if the high performance version is at play
+		if(Router::$controller != "hpbigmap_json" AND Router::$controller != "hpiframemap_json"
+				AND Router::$controller != "hpadminmap_json")
+		{
+			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_logical_operator_filter'));
+		}
 
 		
 		if(Router::$controller == "adminmap")
