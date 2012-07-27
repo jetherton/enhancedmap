@@ -886,6 +886,7 @@ class enhancedmap_helper_Core {
 		$logical_operator = isset($_GET['lo'])  ? intval($_GET['lo']) : 'or';
 		
 		//get color
+		
 		$cat_str = "";//only used by highest first coloring mode
 		$all_categories = false;
   		if(count($category_id) == 1 AND intval($category_id[0]) == 0 )
@@ -906,7 +907,33 @@ class enhancedmap_helper_Core {
 			}
 		}
 		$color = self::merge_colors($colors);	
+		//if simple groups are involved things get crazy
 		
+		if(isset($_GET['sgid']))
+		{
+			$sg_cat_str = "";//only used by highest first coloring mode
+			$all_categories = false;
+			if(count($category_id) == 1 AND intval(substr($category_id[0],3)) == 0 )
+			{
+				$colors = array(Kohana::config('settings.default_map_all'));
+				$all_categories = true;
+			}
+			else
+			{
+				//more than one color
+				$colors = array();
+				foreach($category_id as $cat)
+				{
+					$c = ORM::factory('simplegroups_category', substr($cat,3));
+					$colors[$c->id] = $c->category_color;
+					if($sg_cat_str != ''){
+						$sg_cat_str .= ',';
+					}
+					$sg_cat_str .= $c->id;
+				}
+			}
+			$color = self::merge_colors($colors);
+		}
 
 		// Create markers by marrying the locations and incidents
 		$markers = array();

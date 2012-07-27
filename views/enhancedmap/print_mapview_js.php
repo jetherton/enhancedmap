@@ -421,22 +421,22 @@ function changeTopBottom(direction)
                 return;
             }
 
-            var extraParams = getUrlStringFromParams();
-           
-            var retval = $.timeline({categoryId: catID,
-                               startTime: new Date(startDate * 1000),
-                               endTime: new Date(endDate * 1000),
-                               mediaType: mediaType
-                              }).addMarkers(
-                                startDate, endDate, gMap.getZoom(),
-                                gMap.getCenter(), thisLayerID, thisLayerType,
-                                thisLayerUrl, thisLayerColor, json_url, extraParams);
+           var extraParams = getUrlStringFromParams();
+			var retVal = $.timeline("<?php echo $graph_id;?>", {categoryId: catID,
+			                   startTime: new Date(startDate * 1000),
+			                   endTime: new Date(endDate * 1000),
+							   mediaType: mediaType
+							  }).addMarkers(
+								startDate, endDate, gMap.getZoom(),
+								gMap.getCenter(), thisLayerID, thisLayerType, 
+								thisLayerUrl, thisLayerColor, json_url, extraParams);
            
             map.updateSize();
-            return retval;                                                            
+            return retVal;                                                            
            
         } 
-
+        
+        	
 
 
 
