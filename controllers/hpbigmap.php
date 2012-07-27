@@ -10,7 +10,7 @@
  * @author     John Etherton <john@ethertontech.com>
  * @package    Admin Map - https://github.com/jetherton/adminmap
  */
-class Bigmap_Controller extends Template_Controller {
+class Hpbigmap_Controller extends Template_Controller {
 
 	public $auto_render = TRUE;
 
@@ -93,7 +93,7 @@ class Bigmap_Controller extends Template_Controller {
     public function index()
     {
     	//set the title of the page
-    	$this->template->header->this_page = 'bigmap';
+    	$this->template->header->this_page = 'hpbigmap';
     	//javascript for the big map special features
 		plugin::add_javascript("adminmap/js/bigmap");
     	
@@ -111,8 +111,8 @@ class Bigmap_Controller extends Template_Controller {
 
 		//get the categories
 		adminmap_helper::set_categories($this, false);
-		$json_url = ($clustering == 1) ? "bigmap_json/cluster" : "bigmap_json";
-		$json_timeline_url = "bigmap_json/timeline/";
+		$json_url = ($clustering == 1) ? "hpbigmap_json/cluster" : "hpbigmap_json";
+		$json_timeline_url = "hpbigmap_json/timeline/";
 		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////

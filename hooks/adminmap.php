@@ -48,9 +48,9 @@ class adminmap {
 			Event::add('ushahidi_action.header_scripts', array($this, '_add_report_filter_js'));
 		}
 		//make sure the filters are in place for these controllers
-		if(Router::$controller == "json" || Router::$controller == "densitymap"|| Router::$controller == "bigmap" || 
-			Router::$controller == 'bigmap_json' || Router::$controller == 'adminmap_json' ||
-			Router::$controller == 'iframemap_json') //any time the map is brought up
+		if(Router::$controller == "json" || Router::$controller == "densitymap"|| Router::$controller == "hpbigmap" || 
+			Router::$controller == 'hpbigmap_json' || Router::$controller == 'hpadminmap_json' ||
+			Router::$controller == 'hpiframemap_json') //any time the map is brought up
 		{
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_logical_operator_filter'));
 		}
@@ -58,7 +58,7 @@ class adminmap {
 		
 		//only add the all reports filter if we're on the back end
 		if((Router::$controller == "reports" AND strpos(url::current(), 'admin/') === 0) OR 
-		   (Router::$controller == "adminmap_json" AND strpos(url::current(), 'admin/') === 0))
+		   (Router::$controller == "hpadminmap_json" AND strpos(url::current(), 'admin/') === 0))
 		{
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_all_reports_filter'));
 		}
@@ -308,14 +308,14 @@ class adminmap {
 	public function _admin_nav_tab()
 	{
 		$tabs = Event::$data;
-		$tabs['adminmap'] = Kohana::lang('adminmap.admin_map_main_menu_tab');
+		$tabs['hpadminmap'] = Kohana::lang('adminmap.admin_map_main_menu_tab');
 		Event::$data = $tabs;
 	}
 	
 	//adds the "Full Screen Map" button on the main page
 	public function _add_big_map_main_button()
 	{
-		echo '<div ><a class="bigmapbutton" style="border:2px solid grey; padding: 2px;" href="'.url::site().'bigmap"> VIEW FULL MAP </a></div>';
+		echo '<div ><a class="bigmapbutton" style="border:2px solid grey; padding: 2px;" href="'.url::site().'hpbigmap"> VIEW FULL MAP </a></div>';
 	}
 	
 	//adds a tab for the big map on the front end
@@ -324,8 +324,8 @@ class adminmap {
 		$this_page = Event::$data;
 		
 		$menu = "";
-		$menu .= "<li><a href=\"".url::site()."bigmap\" ";
-		$menu .= ($this_page == 'bigmap') ? " class=\"active\"" : "";
+		$menu .= "<li><a href=\"".url::site()."hpbigmap\" ";
+		$menu .= ($this_page == 'hpbigmap') ? " class=\"active\"" : "";
 		$menu .= ">". Kohana::lang('adminmap.big_map_main_menu_tab')."</a></li>";
 		echo $menu;
 	}

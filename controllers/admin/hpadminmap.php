@@ -12,7 +12,7 @@
  * @package    Admin Map - https://github.com/jetherton/adminmap
  */
 
-class adminmap_Controller extends Admin_Controller
+class Hpadminmap_Controller extends Admin_Controller
 {
 
 	function __construct()
@@ -40,8 +40,8 @@ class adminmap_Controller extends Admin_Controller
 		
 		//setup the map
 		$clustering = Kohana::config('settings.allow_clustering');
-		$json_url = ($clustering == 1) ? "admin/adminmap_json/cluster" : "admin/adminmap_json";
-		$json_timeline_url = "admin/adminmap_json/timeline/";
+		$json_url = ($clustering == 1) ? "admin/hpadminmap_json/cluster" : "admin/hpadminmap_json";
+		$json_timeline_url = "admin/hpadminmap_json/timeline/";
 		adminmap_helper::set_map($this->template, $this->template, $json_url, $json_timeline_url);
 		
 		//setup the overlays and shares

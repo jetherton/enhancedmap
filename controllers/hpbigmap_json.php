@@ -14,7 +14,7 @@
  * @package    Admin Map - https://github.com/jetherton/adminmap
  */
 
-class Bigmap_json_Controller extends Template_Controller
+class Hpbigmap_json_Controller extends Template_Controller
 {
     public $auto_render = TRUE;
 

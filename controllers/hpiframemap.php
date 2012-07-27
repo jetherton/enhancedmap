@@ -12,7 +12,7 @@
  * @author     John Etherton <john@ethertontech.com>
  * @package    Admin Map - https://github.com/jetherton/adminmap
  */
-class Iframemap_Controller extends Template_Controller {
+class Hpiframemap_Controller extends Template_Controller {
 
 	public $auto_render = TRUE;
 
@@ -97,7 +97,7 @@ class Iframemap_Controller extends Template_Controller {
     	
     	
    	    //set the title of the page
-    	$this->template->header->this_page = 'bigmap';
+    	$this->template->header->this_page = 'hpbigmap';
     	//javascript for the big map special features
 		
     	
@@ -118,8 +118,8 @@ class Iframemap_Controller extends Template_Controller {
 
 		//get the categories
 		adminmap_helper::set_categories($this, false);
-		$json_url = ($clustering == 1) ? "iframemap_json/cluster" : "iframemap_json";
-		$json_timeline_url = "bigmap_json/timeline/";
+		$json_url = ($clustering == 1) ? "hpiframemap_json/cluster" : "hpiframemap_json";
+		$json_timeline_url = "hpbigmap_json/timeline/";
 		
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -145,7 +145,7 @@ class Iframemap_Controller extends Template_Controller {
 	{
 		$this->auto_render = FALSE;
 		$view = View::factory("adminmap/iframemap_setup");
-		$view->html = htmlentities('<iframe src="'. url::base().'iframemap" width="515px" height="430px"></iframe>');
+		$view->html = htmlentities('<iframe src="'. url::base().'hpiframemap" width="515px" height="430px"></iframe>');
 		$view->render(true);
 				
 	}

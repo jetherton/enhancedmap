@@ -275,7 +275,7 @@ function setURL()
 	
 	var embedUrl = "<?php echo url::site();?>";
 	
-	$("#embedMapUrlText").val('<iframe src="' + embedUrl + "iframemap#/?" + $.address.queryString() + '" width="515px" height="430px"></iframe>');
+	$("#embedMapUrlText").val('<iframe src="' + embedUrl + "hpiframemap#/?" + $.address.queryString() + '" width="515px" height="430px"></iframe>');
 	
 	
 }
@@ -412,7 +412,7 @@ function changeTopBottom(direction)
             if(canRedrawMapKey)
             {
             	var currentLogicalOperator = urlParams['lo'];
-                $.get("<?php echo url::site(); ?>printmapkey/getKey/" + catID + "/" + currentLogicalOperator + "/" + startDate + "/" + endDate,
+                $.get("<?php echo url::site(); ?>hpprintmapkey/getKey/" + catID + "/" + currentLogicalOperator + "/" + startDate + "/" + endDate,
                     function(data){
                         $("#key").html(data);                    
                                            
@@ -590,7 +590,7 @@ function changeTopBottom(direction)
 				}
 			}
 			
-			$.get("<?php echo url::site(); ?>printmapkey/getKey/" + 
+			$.get("<?php echo url::site(); ?>hpprintmapkey/getKey/" + 
 				gCategoryId.join(",") + "/" + 
 				$("#currentLogicalOperator").val() + "/" + 
 				$("#startDate").val() + "/" + 

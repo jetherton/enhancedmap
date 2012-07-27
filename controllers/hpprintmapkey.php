@@ -9,7 +9,7 @@
  * @author     John Etherton <john@ethertontech.com>
  * @package    Admin Map - https://github.com/jetherton/adminmap
  */
-class Printmapkey_Controller extends Controller {
+class Hpprintmapkey_Controller extends Controller {
 
 	function getKey($catIds = "0", $logicalOperator = "or", $startDate = "1", $endDate = "2")
 	{

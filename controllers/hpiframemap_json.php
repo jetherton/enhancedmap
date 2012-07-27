@@ -13,7 +13,7 @@
  * @package    Admin Map - https://github.com/jetherton/adminmap
  */
 
-class Iframemap_json_Controller extends Template_Controller
+class Hpiframemap_json_Controller extends Template_Controller
 {
     public $auto_render = TRUE;
 

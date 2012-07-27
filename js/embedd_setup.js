@@ -15,7 +15,7 @@ $(document).ready(function(){
 	adminmap_embed_count++;
 	if( adminmap_embed_count == 1)
 	{
-		$.get(baseUrl + 'iframemap/setup', 
+		$.get(baseUrl + 'hpiframemap/setup', 
 				function(data){			
 					$("#map").before(data);				
 				});

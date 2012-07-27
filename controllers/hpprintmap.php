@@ -9,7 +9,7 @@
  * @author     John Etherton <john@ethertontech.com>
  * @package    Admin Map - https://github.com/jetherton/adminmap
  */
-class Printmap_Controller extends Template_Controller {
+class Hpprintmap_Controller extends Template_Controller {
 
 	public $auto_render = TRUE;
 
@@ -123,8 +123,8 @@ class Printmap_Controller extends Template_Controller {
 			$urlParams = array();
 		}
 		
-		$json_url = ($clustering == 1) ? "bigmap_json/cluster" : "bigmap_json";
-		$json_timeline_url = "bigmap_json/timeline/";
+		$json_url = ($clustering == 1) ? "hpbigmap_json/cluster" : "hpbigmap_json";
+		$json_timeline_url = "hpbigmap_json/timeline/";
 			
 		
 		

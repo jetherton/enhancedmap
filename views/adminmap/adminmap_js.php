@@ -109,7 +109,7 @@
 		// Current json_url, if map is switched dynamically between json and json_cluster
 		var json_url = default_json_url;
 
-		var time_line_url = "<?php echo isset($json_timeline_url) ? $json_timeline_url : 'bigmap_json/timeline/'; ?>";
+		var time_line_url = "<?php echo isset($json_timeline_url) ? $json_timeline_url : 'hpbigmap_json/timeline/'; ?>";
 		
 		// Global list for current KML overlays in display
 		var kmlOverlays = [];
