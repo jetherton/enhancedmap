@@ -1127,8 +1127,122 @@ class adminmap_helper_Core {
         $graph_data[0]['color'] = '#'.$color;
         $graph_data[0]['data'] = array();
 
-		
-	$incidents = reports::fetch_incidents();
+        
+        
+        
+        
+        ////////////////////////////////////////////////////////////////////////////////////
+        //start the process of getting ready to grab incidents
+        ////////////////////////////////////////////////////////////////////////////////////
+        
+        // Get Zoom Level
+        $zoomLevel = (isset($_GET['z']) AND !empty($_GET['z'])) ?
+        (int) $_GET['z'] : 8;
+        
+        //$distance = 60;
+        $distance = (10000000 >> $zoomLevel) / 100000;
+        
+         
+        // Category ID
+        $category_ids = (isset($_GET['c']) AND is_array($_GET['c'])) ? $_GET['c'] : array(0);
+        
+        // Start date
+        $start_date = (isset($_GET['s']) AND intval($_GET['s']) > 0) ? intval($_GET['s']) : NULL;
+        
+        // End date
+        $end_date = (isset($_GET['e']) AND intval($_GET['e']) > 0) ? intval($_GET['e']) : NULL;
+        
+        //Logical operator
+        $logical_operator = isset($_GET['lo'])  ? $_GET['lo'] : 'or';
+        
+        // SouthWest Bound
+        $southwest = (isset($_GET['sw']) AND !empty($_GET['sw'])) ?
+        $_GET['sw'] : "0";
+        
+        $northeast = (isset($_GET['ne']) AND !empty($_GET['ne'])) ?
+        $_GET['ne'] : "0";
+        
+        
+        //approve filter
+        if($on_the_back_end)
+        {
+        	//figure out if we're showing unapproved stuff or what.
+        	if (isset($_GET['u']) AND !empty($_GET['u']))
+        	{
+        		$show_unapproved = (int) $_GET['u'];
+        	}
+        	$approved_text = "";
+        	if($show_unapproved == 1)
+        	{
+        		$approved_text = "incident.incident_active = 1 ";
+        	}
+        	else if ($show_unapproved == 2)
+        	{
+        		$approved_text = "incident.incident_active = 0 ";
+        	}
+        	else if ($show_unapproved == 3)
+        	{
+        		$approved_text = " (incident.incident_active = 0 OR incident.incident_active = 1) ";
+        	}
+        }
+        else
+        {
+        	$approved_text = "incident.incident_active = 1 ";
+        	$show_unapproved = 1;
+        }
+        
+        //get color
+        if(count($category_ids) == 1 AND intval($category_ids[0]) == 0 )
+        {
+        	$colors = array(Kohana::config('settings.default_map_all'));
+        }
+        else
+        {
+        	//more than one color
+        	$colors = array();
+        	foreach($category_ids as $cat)
+        	{
+        		$colors[] = ORM::factory('category', $cat)->category_color;
+        	}
+        }
+        $color = self::merge_colors($colors);
+        
+        //make the filter text
+        $filter = "";
+        $filter .= ($start_date) ?
+        " AND incident.incident_date >= '" . date("Y-m-d H:i:s", $start_date) . "'" : "";
+        $filter .= ($end_date) ?
+        " AND incident.incident_date <= '" . date("Y-m-d H:i:s", $end_date) . "'" : "";
+        
+        if ($southwest AND $northeast)
+        {
+        	list($latitude_min, $longitude_min) = explode(',', $southwest);
+        	list($latitude_max, $longitude_max) = explode(',', $northeast);
+        
+        	$filter .= " AND location.latitude >=".(float) $latitude_min.
+        	" AND location.latitude <=".(float) $latitude_max;
+        	$filter .= " AND location.longitude >=".(float) $longitude_min.
+        	" AND location.longitude <=".(float) $longitude_max;
+        }
+        
+        
+        // Fetch the incidents using the specified parameters
+        $incidents = adminmap_reports::get_reports_list_by_cat($category_ids,
+        		$approved_text. ' ' .$filter ,
+        		$logical_operator,
+        		"incident.id",
+        		"asc");
+        ////////////////////////////////////////////////////////////////////////////////////
+        //dont grabing incidents
+        ////////////////////////////////////////////////////////////////////////////////////
+        
+        
+        
+        
+        
+        
+        
+        
 	
 	
 	$approved_IDs_str = "('-1')";
@@ -1140,7 +1254,7 @@ class adminmap_helper_Core {
 		{
 			$i++;
 			$approved_IDs_str = ($i > 1) ? $approved_IDs_str.', ' : $approved_IDs_str;
-			$approved_IDs_str = $approved_IDs_str."'".$incident->incident_id."'";
+			$approved_IDs_str = $approved_IDs_str."'".$incident->id."'";
 		}
 		$approved_IDs_str = $approved_IDs_str.") ";
 	}
