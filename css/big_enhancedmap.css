@@ -386,6 +386,7 @@ ul.category-filters li ul{
     margin-right: 8px;
     width:16px;
     border:1px solid white;
+    background-image:url(../images/circle.png);
 }
 
 .category-title {
@@ -549,4 +550,8 @@ a.alphabetize_link{
 a.alphabetize_link.active{
 	color:white;
 	background:blue;
+}
+
+.olControlScaleLine{
+	left:80px;
 }

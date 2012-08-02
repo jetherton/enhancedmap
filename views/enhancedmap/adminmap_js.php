@@ -562,7 +562,7 @@
 						{
 							//remove this category ID from the list of IDs to show
 							var idNum = $(this).attr("id").substring(4);
-							removeCategoryFilter(idNum);
+							//removeCategoryFilter(idNum);
 						}
 					});
 					$("#child_"+catID).hide();
@@ -602,18 +602,26 @@
 					//first check and see if we're dealing with a parent category
 					if( $("#child_"+catID).find('a').length > 0)
 					{
-				
-						//we want to deactivate any kid categories.
+						//are we turning the parent on or off?
+						var parentActive = $("#cat_"+catID).hasClass("active");
+						
+						//we want to turn on/off kid categories						
 						var kids = $("#child_"+catID).find('a');
 						kids.each(function(){
-							if($(this).hasClass("active"))
+							
+							var kidNum = $(this).attr("id").substring(4);
+							if(!parentActive)
 							{
-								//remove this category ID from the list of IDs to show
-								var idNum = $(this).attr("id").substring(4);
-								removeCategoryFilter(idNum);
+								$(this).addClass("active");
+
+							}
+							else
+							{
+								removeCategoryFilter(kidNum);
+								$(this).removeClass("active");
 							}
 						});
-					
+															
 					}//end of if for dealing with parents
 					
 					//check if we're dealing with a child
@@ -626,6 +634,13 @@
 						if($("#cat_"+parentID).hasClass("active")) //it is active so make it unactive and remove this category from the list of categories we're looking at.
 						{ 
 							removeCategoryFilter(parentID);
+							//also deactiveate any siblings
+							var kids = $("#child_"+parentID).find('a');
+							kids.each(function(){
+								var kidNum = $(this).attr("id").substring(4);
+								removeCategoryFilter(kidNum);
+								$(this).removeClass("active");
+							});
 						}
 						
 					}//end of dealing with kids
