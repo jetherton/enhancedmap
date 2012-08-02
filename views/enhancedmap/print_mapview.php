@@ -40,6 +40,8 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 			<?php echo $div_boolean_filter; ?>
 			
 			<?php echo $div_dotsize_selector; ?>
+			
+			<?php echo $div_clustering_selector;?>
 		
 			<?php echo $div_categories_filter; ?>
 		

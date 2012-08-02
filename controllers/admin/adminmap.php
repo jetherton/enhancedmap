@@ -54,8 +54,11 @@ class adminmap_Controller extends Admin_Controller
 		//dot size selector
 		$this->template->content->div_dotsize_selector = enhancedmap_helper::get_dotsize_selector();
 		
+		//clustering selector
+		$this->template->content->div_clustering_selector = enhancedmap_helper::get_clustering_selector();
+		
 		//setup the map
-		$clustering = Kohana::config('settings.allow_clustering');
+		$clustering = cookie::get('clustering', Kohana::config('settings.allow_clustering'));
 		$json_url = ($clustering == 1) ? "admin/adminmap_json/cluster" : "admin/adminmap_json";
 		$json_timeline_url = "admin/adminmap_json/timeline/";
 		enhancedmap_helper::set_map($this->template, $this->template, $json_url, $json_timeline_url);

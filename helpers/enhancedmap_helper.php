@@ -379,7 +379,7 @@ class enhancedmap_helper_Core {
 	}
 	
 	/**
-	 * Use this to setup the boolean filter
+	 * Use this to setup the dot size
 	 */
 	public static function get_dotsize_selector($dotsize_selector_view = 'enhancedmap/dotsize_selector', 
 			$dotsize_selector_id = "dot_size_selector")
@@ -392,6 +392,20 @@ class enhancedmap_helper_Core {
 		return $view;
 	}
 	
+	
+	
+	/**
+	 * Use this to setup clustering or no clustering
+	 */
+	public static function get_clustering_selector($clustering_selector_view = 'enhancedmap/clustering_selector',
+			$clustering_selector_id = "cluster_selector")
+	{
+		$view = new View($clustering_selector_view);
+		
+		$view->isClustering = cookie::get('clustering', Kohana::config('settings.allow_clustering'));
+		$view->clustering_selector_id = $clustering_selector_id;
+		return $view;
+	}
 	
 	
 	public static function set_categories($on_backend = false, $group = false, $categories_view = "enhancedmap/categories_filter",

@@ -108,7 +108,7 @@ class Iframemap_Controller extends Template_Controller {
 		$this->template->content->width = $width;		
 		
 		//ARE WE CLUSTERING?
-		$clustering = Kohana::config('settings.allow_clustering');
+		$clustering = cookie::get('clustering', Kohana::config('settings.allow_clustering'));
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////		
 		//get the CATEGORIES

@@ -101,7 +101,7 @@ class Bigmap_Controller extends Template_Controller {
 
 		
 		//ARE WE CLUSTERING?
-		$clustering = Kohana::config('settings.allow_clustering');
+		$clustering = cookie::get('clustering', Kohana::config('settings.allow_clustering'));
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////		
 		//get the CATEGORIES
@@ -119,6 +119,9 @@ class Bigmap_Controller extends Template_Controller {
 		
 		//dot size selector
 		$this->template->content->div_dotsize_selector = enhancedmap_helper::get_dotsize_selector();
+		
+		//clustering selector
+		$this->template->content->div_clustering_selector = enhancedmap_helper::get_clustering_selector();
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the overlays and shares

@@ -1345,7 +1345,36 @@
 			
 					}
 				} //end loop over parentsArray
-			}//end if default ordering
-			
-			
+			}//end if default ordering			
+		}//end of alphabetize
+		
+		
+		
+	function setClustering()
+	{
+		var isClustering = $("#clustering").val();
+		if(isClustering == '1')
+		{
+			//we are clustering
+			json_url = json_url+'/cluster';
 		}
+		else
+		{
+			//we are not clustering
+			json_url = json_url.substr(0, json_url.indexOf('/cluster'));
+		}
+		
+		//get some meta data ready to go
+		var startTime = new Date($("#startDate").val() * 1000);
+		var endTime = new Date($("#endDate").val() * 1000);
+		// Get Current Zoom
+		currZoom = map.getZoom();
+		// Get Current Center
+		currCenter = map.getCenter();
+		
+		//redraw the map
+		addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
+		
+		//set the preferences for this user
+		setCookie('clustering', isClustering, 20);
+	}

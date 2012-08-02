@@ -32,6 +32,8 @@
 			<?php echo $div_boolean_filter;?>
 			
 			<?php echo $div_dotsize_selector;?>
+			
+			<?php echo $div_clustering_selector;?>
 
 			<?php echo $div_category_filter;?>
 		

@@ -99,6 +99,9 @@
 	'exlarge'=>'Extra-Large',
 	
 	'alphabetize'=>'Alphabetize',
+	'clustering'=>'Clustering',
+	'on'=>'On',
+	'off'=>'Off',
 
 );
 	
