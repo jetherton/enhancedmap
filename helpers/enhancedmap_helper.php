@@ -949,6 +949,15 @@ class enhancedmap_helper_Core {
 				$colors[$c->category_position] = $c->category_color;
 				if($cat_str != ''){$cat_str .= ',';}
 				$cat_str .= $c->id;
+				//don't forget the sub cats
+				foreach($c->children as $child)
+				{
+					$colors[$child->category_position] = $child->category_color;
+					if($cat_str != ''){
+						$cat_str .= ',';
+					}
+					$cat_str .= $child->id;
+				}
 			}
 		}
 		$color = self::merge_colors($colors);	
@@ -965,8 +974,6 @@ class enhancedmap_helper_Core {
 			}
 			else
 			{
-				//more than one color
-				$colors = array();
 				foreach($category_id as $cat)
 				{
 					$c = ORM::factory('simplegroups_category', substr($cat,3));
@@ -1007,6 +1014,8 @@ class enhancedmap_helper_Core {
 		//if the coloring mode is highest first
 		if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0)
 		{
+			
+			
 			$position_map = array();
 			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'category.category_position ) AS position
 			FROM  `'.self::$table_prefix.'incident_category`
@@ -1104,7 +1113,7 @@ class enhancedmap_helper_Core {
 					$lon_sum += $target['longitude'];
 						
 					
-					//only if we're in the highes first color mode, do we keep track of the lowest position in a cluster
+					//only if we're in the highest first color mode, do we keep track of the lowest position in a cluster
 					if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0 AND count($position_map) > 0)
 					{
 						if($min_position > $position_map[$target['id']])
@@ -1189,6 +1198,16 @@ class enhancedmap_helper_Core {
 			}
 			else
 			{
+				
+				//only if we're in the highes first color mode, do we keep track of the lowest position in a cluster
+				if($color_mode == 'highest_first' AND !$all_categories)
+				{
+					if($min_position > $position_map[$marker['id']])
+					{
+						$min_position = $position_map[$marker['id']];
+					}
+					$cluster_data['min_position'] = $min_position;
+				}
 				$singles[] = $marker;
 			}
 		}
