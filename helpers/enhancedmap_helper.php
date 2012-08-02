@@ -279,8 +279,9 @@ class enhancedmap_helper_Core {
 		// Map Settings
 		//get the global radius size
 		$global_radius_size = ORM::factory('enhancedmap_settings')->where('key', 'dot_size')->find()->value;
+		$your_radius_size = cookie::get('dot_size', $global_radius_size);
 		$radius = 0;
-		switch(intval($global_radius_size))
+		switch(intval($your_radius_size))
 		{
 			case 1:
 				$radius = 2;
@@ -384,7 +385,9 @@ class enhancedmap_helper_Core {
 			$dotsize_selector_id = "dot_size_selector")
 	{
 		$view = new View($dotsize_selector_view);
-		$view->current_size = ORM::factory('enhancedmap_settings')->where('key','dot_size')->find()->value;
+		$global_radius_size = ORM::factory('enhancedmap_settings')->where('key', 'dot_size')->find()->value;
+		$your_radius_size = cookie::get('dot_size', $global_radius_size);
+		$view->current_size = $your_radius_size;
 		$view->dotsize_selector_id = $dotsize_selector_id;
 		return $view;
 	}
