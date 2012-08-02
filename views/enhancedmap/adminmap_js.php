@@ -1187,3 +1187,150 @@
 			var c_value=escape(value) + ((exdays==null) ? "" : "; expires="+exdate.toUTCString());
 			document.cookie=c_name + "=" + c_value + "; path=/";
 		}
+		
+		var originalListOrder = new Array();
+		var originalListOrderKids = new Array();
+		function alphabetize(filterId)
+		{
+			var sortAlphabetically = !$("#"+filterId+"_alphabetize_link").hasClass('active');
+			if(sortAlphabetically)
+			{
+				$("#"+filterId+"_alphabetize_link").addClass('active');
+				
+				var titleArray = new Array();
+				var elementArray = new Array();
+				var count = 0;
+				var parentsArray = new Array();
+				//gather all the elements up
+				$("ul#"+filterId+" a[id^='cat_']").each(function(index){
+					var element = $(this).parent();
+					count++;
+					//skip this first one, since it's all cats
+					if(count > 1 && $(this).attr("cat_parent") == undefined)
+					{
+						var text = $("div.category-title", this).text() + "_" + $(this).attr("id");
+						titleArray.push(text);
+						originalListOrder.push(text);
+						elementArray[text] = element;
+					}
+					else
+					{
+						parentsArray[$(this).attr("cat_parent")] = $(this).attr("cat_parent");
+					}				
+				});
+				
+				//now sort
+				titleArray.sort();
+				
+				//now go through the elements again
+				for(i in titleArray)
+				{
+					var text = titleArray[i];
+					var element = elementArray[text];
+					//move the element
+					$(element).detach().appendTo("#" + filterId);
+		
+				}
+				
+				//do it all over again for the kids
+				for(i in parentsArray)
+				{
+					var parentId = parentsArray[i];
+					if(parentId == undefined)
+					{
+						continue;
+					}
+					originalListOrderKids[parentId] = new Array();
+					var titleArray = new Array();
+					var elementArray = new Array();
+					//gather all the elements up
+					$("ul#"+filterId+" li div#child_"+parentId+" a[id^='cat_']").each(function(index){
+						var element = $(this).parent();
+						var text = $("div.category-title", this).text() + "_" + $(this).attr("id");
+						titleArray.push(text);
+						elementArray[text] = element;
+						originalListOrderKids[parentId].push(text);
+					});
+					
+					//now sort
+					titleArray.sort();
+					
+					//now go through the elements again
+					for(i in titleArray)
+					{
+						var text = titleArray[i];
+						var element = elementArray[text];
+						//move the element
+						$(element).detach().appendTo("#" + filterId+" div#child_"+parentId+" ul");
+			
+					}
+				} //end loop over parentsArray
+				
+			} //end if alphabetical
+			else
+			{
+				$("#"+filterId+"_alphabetize_link").removeClass('active');
+				
+				//init the array
+				var elementArray = new Array();
+				var parentsArray = new Array();
+				var count = 0;				
+				//gather all the elements up
+				$("ul#"+filterId+" a[id^='cat_']").each(function(index){
+					var element = $(this).parent();
+					count++;
+					//skip this first one, since it's all cats
+					if(count>1 && $(this).attr("cat_parent") == undefined)
+					{
+						var text = $("div.category-title", this).text() + "_" + $(this).attr("id");
+						elementArray[text] = element;
+					}
+					else
+					{
+						parentsArray[$(this).attr("cat_parent")] = $(this).attr("cat_parent");
+					}							
+				});
+
+				//put things back the way they were
+				for(i in originalListOrder)
+				{
+					var text = originalListOrder[i];
+					var element = elementArray[text];
+					//move the element
+					$(element).detach().appendTo("#"+filterId);
+		
+				}//end putting things into the new order
+				
+				
+				//do it all over again for the kids
+				for(i in parentsArray)
+				{
+					var parentId = parentsArray[i];
+					if(parentId == undefined)
+					{
+						continue;
+					}
+				
+					var elementArray = new Array();
+					//gather all the elements up
+					$("ul#"+filterId+" li div#child_"+parentId+" a[id^='cat_']").each(function(index){
+						var element = $(this).parent();
+						var text = $("div.category-title", this).text() + "_" + $(this).attr("id");
+						elementArray[text] = element;
+					});
+					
+					
+					//now go through the elements again
+					for(i in originalListOrderKids[parentId])
+					{
+						var text = originalListOrderKids[parentId][i];
+						var element = elementArray[text];
+						//move the element
+						$(element).detach().appendTo("#" + filterId+" div#child_"+parentId+" ul");
+			
+					}
+				} //end loop over parentsArray
+			}//end if default ordering
+			
+			
+		}

@@ -541,3 +541,12 @@ div.shares_filters_header{
 ul.status-filters, ul.boolean-filters{
 	height:auto;
 }
+
+a.alphabetize_link{
+	padding:3px;
+	
+}
+a.alphabetize_link.active{
+	color:white;
+	background:blue;
+}

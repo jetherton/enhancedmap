@@ -151,6 +151,18 @@ class Bigmap_Controller extends Template_Controller {
 	}//end 
 
 	
+	/**
+	 * Used to set how the category list will be displayed
+	 */
+	public function fitler_cats()
+	{
+		$alphabetize = isset($_GET['alphabetize']);
+		
+		$fitler = enhancedmap_helper::set_categories(false, false, "enhancedmap/categories_filter",
+			"category_switch", $alphabetize );
+
+		$filter->render(true);
+	}
 	
 	
 	

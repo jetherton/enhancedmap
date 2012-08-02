@@ -98,7 +98,7 @@
 	'large'=>'Large',
 	'exlarge'=>'Extra-Large',
 	
-	
+	'alphabetize'=>'Alphabetize',
 
 );
 	

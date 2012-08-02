@@ -395,7 +395,7 @@ class enhancedmap_helper_Core {
 	
 	
 	public static function set_categories($on_backend = false, $group = false, $categories_view = "enhancedmap/categories_filter",
-			$categories_view_id = "category_switch")
+			$categories_view_id = "category_switch", $alphabetize = false)
 	{
 		
 		$view = new View($categories_view);
@@ -429,8 +429,12 @@ class enhancedmap_helper_Core {
 			}
 			$cats = $cats->where('parent_id', '0');
 			$cats = $cats->where('applies_to_report', 1);
-			$cats = $cats->where('simplegroups_groups_id', $group->id)
-				->find_all() ;
+			$cats = $cats->where('simplegroups_groups_id', $group->id);
+			if($alphabetize)
+			{
+				$cats = $cats->orderby('category_title', 'ASC');
+			}			
+			$cats = $cats->find_all() ;
 			foreach ($cats as $category)
 			{				
 				/////////////////////////////////////////////////////////////////////////////////////////////
@@ -490,9 +494,17 @@ class enhancedmap_helper_Core {
 		{	
 			$cats = $cats->where('category_visible', '1');
 		}
-		$cats = $cats->where('parent_id', '0')
-			->orderby('category_position', 'asc')		
-			->find_all() ;
+		$cats = $cats->where('parent_id', '0');
+		if($alphabetize)
+		{
+			$cats = $cats->orderby('category_title', 'ASC');
+		}
+		else 
+		{
+			$cats= $cats->orderby('category_position', 'asc');
+		}		
+		$cats = $cats->find_all();
+		
 		foreach ($cats as $category)
 		{
 			/////////////////////////////////////////////////////////////////////////////////////////////
