@@ -542,3 +542,12 @@ ul.category-filters li ul{
 	background: #ffcccc;
 	}
 	
+
+a.alphabetize_link{
+	padding:3px;
+	
+}
+a.alphabetize_link.active{
+	color:white;
+	background:blue;
+}	
