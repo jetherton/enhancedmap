@@ -277,8 +277,26 @@ class enhancedmap_helper_Core {
 		
 
 		// Map Settings
+		//get the global radius size
+		$global_radius_size = ORM::factory('enhancedmap_settings')->where('key', 'dot_size')->find()->value;
+		$radius = 0;
+		switch(intval($global_radius_size))
+		{
+			case 1:
+				$radius = 2;
+				break;
+			case 2:
+				$radius = 4;
+				break;
+			case 3:
+				$radius = 6;
+				break;
+			case 4:
+				$radius = 8;
+				break;
+		} 
 		$clustering = Kohana::config('settings.allow_clustering');
-		$marker_radius = Kohana::config('map.marker_radius');
+		$marker_radius = $radius; //Kohana::config('map.marker_radius');
 		$marker_opacity = Kohana::config('map.marker_opacity');
 		$marker_stroke_width = Kohana::config('map.marker_stroke_width');
 		$marker_stroke_opacity = Kohana::config('map.marker_stroke_opacity');
@@ -356,6 +374,18 @@ class enhancedmap_helper_Core {
 		$view->on_backend = $on_backend;
 		$view->boolean_filter_id = $boolean_filter_id;
 		$view->show_help = $show_help;
+		return $view;
+	}
+	
+	/**
+	 * Use this to setup the boolean filter
+	 */
+	public static function get_dotsize_selector($dotsize_selector_view = 'enhancedmap/dotsize_selector', 
+			$dotsize_selector_id = "dot_size_selector")
+	{
+		$view = new View($dotsize_selector_view);
+		$view->current_size = ORM::factory('enhancedmap_settings')->where('key','dot_size')->find()->value;
+		$view->dotsize_selector_id = $dotsize_selector_id;
 		return $view;
 	}
 	

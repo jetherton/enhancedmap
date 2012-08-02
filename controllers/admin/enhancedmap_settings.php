@@ -67,47 +67,14 @@ class Enhancedmap_settings_Controller extends Admin_Controller
 			{
 				// Yes! everything is valid
 				//load in the settings from the DB
-				//show big map tab
-				$setting = ORM::factory('enhancedmap_settings')->where('key', 'enable_bigmap')->find();
-				$setting->value = $post->enable_bigmap;
-				$setting->save();
 				
-				$setting = ORM::factory('enhancedmap_settings')->where('key', 'enable_printmap')->find();
-				$setting->value = $post->enable_printmap;
-				$setting->save();
-				
-				$setting = ORM::factory('enhancedmap_settings')->where('key', 'enable_iframemap')->find();
-				$setting->value = $post->enable_iframemap;
-				$setting->save();
-				
-				$setting = ORM::factory('enhancedmap_settings')->where('key', 'enable_adminmap')->find();
-				$setting->value = $post->enable_adminmap;
-				$setting->save();
-				
-				$setting = ORM::factory('enhancedmap_settings')->where('key', 'adminmap_height')->find();
-				$setting->value = $post->adminmap_height;
-				$setting->save();
-				
-				$setting = ORM::factory('enhancedmap_settings')->where('key', 'adminmap_width')->find();
-				$setting->value = $post->adminmap_width;
-				$setting->save();
-				
-				$setting = ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_backend')->find();
-				$setting->value = $post->show_unapproved_backend;
-				$setting->save();
-				
-				$setting = ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_frontend')->find();
-				$setting->value = $post->show_unapproved_frontend;
-				$setting->save();
-				
-				$setting = ORM::factory('enhancedmap_settings')->where('key', 'show_hidden_categories_backend')->find();
-				$setting->value = $post->show_hidden_categories_backend;
-				$setting->save();	
-				
-				$setting = ORM::factory('enhancedmap_settings')->where('key', 'color_mode')->find();
-				$setting->value = $post->color_mode;
-				$setting->save();
-
+				//load up all the settings
+				$settings = ORM::factory('enhancedmap_settings')->find_all();
+				foreach($settings as $setting)
+				{
+					$setting->value = $_POST[$setting->key];
+					$setting->save();
+				}
 				$form = $_POST;
 				
 				$this->template->content->form_saved = true;
@@ -127,28 +94,13 @@ class Enhancedmap_settings_Controller extends Admin_Controller
 		}//end if a post happened
 		else 		//there was no post
 		{
-					
-			//load in the settings from the DB
-			//show big map tab
-			$form['enable_bigmap'] = ORM::factory('enhancedmap_settings')->where('key', 'enable_bigmap')->find()->value;
-			//show print map tab
-			$form['enable_printmap'] = ORM::factory('enhancedmap_settings')->where('key', 'enable_printmap')->find()->value;
-			//show iframe embed code
-			$form['enable_iframemap'] = ORM::factory('enhancedmap_settings')->where('key', 'enable_iframemap')->find()->value;
-			//enable the admin map
-			$form['enable_adminmap'] = ORM::factory('enhancedmap_settings')->where('key', 'enable_adminmap')->find()->value;
-			//admin map height
-			$form['adminmap_height'] = ORM::factory('enhancedmap_settings')->where('key', 'adminmap_height')->find()->value;
-			//admin map width
-			$form['adminmap_width'] = ORM::factory('enhancedmap_settings')->where('key', 'adminmap_width')->find()->value;
-			//Show unapproved reports on the back end
-			$form['show_unapproved_backend'] = ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_backend')->find()->value;
-			//Show unapproved reports on the front end
-			$form['show_unapproved_frontend'] = ORM::factory('enhancedmap_settings')->where('key', 'show_unapproved_frontend')->find()->value;
-			//Show hidden categories on the backend
-			$form['show_hidden_categories_backend'] = ORM::factory('enhancedmap_settings')->where('key', 'show_hidden_categories_backend')->find()->value;
-			//set the color mode
-			$form['color_mode'] = ORM::factory('enhancedmap_settings')->where('key', 'color_mode')->find()->value;
+			
+			//load up all the settings
+			$settings = ORM::factory('enhancedmap_settings')->find_all();
+			foreach($settings as $setting)
+			{
+				$form[$setting->key] = $setting->value;
+			}		
 		}		
 		
 		

@@ -125,6 +125,15 @@ class Enhancedmap_Install {
 			$frontend->save();
 		}
 		
+		//dot sizes
+		if(!ORM::factory('enhancedmap_settings')->where('key', 'dot_size')->find()->loaded)
+		{
+			$frontend = ORM::factory('enhancedmap_settings');
+			$frontend->key = 'dot_size';
+			$frontend->value = '2';
+			$frontend->save();
+		}
+		
  
 		
 		

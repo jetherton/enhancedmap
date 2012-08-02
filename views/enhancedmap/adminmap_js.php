@@ -1138,3 +1138,40 @@
 			
 		});
 
+
+		
+		function setDotSize()
+		{
+			var radiusModifier = $("#dot_size").val();
+			var newRadius = 0;
+			switch(radiusModifier)
+			{
+				case '1':
+				newRadius = '2';
+				break;
+				
+				case '2':
+				newRadius = '4';
+				break;
+				
+				case '3':
+				newRadius = '6';
+				break;
+				
+				case '4':
+				newRadius = '8';
+				break;
+			}
+			//set the marker radius
+			markerRadius = newRadius;
+			//get some meta data ready to go
+			var startTime = new Date($("#startDate").val() * 1000);
+			var endTime = new Date($("#endDate").val() * 1000);
+			// Get Current Zoom
+			currZoom = map.getZoom();
+			// Get Current Center
+			currCenter = map.getCenter();
+			
+			//redraw the map
+			addMarkers(gCategoryId, $("#startDate").val(), $("#endDate").val(), currZoom, currCenter, gMediaType);
+		}

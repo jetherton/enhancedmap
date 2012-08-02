@@ -161,6 +161,24 @@
 									
 								?>
 						</div>			
+							
+						<div class="row">
+							<h4>
+								<a href="#" class="tooltip" title="<?php echo Kohana::lang("enhancedmap.size_of_dots_description"); ?>">
+									<?php echo Kohana::lang('enhancedmap.size_of_dots');?>
+								</a>
+							</h4>
+								<?php
+									$size_array = array('1'=>Kohana::lang('enhancedmap.small'),
+											'2'=>Kohana::lang('enhancedmap.medium'),
+											'3'=>Kohana::lang('enhancedmap.large'),
+											'4'=>Kohana::lang('enhancedmap.exlarge'),
+											);
+									print form::dropdown('dot_size',$size_array, $form['dot_size']);
+									
+								?>
+						</div>			
+						
 						
 						
 					<div class="simple_border"></div>

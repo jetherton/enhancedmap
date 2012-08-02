@@ -116,6 +116,9 @@ class Bigmap_Controller extends Template_Controller {
 		
 		//category filter
 		$this->template->content->div_category_filter = enhancedmap_helper::set_categories(false);
+		
+		//dot size selector
+		$this->template->content->div_dotsize_selector = enhancedmap_helper::get_dotsize_selector();
 
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		//setup the overlays and shares
