@@ -51,6 +51,9 @@ class adminmap_Controller extends Admin_Controller
 		$this->template->content->div_boolean_filter = enhancedmap_helper::get_boolean_filter($on_backend = true,
 				$boolean_filter_view = 'enhancedmap/boolean_filter', $status_filter_id = "boolean_filter", $show_help = false);
 		
+		//dot size selector
+		$this->template->content->div_dotsize_selector = enhancedmap_helper::get_dotsize_selector();
+		
 		//setup the map
 		$clustering = Kohana::config('settings.allow_clustering');
 		$json_url = ($clustering == 1) ? "admin/adminmap_json/cluster" : "admin/adminmap_json";

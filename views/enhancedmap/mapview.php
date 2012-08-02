@@ -22,6 +22,8 @@
 		    
 		    <?php echo $div_boolean_filter;?>
 		    
+		    <?php echo $div_dotsize_selector;?>
+		    
 		    <?php echo $div_categories_filter;?>
 
 			<?php echo $div_layers_filter; ?>

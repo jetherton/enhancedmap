@@ -128,6 +128,9 @@ class Printmap_Controller extends Template_Controller {
 		//boolean filter
 		$this->template->content->div_boolean_filter = enhancedmap_helper::get_boolean_filter();
 		
+		//dot size selector
+		$this->template->content->div_dotsize_selector = enhancedmap_helper::get_dotsize_selector();
+		
 
 		
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
