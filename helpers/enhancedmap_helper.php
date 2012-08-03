@@ -652,6 +652,15 @@ class enhancedmap_helper_Core {
 				$colors[$c->category_position] = $c->category_color;
 				if($cat_str != ''){$cat_str .= ',';}
 				$cat_str .= $c->id;
+				//don't forget the sub cats
+				foreach($c->children as $child)
+				{
+					$colors[$child->category_position] = $child->category_color;
+					if($cat_str != ''){
+						$cat_str .= ',';
+					}
+					$cat_str .= $child->id;
+				}
 			}			
 		}
 		$color = self::merge_colors($colors);	
