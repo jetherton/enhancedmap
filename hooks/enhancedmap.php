@@ -212,10 +212,13 @@ class enhancedmap {
 			$found_it = false;
 			while($i < count($params))
 			{
-				if($params[$i] == $category_sql)
+				if(isset($params[$i]))
 				{
-					$found_it = true;
-					break;					
+					if($params[$i] == $category_sql)
+					{
+						$found_it = true;
+						break;					
+					}
 				}
 				$i++;
 			}
