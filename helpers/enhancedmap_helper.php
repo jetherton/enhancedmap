@@ -715,6 +715,14 @@ class enhancedmap_helper_Core {
 		
 		foreach ($markers as $marker)
 		{
+			
+			//make sure that each marker has a valid lat and lon, seems people can find ways to add non-valid lats and lons
+			if($marker->latitude == null OR strlen($marker->latitude) == 0 OR $marker->longitude == null OR strlen($marker->longitude) == 0)
+			{
+				$marker->latitude = 0;
+				$marker->longitude = 0;
+			}
+			
 			$thumb = "";
 			if ($media_type == 1)
 			{
@@ -1015,6 +1023,12 @@ class enhancedmap_helper_Core {
 		$ids_str = ""; //only used in highest first coloring mode
 		foreach ($incidents as $incident)
 		{
+			//make sure that each marker has a valid lat and lon, seems people can find ways to add non-valid lats and lons
+			if($incident->latitude == null OR strlen($incident->latitude) == 0 OR $incident->longitude == null OR strlen($incident->longitude) == 0)
+			{
+				$incident->latitude = 0;
+				$incident->longitude = 0;
+			}
 			$markers[] = array(
 				'id' => $incident->incident_id,
 				'incident_title' => $incident->incident_title,
