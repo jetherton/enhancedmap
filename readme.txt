@@ -19,6 +19,7 @@ to manipulate the tiles on the server, you can print via the server. you can acc
 
 == Installation ==
 1. Copy the entire /enhancedmap/ directory into your /plugins/ directory.
+      Note, that you must name the plugin folder exactly "enhancedmap"
 2. Activate the plugin.
 
 == Changelog ==
