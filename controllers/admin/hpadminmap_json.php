@@ -19,7 +19,7 @@ class Hpadminmap_json_Controller extends Admin_Controller
     public $auto_render = TRUE;
 
     // Main template
-    public $template = 'json';
+    public $template = 'adminmap/json';
 
     // Table Prefix
     protected $table_prefix;

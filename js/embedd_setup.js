@@ -15,10 +15,13 @@ $(document).ready(function(){
 	adminmap_embed_count++;
 	if( adminmap_embed_count == 1)
 	{
-		$.get(baseUrl + 'hpiframemap/setup', 
-				function(data){			
-					$("#map").before(data);				
-				});
+		if(typeof baseUrl != 'undefined')
+		{
+			$.get(baseUrl + 'hpiframemap/setup', 
+					function(data){			
+						$("#map").before(data);				
+					});
+		}
 	}
 	
 });
