@@ -674,15 +674,15 @@ class enhancedmap_helper_Core {
 			if($all_categories)
 			{
 				$colors = array();
-			}
-			$all_categories = false;
-			if(count($category_id) == 1 AND intval(substr($category_id[0],3)) == 0 )
+			}			
+			if(count($category_id) == 1 AND strlen(substr($category_id[0],3)) == 0 AND $all_categories)
 			{
 				$colors = array(Kohana::config('settings.default_map_all'));
 				$all_categories = true;
 			}
 			else
 			{
+				$all_categories = false;
 				foreach($category_id as $cat)
 				{
 					$c = ORM::factory('simplegroups_category', substr($cat,3));
@@ -709,8 +709,8 @@ class enhancedmap_helper_Core {
 		$markers = (isset($_GET['page']) AND intval($_GET['page']) > 0)? reports::fetch_incidents(TRUE) : reports::fetch_incidents();
 		
 		//only do this if highest_first
-		$position_map = array();
-		if($color_mode=='highest_first'  AND !$all_categories AND $markers->count() > 0)
+		$position_map = array(); 
+		if($color_mode=='highest_first'  AND (!$all_categories) AND ($markers->count() > 0) AND (strlen($cat_str) > 0))
 		{
 			$ids_str = ""; //only used in highest first coloring mode
 			foreach ($markers as $incident)
@@ -722,7 +722,6 @@ class enhancedmap_helper_Core {
 				$ids_str .= $incident->incident_id;						
 			}
 			
-			
 			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'category.category_position ) AS position
 			FROM  `'.self::$table_prefix.'incident_category`
 			JOIN '.self::$table_prefix.'category ON '.self::$table_prefix.'incident_category.category_id = '.self::$table_prefix.'category.id
@@ -730,7 +729,6 @@ class enhancedmap_helper_Core {
 			AND category_id IN ('.$cat_str.')
 			GROUP BY '.self::$table_prefix.'incident_category.incident_id
 			ORDER BY '.self::$table_prefix.'incident_category.incident_id';
-				
 			$results = $db->query($query_str);
 			
 			//now build the map
@@ -738,6 +736,38 @@ class enhancedmap_helper_Core {
 			{
 				$position_map[$r->incident_id] = $r->position;
 			}	
+		}
+		
+		//if the coloring mode is highest first and simple groups are in the mix
+		if($color_mode == 'highest_first' AND !$all_categories AND strlen($sg_cat_str) > 0 AND isset($_GET['sgid']))
+		{
+		
+			$ids_str = ""; //only used in highest first coloring mode
+			foreach ($markers as $incident)
+			{
+				if($ids_str != '')
+				{
+					$ids_str .= ',';
+				}
+				$ids_str .= $incident->incident_id;
+			}
+		
+			//$position_map = array();
+			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'simplegroups_category.id ) AS position
+			FROM  `'.self::$table_prefix.'simplegroups_incident_category`
+			JOIN '.self::$table_prefix.'simplegroups_category ON '.self::$table_prefix.'simplegroups_incident_category.simplegroups_category_id = '.self::$table_prefix.'simplegroups_category.id
+			WHERE incident_id IN ('.$ids_str.')
+			AND simplegroups_category_id IN ('.$sg_cat_str.')
+			GROUP BY '.self::$table_prefix.'simplegroups_incident_category.incident_id
+			ORDER BY '.self::$table_prefix.'simplegroups_incident_category.incident_id';
+		
+			$results = $db->query($query_str);
+		
+			//now build the map
+			foreach($results as $r)
+			{
+				$position_map[$r->incident_id] = $r->position;
+			}
 		}
 		
 		
@@ -1033,14 +1063,14 @@ class enhancedmap_helper_Core {
 			{
 				$colors = array();
 			}
-			$all_categories = false;
-			if(count($category_id) == 1 AND intval(substr($category_id[0],3)) == 0 )
+			if(count($category_id) == 1 AND strlen(substr($category_id[0],3)) == 0 AND $all_categories)
 			{
 				$colors = array(Kohana::config('settings.default_map_all'));
 				$all_categories = true;
 			}
 			else
-			{				
+			{
+				$all_categories = false;
 				foreach($category_id as $cat)
 				{
 					$c = ORM::factory('simplegroups_category', substr($cat,3));
@@ -1085,7 +1115,7 @@ class enhancedmap_helper_Core {
 		}
 		$position_map = array();
 		//if the coloring mode is highest first
-		if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0)
+		if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0 AND strlen($cat_str) > 0)
 		{
 			
 			
@@ -1100,6 +1130,27 @@ class enhancedmap_helper_Core {
 			
 			$results = $db->query($query_str);
 				
+			//now build the map
+			foreach($results as $r)
+			{
+				$position_map[$r->incident_id] = $r->position;
+			}
+		}
+		//if the coloring mode is highest first and simple groups are in the mix
+		if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0 AND strlen($sg_cat_str) > 0 AND isset($_GET['sgid']))
+		{
+				
+				
+			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'simplegroups_category.id ) AS position
+			FROM  `'.self::$table_prefix.'simplegroups_incident_category`
+			JOIN '.self::$table_prefix.'simplegroups_category ON '.self::$table_prefix.'simplegroups_incident_category.simplegroups_category_id = '.self::$table_prefix.'simplegroups_category.id
+			WHERE incident_id IN ('.$ids_str.')
+			AND simplegroups_category_id IN ('.$sg_cat_str.')
+			GROUP BY '.self::$table_prefix.'simplegroups_incident_category.incident_id
+			ORDER BY '.self::$table_prefix.'simplegroups_incident_category.incident_id';
+				
+			$results = $db->query($query_str);
+		
 			//now build the map
 			foreach($results as $r)
 			{
