@@ -995,8 +995,13 @@ class enhancedmap_helper_Core {
 		//if simple groups are involved things get crazy
 		
 		if(isset($_GET['sgid']))
-		{
+		{			
 			$sg_cat_str = "";//only used by highest first coloring mode
+			//reset colors if the all cat color is currently being used
+			if($all_categories)
+			{
+				$colors = array();
+			}
 			$all_categories = false;
 			if(count($category_id) == 1 AND intval(substr($category_id[0],3)) == 0 )
 			{
@@ -1004,7 +1009,7 @@ class enhancedmap_helper_Core {
 				$all_categories = true;
 			}
 			else
-			{
+			{				
 				foreach($category_id as $cat)
 				{
 					$c = ORM::factory('simplegroups_category', substr($cat,3));
