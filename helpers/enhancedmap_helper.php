@@ -1557,9 +1557,9 @@ class enhancedmap_helper_Core {
 		}
 		$approved_IDs_str = $approved_IDs_str.") ";
 	}
-
-        $query = 'SELECT UNIX_TIMESTAMP('.$select_date_text.') AS time, COUNT(id) AS number FROM '.enhancedmap_helper::$table_prefix.'incident WHERE incident.id in'.$approved_IDs_str.' GROUP BY '.$groupby_date_text;
-	$query = $db->query($query);
+		$table_prefix = Kohana::config('database.default.table_prefix');
+        $query = 'SELECT UNIX_TIMESTAMP('.$select_date_text.') AS time, COUNT(id) AS number FROM '.$table_prefix.'incident WHERE incident.id in'.$approved_IDs_str.' GROUP BY '.$groupby_date_text;
+		$query = $db->query($query);
 
         foreach ( $query as $items )
         {
