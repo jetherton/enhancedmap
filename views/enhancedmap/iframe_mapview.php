@@ -10,9 +10,6 @@
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 ?>
-<div id="title">
-<h1><a href="<?php echo url::base(); ?>"><?php echo $site_name;?></a></h1>
-</div>
 
 
 <!-- keep track of what status we're looking at -->
@@ -23,27 +20,20 @@
 
 
 
-<table>
-<tr>
-<td>
+
 <!-- Controls -->
-		<div id="controls">	
+		<div id="controls" style="z-index:10; float:right; ">	
 		
 	
 		
-		<?php echo $div_boolean_filter;?>
+
 				 
 		<?php echo $div_categories_filter;?>
 		
-		<?php echo $div_layers_filter; ?>
-		
-		<?php echo $div_shares_filter; ?>
 		
 	</div>
-	</td>
-	
+	<div id="mapstuff" style="float:left;">
 		<!-- /controls -->
-	<td>	
 		<!-- Map and time slider -->
 				<!-- The map -->
 				<div class="map" id="map" style="width:<?php echo $width;?>px"></div>
@@ -68,17 +58,17 @@
 				
 				</div>
 			<!-- /Map and time slider -->
-	</td>
-	</tr>
-	</table>
+	
 	
 	
 	<!-- Time chooser -->
+	<div style="display:none;">
 	<?php								
 		echo $div_timeline;
 	
 	?>
+	</div>
 	<!-- /Time chooser -->
-
+	</div>
 	
 

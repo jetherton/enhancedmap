@@ -501,7 +501,7 @@
 						feature_icon = feature.attributes.icon;
 						if (feature_icon!=="")
 						{
-							return "normal";
+							return "bold";
 						}
 						else
 						{
@@ -603,10 +603,10 @@
 					icon: function(feature)
 					{
 						feature_icon = feature.attributes.icon;
-						if (feature_icon!=="")
+						if (feature_icon!=="" && feature_icon !== undefined)
 						{
-							//return baseUrl + 'media/img/openlayers/marker.png'; //we don't like markers, we like dots
-							return "";
+							return feature_icon;
+							
 						} 
 						else
 						{
@@ -625,7 +625,7 @@
 							feature_icon = feature.attributes.icon;
 							if (feature_icon!=="")
 							{
-								return "> " + feature.attributes.count;
+								return " " + feature.attributes.count;
 							} 
 							else
 							{

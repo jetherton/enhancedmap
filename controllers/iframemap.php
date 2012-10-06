@@ -92,7 +92,7 @@ class Iframemap_Controller extends Template_Controller {
 
     public function index($width=400)
     {
-    	
+    	header('X-Frame-Options: GOFORIT');
     	
    	    //set the title of the page
     	$this->template->header->this_page = 'bigmap';

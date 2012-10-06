@@ -992,13 +992,8 @@ class enhancedmap_helper_Core {
 		$json = "";
 		$json_item = "";
 		$json_array = array();
-		$geometry_array = array();
 		
-		//get the coloring mode
-		$color_mode = ORM::factory('enhancedmap_settings')->where('key', 'color_mode')->find()->value;
-
 		
-		$icon = "";
 
 		// Get Zoom Level
 		$zoomLevel = (isset($_GET['z']) AND !empty($_GET['z'])) ?
@@ -1006,9 +1001,6 @@ class enhancedmap_helper_Core {
 
 		//$distance = 60;
 		$distance = (10000000 >> $zoomLevel) / 100000;
-		
-		// Fetch the incidents using the specified parameters
-		$incidents = reports::fetch_incidents();
 		
 		// Category ID
 		$category_id = (isset($_GET['c']) AND is_array($_GET['c'])) ? $_GET['c'] : array(0);
@@ -1021,155 +1013,104 @@ class enhancedmap_helper_Core {
 		
 		//Logical operator
 		$logical_operator = isset($_GET['lo'])  ? intval($_GET['lo']) : 'or';
+				
 		
-		//get color
+		//start setting up the SQL to find out what our counts will be
+		$table_prefix = Kohana::config('database.default.table_prefix');
 		
-		$cat_str = "";//only used by highest first coloring mode
-		$all_categories = false;
-  		if(count($category_id) == 1 AND intval($category_id[0]) == 0 )
+		
+		
+		$user_name = Kohana::config('database.default.connection.user');
+		$password = Kohana::config('database.default.connection.pass');
+		$database = Kohana::config('database.default.connection.database');
+		$server = Kohana::config('database.default.connection.host');
+		$db_handle = mysql_connect($server, $user_name, $password);
+		$db_found = mysql_select_db($database, $db_handle);
+		
+		//setup where text for categories
+		$where = '';
+		foreach($category_id as $cat_id)
 		{
-			$colors = array(Kohana::config('settings.default_map_all'));
-			$all_categories = true;
-		}		
-		else 
-		{	
-			//more than one color
-			$colors = array();			
-			foreach($category_id as $cat)
+			if($cat_id == 0)
 			{
-				$c = ORM::factory('category', $cat);
-				$colors[$c->category_position] = $c->category_color;
-				if($cat_str != ''){$cat_str .= ',';}
-				$cat_str .= $c->id;
-				//don't forget the sub cats
-				foreach($c->children as $child)
-				{
-					$colors[$child->category_position] = $child->category_color;
-					if($cat_str != ''){
-						$cat_str .= ',';
-					}
-					$cat_str .= $child->id;
-				}
+				continue;
 			}
+			if(strlen($where) > 0)
+			{
+				$where .= 'OR ';
+			}
+			$where .= ' province_cat.id = '. $cat_id . ' ';
 		}
-		$color = self::merge_colors($colors);	
-		//if simple groups are involved things get crazy
-		
-		if(isset($_GET['sgid']))
-		{			
-			$sg_cat_str = "";//only used by highest first coloring mode
-			//reset colors if the all cat color is currently being used
-			if($all_categories)
-			{
-				$colors = array();
-			}
-			if(count($category_id) == 1 AND strlen(substr($category_id[0],3)) == 0 AND $all_categories)
-			{
-				$colors = array(Kohana::config('settings.default_map_all'));
-				$all_categories = true;
-			}
-			else
-			{
-				$all_categories = false;
-				foreach($category_id as $cat)
-				{
-					$c = ORM::factory('simplegroups_category', substr($cat,3));
-					$colors[$c->id] = $c->category_color;
-					if($sg_cat_str != ''){
-						$sg_cat_str .= ',';
-					}
-					$sg_cat_str .= $c->id;
-				}
-			}
-			$color = self::merge_colors($colors);
-		}
-
-		// Create markers by marrying the locations and incidents
-		$markers = array();
-		$ids_str = ""; //only used in highest first coloring mode
-		foreach ($incidents as $incident)
-		{
-			//make sure that each marker has a valid lat and lon, seems people can find ways to add non-valid lats and lons
-			if($incident->latitude == null OR strlen($incident->latitude) == 0 OR $incident->longitude == null OR strlen($incident->longitude) == 0)
-			{
-				$incident->latitude = 0;
-				$incident->longitude = 0;
-			}
-			$markers[] = array(
-				'id' => $incident->incident_id,
-				'incident_title' => $incident->incident_title,
-				'latitude' => $incident->latitude,
-				'longitude' => $incident->longitude,
-				'thumb' => ''
-				);
-			
-			if($color_mode=='highest_first'  AND !$all_categories)
-			{
-				if($ids_str != '')
-				{ 
-					$ids_str .= ',';
-				}
-				$ids_str .= $incident->incident_id;
-			}
-			
-		}
-		$position_map = array();
-		//if the coloring mode is highest first
-		if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0 AND strlen($cat_str) > 0)
+		if(count($category_id) AND $category_id[0] != 0)
 		{
 			
-			
-			$position_map = array();
-			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'category.category_position ) AS position
-			FROM  `'.self::$table_prefix.'incident_category`
-			JOIN '.self::$table_prefix.'category ON '.self::$table_prefix.'incident_category.category_id = '.self::$table_prefix.'category.id
-			WHERE incident_id IN ('.$ids_str.')
-			AND category_id IN ('.$cat_str.')
-			GROUP BY '.self::$table_prefix.'incident_category.incident_id
-			ORDER BY '.self::$table_prefix.'incident_category.incident_id';
-			
-			$results = $db->query($query_str);
-				
-			//now build the map
-			foreach($results as $r)
-			{
-				$position_map[$r->incident_id] = $r->position;
-			}
+			$where = ' WHERE '.$where;
 		}
-		//if the coloring mode is highest first and simple groups are in the mix
-		if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0 AND strlen($sg_cat_str) > 0 AND isset($_GET['sgid']))
+		
+		//start creating some SQL
+		$sql = 'SELECT incident.id, incident.location_id, incident_title, incident_date, incident_active, media.media_link as media_link, province_cat.id as cat, province_cat.category_color as color, province_cat.category_title as cat_title, location.latitude as lat, location.longitude as lon ';
+		$sql .= 'FROM  `'.$table_prefix.'incident` as `incident` ';
+		$sql .= 'LEFT JOIN  `'.$table_prefix.'location` as `location` ON  `location`.id =  `incident`.`location_id` ';
+		$sql .= 'LEFT JOIN  `'.$table_prefix.'incident_category` as `province_incident_cat` ON  `province_incident_cat`.incident_id =  `incident`.`id` ';
+		$sql .= 'LEFT JOIN  `'.$table_prefix.'category` as `province_cat` ON  `province_cat`.`id` =  `province_incident_cat`.`category_id` ';
+		$sql .= 'LEFT JOIN  `'.$table_prefix.'media` as `media` ON  `media`.`incident_id` =  `incident`.`id` ';
+		$sql .= $where;
+		$sql .= 'GROUP BY `incident`.`id` ';
+		$sql .= 'ORDER BY id asc ';
+		
+		if ($db_found)
 		{
-				
-				
-			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'simplegroups_category.id ) AS position
-			FROM  `'.self::$table_prefix.'simplegroups_incident_category`
-			JOIN '.self::$table_prefix.'simplegroups_category ON '.self::$table_prefix.'simplegroups_incident_category.simplegroups_category_id = '.self::$table_prefix.'simplegroups_category.id
-			WHERE incident_id IN ('.$ids_str.')
-			AND simplegroups_category_id IN ('.$sg_cat_str.')
-			GROUP BY '.self::$table_prefix.'simplegroups_incident_category.incident_id
-			ORDER BY '.self::$table_prefix.'simplegroups_incident_category.incident_id';
-				
-			$results = $db->query($query_str);
-		
-			//now build the map
-			foreach($results as $r)
-			{
-				$position_map[$r->incident_id] = $r->position;
+			if(isset($_GET['debug'])){
+				$t = microtime(true);
+				echo $sql. "\r\n\r\n";
 			}
+				
+			$result = mysql_query($sql);
+				
+			if(isset($_GET['debug'])){
+				$t1 = microtime(true);
+				echo "running Query: ".($t1-$t);
+				$t = $t1;
+				echo "\r\n\r\n";
+			}
+				
+			//read all the data into an array
+			$incidents = array();
+			while ($incident = mysql_fetch_assoc($result))
+			{
+				$incidents[$incident['id']] = $incident;
+			}
+			mysql_close($db_handle);
+				
+			if(isset($_GET['debug'])){
+				$t1 = microtime(true);
+				echo "packaging things in an array ".($t1-$t);
+				$t = $t1;
+				echo "\r\n\r\n";
+			}
+							
+		}
+		else
+		{
+			echo "database not found";
+			exit;
 		}
 		
 		
-
+		
+		
+		
+		
 		$clusters = array();	// Clustered
 		$singles = array();		// Non Clustered
 
 		// Loop until all markers have been compared
-		while (count($markers))
+		while (count($incidents))
 		{
-			$marker	 = array_pop($markers);
+			$marker	 = array_pop($incidents);
 			$cluster = array();
 			$cluster_data = array();			
-			$min_position = 9000000;
+			$category_color = "";
 			$south = 0;
 			$north = 0;
 			$east = 0;
@@ -1179,15 +1120,16 @@ class enhancedmap_helper_Core {
 			$id_str = "";
 
 			// Compare marker against all remaining markers.
-			foreach ($markers as $key => $target)
+			foreach ($incidents as $key => $target)
 			{
-				$pixels = abs($marker['longitude']-$target['longitude']) +
-					abs($marker['latitude']-$target['latitude']);
+				$pixels = abs($marker['lon']-$target['lon']) +
+					abs($marker['lat']-$target['lat']);
 					
 				// If two markers are closer than defined distance, remove compareMarker from array and add to cluster.
-				if ($pixels < $distance)
+				//also make sure the markers are from the same cat, and aren't the video category
+				if ($pixels < $distance AND $marker['cat'] == $target['cat'] AND $target['cat'] != 1)
 				{
-					unset($markers[$key]);
+					unset($incidents[$key]);
 					$target['distance'] = $pixels;
 					$cluster[] = $target;
 					
@@ -1199,52 +1141,44 @@ class enhancedmap_helper_Core {
 					
 					if (!$south)
 					{
-						$south = $target['latitude'];
+						$south = $target['lat'];
 					}
-					elseif ($target['latitude'] < $south)
+					elseif ($target['lat'] < $south)
 					{
-						$south = $target['latitude'];
+						$south = $target['lat'];
 					}
 					
 					if (!$west)
 					{
-						$west = $target['longitude'];
+						$west = $target['lon'];
 					}
-					elseif ($target['longitude'] < $west)
+					elseif ($target['lon'] < $west)
 					{
-						$west = $target['longitude'];
+						$west = $target['lon'];
 					}
 					
 					if (!$north)
 					{
-						$north = $target['latitude'];
+						$north = $target['lat'];
 					}
-					elseif ($target['latitude'] > $north)
+					elseif ($target['lat'] > $north)
 					{
-						$north = $target['latitude'];
+						$north = $target['lat'];
 					}
 					
 					if (!$east)
 					{
-						$east = $target['longitude'];
+						$east = $target['lon'];
 					}
-					elseif ($target['longitude'] > $east)
+					elseif ($target['lon'] > $east)
 					{
-						$east = $target['longitude'];
+						$east = $target['lon'];
 					}
 					
-					$lat_sum += $target['latitude'];
-					$lon_sum += $target['longitude'];
+					$lat_sum += $target['lat'];
+					$lon_sum += $target['lon'];
 						
 					
-					//only if we're in the highest first color mode, do we keep track of the lowest position in a cluster
-					if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0 AND count($position_map) > 0)
-					{
-						if($min_position > $position_map[$target['id']])
-						{
-							$min_position = $position_map[$target['id']];
-						}
-					}
 				}
 			}
 
@@ -1262,42 +1196,42 @@ class enhancedmap_helper_Core {
 					
 				if (!$south)
 				{
-					$south = $marker['latitude'];
+					$south = $marker['lat'];
 				}
-				elseif ($marker['latitude'] < $south)
+				elseif ($marker['lat'] < $south)
 				{
-					$south = $marker['latitude'];
+					$south = $marker['lat'];
 				}
 					
 				if (!$west)
 				{
-					$west = $marker['longitude'];
+					$west = $marker['lon'];
 				}
-				elseif ($marker['longitude'] < $west)
+				elseif ($marker['lon'] < $west)
 				{
-					$west = $marker['longitude'];
+					$west = $marker['lon'];
 				}
 					
 				if (!$north)
 				{
-					$north = $marker['latitude'];
+					$north = $marker['lat'];
 				}
-				elseif ($marker['latitude'] > $north)
+				elseif ($marker['lat'] > $north)
 				{
-					$north = $marker['latitude'];
+					$north = $marker['lat'];
 				}
 					
 				if (!$east)
 				{
-					$east = $marker['longitude'];
+					$east = $marker['lon'];
 				}
-				elseif ($marker['longitude'] > $east)
+				elseif ($marker['lon'] > $east)
 				{
-					$east = $marker['longitude'];
+					$east = $marker['lon'];
 				}
 					
-				$lat_sum += $marker['latitude'];
-				$lon_sum += $marker['longitude'];
+				$lat_sum += $marker['lat'];
+				$lon_sum += $marker['lon'];
 				
 					
 			
@@ -1306,32 +1240,14 @@ class enhancedmap_helper_Core {
 										'ids'=>$id_str,
 										'center' => ($lon_sum/count($cluster)).",".($lat_sum/count($cluster)),
 										'sw' => $west.",".$south,
-										'ne' => $east.",".$north);									
-				
-				//only if we're in the highes first color mode, do we keep track of the lowest position in a cluster
-				if($color_mode == 'highest_first' AND !$all_categories)
-				{
-					if($min_position > $position_map[$marker['id']])
-					{
-						$min_position = $position_map[$marker['id']];
-					}
-					$cluster_data['min_position'] = $min_position;
-				}
+										'ne' => $east.",".$north,
+										'color' => $marker['color'],
+										'category_title' => $marker['cat_title']);																	
 				
 				$clusters[] = $cluster_data;
 			}
 			else
 			{
-				
-				//only if we're in the highes first color mode, do we keep track of the lowest position in a cluster
-				if($color_mode == 'highest_first' AND !$all_categories)
-				{
-					if($min_position > $position_map[$marker['id']])
-					{
-						$min_position = $position_map[$marker['id']];
-					}
-					$cluster_data['min_position'] = $min_position;
-				}
 				$singles[] = $marker;
 			}
 		}
@@ -1359,18 +1275,17 @@ class enhancedmap_helper_Core {
 			//id string					
 			$id_str = $cluster['ids'];
 			
-			$dot_color = ($color_mode == 'highest_first' AND !$all_categories) ? $colors[$cluster['min_position']] : $color;
+			$dot_color = $cluster['color'];
 			
 			// Build out the JSON string
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
 			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
-				 . "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " Reports</a>")) . "\",";
+				 . "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " " . $cluster['category_title']. " Reports</a>")) . "\",";
 			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix. "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast."\", ";
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$dot_color."\", ";
-			$json_item .= "\"icon\": \"".$icon."\", ";
 			$json_item .= "\"ids\": [".$id_str."], ";
 			$json_item .= "\"thumb\": \"\", ";
 			$json_item .= "\"timestamp\": \"0\", ";
@@ -1387,25 +1302,37 @@ class enhancedmap_helper_Core {
 
 		foreach ($singles as $single)
 		{
-			$dot_color = ($color_mode == 'highest_first' AND !$all_categories) ? $colors[$position_map[$single['id']]] : $color;
+			$dot_color = $single['color'];
 			
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
-			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
+			if($single['media_link'] == null)
+			{
+				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
 					. "reports/".$view_or_edit."/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "\",";
+			}
+			else
+			{
+				$media_id = substr($single['media_link'], strpos($single['media_link'], '?v=')+3);
+				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
+						. "reports/".$view_or_edit."/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "<br/>";
+				$json_item .= '<iframe width=\"300\" height=\"160\" src=\"http://www.youtube.com/embed/'.$media_id.'?rel=0\" frameborder=\"0\" allowfullscreen></iframe>",';
+			}
 			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$single['id']."\", ";
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$dot_color."\", ";
-			$json_item .= "\"icon\": \"".$icon."\", ";
-			// $json_item .= "\"thumb\": \"".$single['thumb']."\", ";
+			if($single['cat'] == 1)
+			{
+				$json_item .= "\"icon\": \"".url::base()."plugins/enhancedmap/images/video.png\", ";
+			} 
 			$json_item .= "\"timestamp\": \"0\", ";
 			$json_item .= "\"ids\": [".$single['id']."], ";
 			$json_item .= "\"count\": \"" . 1 . "\"";
 			$json_item .= "},";
 			$json_item .= "\"geometry\": {";
 			$json_item .= "\"type\":\"Point\", ";
-			$json_item .= "\"coordinates\":[" . $single['longitude'] . ", " . $single['latitude'] . "]";
+			$json_item .= "\"coordinates\":[" . $single['lon'] . ", " . $single['lat'] . "]";
 			$json_item .= "}";
 			$json_item .= "}";
 

@@ -1,4 +1,4 @@
-Enhanced Map - Ushahidi Plugin
+Enhanced Map, Syria Deeply Edition - Ushahidi Plugin
 =================
 About
 -----
@@ -29,3 +29,4 @@ Changelog
 ----------------
 * 2.0 -- 2011/11/30 -- Refactored the plugin to work with Ushahidi's new reports::fetch_incidents() helper method. This allows much tigher intergration with Ushahidi. Though this will get slow when there are more than 3 or 4 thousand reports.
 * 2.1 -- 2012/06/06 -- Renamed to Enhanced Map to reflect all that this plugin has become.
+* 2.1.Syria 2012-10-06 -- Adjusted clustering

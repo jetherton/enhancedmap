@@ -1,5 +1,5 @@
 === About ===
-name: Enhanced Map
+name: Enhanced Map - Syria Deeply Edition
 website: https://github.com/jetherton/enhancedmap
 description: Adds a full screen map on the front end and a map on the back end that shows non-approved reports. Also allows for more complex boolean AND and OR filtering operations. Formerly Admin Map.
 version: 2.1
@@ -25,3 +25,4 @@ to manipulate the tiles on the server, you can print via the server. you can acc
 == Changelog ==
 * 2.0 -- 2011/11/30 -- Refactored the plugin to work with Ushahidi's new reports::fetch_incidents() helper method. This allows much tigher intergration with Ushahidi. Though this will get slow when there are more than 3 or 4 thousand reports.
 * 2.1 -- 2012/06/06 -- Renamed to Enhanced Map to reflect all that this plugin has become.
+* 2.1.Syria 2012-10-06 -- Adjusted clustering
