@@ -22,7 +22,7 @@
 
 
 <!-- Controls -->
-		<div id="controls" style="z-index:10; float:right; ">	
+		<div id="controls">	
 		
 	
 		
