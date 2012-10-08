@@ -90,7 +90,7 @@ class Iframemap_Controller extends Template_Controller {
 		}
 	}
 
-    public function index($width=400)
+    public function index($width=390)
     {
     	header('X-Frame-Options: GOFORIT');
     	

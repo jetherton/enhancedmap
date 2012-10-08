@@ -67,8 +67,8 @@
 	font-size: 8pt;
 	z-index:10; 
 	position:absolute; 
-	top:270px; 
-	left:270px; 
+	top:300px; 
+	left:385px; 
 	background:black;
 	color:white;	
 	padding: 5px;
@@ -170,6 +170,8 @@ a.share{
 /* map */
 div.map {
     border: black solid 1px;
+    height: 390px;
+    width: 501px;
 }
 #mapStatus
 {
