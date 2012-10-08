@@ -1307,20 +1307,25 @@ class enhancedmap_helper_Core {
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
-			if($single['media_link'] == null)
+			
+
+			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
+				. "reports/".$view_or_edit."/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>"));
+			
+			if($single['media_link'] != null)
 			{
-				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
-					. "reports/".$view_or_edit."/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "\",";
+				$url_parts = parse_url($single['media_link']);
+				if(isset($url_parts['query']))
+				{ 
+					parse_str($url_parts['query']);
+					if(isset($v))
+					{
+						$media_id = $v;
+						$json_item .= '<br/><iframe width=\"300\" height=\"160\" src=\"http://www.youtube.com/embed/'.$media_id.'?rel=0\" frameborder=\"0\" allowfullscreen></iframe>';
+					}
+				}
 			}
-			else
-			{
-				$url_parts = parse_url($single['media_link']); 
-				parse_str($url_parts['query']);
-				$media_id = $v;
-				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
-						. "reports/".$view_or_edit."/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "<br/>";
-				$json_item .= '<iframe width=\"300\" height=\"160\" src=\"http://www.youtube.com/embed/'.$media_id.'?rel=0\" frameborder=\"0\" allowfullscreen></iframe>",';
-			}
+			$json_item .="\",";
 			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$single['id']."\", ";
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$dot_color."\", ";
