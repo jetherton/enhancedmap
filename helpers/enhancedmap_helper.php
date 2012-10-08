@@ -1311,6 +1311,7 @@ class enhancedmap_helper_Core {
 
 			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
 				. "reports/".$view_or_edit."/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>"));
+			$json_item .="\",";
 			
 			if($single['media_link'] != null)
 			{
@@ -1321,11 +1322,11 @@ class enhancedmap_helper_Core {
 					if(isset($v))
 					{
 						$media_id = $v;
-						$json_item .= '<br/><iframe width=\"300\" height=\"160\" src=\"http://www.youtube.com/embed/'.$media_id.'?rel=0\" frameborder=\"0\" allowfullscreen></iframe>';
+						$json_item .= "\"videoId\":\"".$media_id."\", "; 
 					}
 				}
 			}
-			$json_item .="\",";
+			
 			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$single['id']."\", ";
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$dot_color."\", ";

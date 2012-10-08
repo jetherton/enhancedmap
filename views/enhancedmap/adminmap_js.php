@@ -220,7 +220,6 @@
 		*/
 		function onFeatureSelect(event)
 		{
-					
 			
 			selectedFeature = event.feature;
 			var feature = event.feature;
@@ -262,6 +261,13 @@
 			{
 				var func = map.featureSelectionEventRegistrants[i];
 				func(selectedFeature);
+			}
+			
+			//if it has a video, play that:
+			
+			if (typeof event.feature.attributes.videoId != 'undefined' && typeof parent.playVideo != 'undefined')
+			{
+				parent.playVideo(event.feature.attributes.videoId);
 			}
 		}
 
