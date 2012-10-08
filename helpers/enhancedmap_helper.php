@@ -1314,7 +1314,9 @@ class enhancedmap_helper_Core {
 			}
 			else
 			{
-				$media_id = substr($single['media_link'], strpos($single['media_link'], '?v=')+3);
+				$url_parts = parse_url($single['media_link']); 
+				parse_str($url_parts['query']);
+				$media_id = $v;
 				$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
 						. "reports/".$view_or_edit."/" . $single['id'] . "/>".str_replace('"','\"',$single['incident_title'])."</a>")) . "<br/>";
 				$json_item .= '<iframe width=\"300\" height=\"160\" src=\"http://www.youtube.com/embed/'.$media_id.'?rel=0\" frameborder=\"0\" allowfullscreen></iframe>",';
