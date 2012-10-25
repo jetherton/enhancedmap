@@ -48,7 +48,7 @@ div#right{
 	position: absolute;
 	float: none;
 	width:250px;
-	z-index: 50;
+	z-index: 51;
 	background-image: url('../images/opacity60.png');
 	border:1px solid black;
 }
@@ -302,17 +302,22 @@ div.cat-filters span a{
 ul.category-filters{
     background: none;
     list-style: none;
-    padding: 0xp;
 	border: none;
 	margin: 0px;
 	margin: 0px;
 	height: 150px;
 	overflow: auto;
-	position: relative;
+	/*position: relative;*/
 }
 
 ul#kml_switch{
 	height: 75px;
+  position: static;
+}
+
+ul#sharing_switch{
+  position: static;
+  left: 0;
 }
 
 
