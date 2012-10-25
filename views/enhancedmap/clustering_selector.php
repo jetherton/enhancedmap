@@ -15,8 +15,8 @@
 			
 				<strong><?php echo Kohana::lang('enhancedmap.clustering');?></strong>
 							<?php
-									$clustering_array = array('1'=>Kohana::lang('enhancedmap.on'),
-											'0'=>Kohana::lang('enhancedmap.off'));
+									$clustering_array = array('1'=>Kohana::lang('ui_main.on'),
+											'0'=>Kohana::lang('ui_main.off'));
 									print form::dropdown('clustering',$clustering_array, $isClustering, 'id="clustering" onchange="setClustering(); return false;"');
 									
 								?> 

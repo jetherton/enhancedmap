@@ -385,7 +385,7 @@ class enhancedmap {
 	public function _add_printmap()
 	{
 		$map = Event::$data;
-		$map = str_replace('<div id="mapOutput"></div>','<div id="mapOutput"></div><div id="printmap-link"><a href="'.url::site('printmap').'">Print a map</a></div>', $map);
+		$map = str_replace('<div id="mapOutput"></div>', '<div id="mapOutput"></div><div id="printmap-link"><a href="' . url::site('printmap') . '">'.Kohana::lang('enhancedmap.print_a_map').'</a></div>', $map);
 		Event::$data = $map;
 	}
 	
