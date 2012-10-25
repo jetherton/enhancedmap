@@ -122,7 +122,7 @@ class enhancedmap {
 			foreach($params as $key=>$value)
 			{
 	
-				if (strcmp($value, 'c.category_visible = 1') == 0)
+				if (! is_array($value) AND strcmp($value, 'c.category_visible = 1') == 0)
 				{
 					$found_it = true;
 					$i = $key;
