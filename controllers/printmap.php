@@ -84,6 +84,8 @@ class Printmap_Controller extends Template_Controller {
 		}else{
 			$this->template->footer->ushahidi_stats = '';
 		}
+
+		$this->template->footer->footer_block = $this->themes->footer_block();
 	}
 
     public function index()
