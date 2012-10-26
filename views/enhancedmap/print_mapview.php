@@ -10,13 +10,10 @@
 
 
 <div id="title">
-<h1>Map Printing</h1>
+<h1><?php echo Kohana::lang('enhancedmap.map_printing'); ?></h1>
 <div id="print_warning">
-<h2>Please Read Before Printing:</h2>
-This page is for creating maps that will be printed. Printing works best using <strong>Firefox</strong> 4 or higher. <strong>Chrome, Internet Explorer,</strong> 
-and other browsers may not print this page correctly.<br/>
-For best results in Firefox, go to <strong>"Page Setup"</strong> and make sure that <strong>"Print Background (Colors &amp; Images)"</strong> is turned on and 
-that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
+<h2><?php echo Kohana::lang('enhancedmap.read_before_printing'); ?></h2>
+<?php echo Kohana::lang('enhancedmap.printmap_info'); ?>
 </div>
 <br/><br/>
 </div>
@@ -33,37 +30,37 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 		<div id="controls">	
 		
 	
-		<INPUT style="width: auto; padding:6px; margin:6px; font-size:18px;" TYPE="BUTTON" VALUE="Print this map" ONCLICK="window.print()"/>
-		
+		<INPUT style="width: auto; padding:6px; margin:6px; font-size:18px;" TYPE="BUTTON" VALUE="<?php echo Kohana::lang('enhancedmap.print_this_map'); ?>" ONCLICK="window.print()"/>
+		   
 			<?php echo $div_status_filter; ?>
-			
+				
 			<?php echo $div_boolean_filter; ?>
-			
+						
 			<?php echo $div_dotsize_selector; ?>
-			
+
 			<?php echo $div_clustering_selector;?>
 		
 			<?php echo $div_categories_filter; ?>
 		
 			<?php echo $div_layers_filter; ?>
-			
-			<?php echo $div_shares_filter; ?>
-			
-			
-			
-			
-			
-			
-
 		
+			<?php echo $div_shares_filter; ?>
+		
+				
+							
+			
+				
+			
 
-
-
+			
+			
+			
+		
 
 		
 		
 			<!-- Time chooser -->
-			<strong>TIME CHOOSER</strong>
+			<strong><?php echo utf8::strtoupper(Kohana::lang('enhancedmap.time_chooser')); ?></strong>
 			<?php								
 			echo $div_timeline;
 			
@@ -73,29 +70,29 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 			
 			
 			<!-- Orientation chooser -->
-			<strong>ORIENTATION</strong>
-			<div id="orientation" class="menuItem">					
+			<strong><?php echo utf8::strtoupper(Kohana::lang('enhancedmap.orientation')); ?></strong>
+			<div id="orientation" class="menuItem">
 				<form>
-					<input type="radio" id="orientation_portrait" name="orientation" value="portrait" checked onclick="this.blur();" onchange="changeOrientation('portrait'); return false;" /> Portrait<br />
-					<input type="radio" id="orientation_landscape" name="orientation" value="landscape"  onclick="this.blur();" onchange="changeOrientation('landscape'); return false;"/> Landscape
+					<input type="radio" id="orientation_portrait" name="orientation" value="portrait" checked onclick="this.blur();" onchange="changeOrientation('portrait'); return false;" /> <?php echo Kohana::lang('enhancedmap.portrait'); ?><br />
+					<input type="radio" id="orientation_landscape" name="orientation" value="landscape"  onclick="this.blur();" onchange="changeOrientation('landscape'); return false;"/> <?php echo Kohana::lang('enhancedmap.landscape'); ?>
 				</form>
 			</div>
 			<!-- /Orientation chooser -->
 			
 			
 			<!-- Key Options -->
-			<strong>KEY OPTIONS</strong>
+			<strong><?php echo utf8::strtoupper(Kohana::lang('enhancedmap.key_options')); ?></strong>
 			<div id="keyoptions" class="menuItem">					
 				<form>
-					Show Key: <input type="checkbox" id="showKeyCheckbox" value="showKeyCheckbox" checked onclick="this.blur();" onchange="showHideKey(); return false;" />
+					<?php echo Kohana::lang('enhancedmap.show_key'); ?> <input type="checkbox" id="showKeyCheckbox" value="showKeyCheckbox" checked onclick="this.blur();" onchange="showHideKey(); return false;" />
 					<br/>
 					<br/>
-					<div id="keyPlacement"> Key Placement:<br/>
-						<input type="radio" name="keyLeftRight" value="left"  id="leftPlacement" onclick="this.blur();" onchange="changeLeftRight('left'); return false;" /> Left 
-						<input type="radio" name="keyLeftRight" value="right" id="rightPlacement"  onclick="this.blur();" checked  onchange="changeLeftRight('right'); return false;" /> Right
+					<div id="keyPlacement"><?php echo Kohana::lang('enhancedmap.key_placement'); ?><br/>
+						<input type="radio" name="keyLeftRight" value="left"  id="leftPlacement" onclick="this.blur();" onchange="changeLeftRight('left'); return false;" />  <?php echo Kohana::lang('enhancedmap.left'); ?>
+						<input type="radio" name="keyLeftRight" value="right" id="rightPlacement"  onclick="this.blur();" checked  onchange="changeLeftRight('right'); return false;" /> <?php echo Kohana::lang('enhancedmap.right'); ?>
 						<br/>
-						<input type="radio" name="keyUpDown" value="up"  id="topPlacement" onclick="this.blur();" onchange="changeTopBottom('top'); return false;" /> Up 
-						<input type="radio" name="keyUpDown" value="down" id="bottomePlacement" onclick="this.blur();" checked onchange="changeTopBottom('bottom'); return false;" /> Down
+						<input type="radio" name="keyUpDown" value="up"  id="topPlacement" onclick="this.blur();" onchange="changeTopBottom('top'); return false;" /> <?php echo Kohana::lang('enhancedmap.up'); ?>
+						<input type="radio" name="keyUpDown" value="down" id="bottomePlacement" onclick="this.blur();" checked onchange="changeTopBottom('bottom'); return false;" /> <?php echo Kohana::lang('enhancedmap.down'); ?>
 					</div>
 				</form>
 			</div>
@@ -103,17 +100,17 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 			
 			
 			<!-- Set URL -->
-			<strong>Share this map</strong>
+			<strong><?php echo Kohana::lang('enhancedmap.share_map'); ?></strong>
 			<div id="keyoptions" class="menuItem">					
 				<form>
-					Generate a URL to share this map with others
-					<input type="button" name="getURL" id="getURL" value="Create URL" onclick="setURL(); return false;"/>
+					<?php echo Kohana::lang('enhancedmap.generate_url'); ?>
+					<input type="button" name="getURL" id="getURL" value="<?php echo Kohana::lang('enhancedmap.create_url'); ?>" onclick="setURL(); return false;"/>
 					<br/>
 					<br/>
-					URL for this map: <br/><textarea id="urlText" rows="5" cols="33"></textarea><br/>
+					<?php echo Kohana::lang('enhancedmap.map_url'); ?> <br/><textarea id="urlText" rows="5" cols="33"></textarea><br/>
 					<?php if (isset($_GET["dev"])): ?>					
-					URL for this page:  <input type="text"; id="mapUrlText"/>
-					URL to embed this map:  <input type="text"; id="embedMapUrlText"/>
+					<?php echo Kohana::lang('enhancedmap.page_url'); ?>  <input type="text"; id="mapUrlText"/>
+					<?php echo Kohana::lang('enhancedmap.embed_url'); ?>  <input type="text"; id="embedMapUrlText"/>
 					<?php endif; ?>
 				</form>
 				
@@ -126,10 +123,10 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 			
 			<?php if (isset($_GET["dev"])): ?>
 			<!-- Print to image -->
-			<strong>Print to Image</strong>
+			<strong><?php echo Kohana::lang('enhancedmap.print_to_image'); ?></strong>
 			<div id="keyoptions" class="menuItem">					
 				<form>
-					Generate an image of this map<br/>
+					<?php echo Kohana::lang('enhancedmap.generate_image'); ?><br/>
 					<input type="button" name="printImage" id="printImage" value="Print To Image" onclick="stitchImage(); return false;"/>
 					<br/>
 				</form>
@@ -156,12 +153,12 @@ that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>
 				
 				
 				<div id="key" class="right bottom">
-				<h5>Map Key:</h5>
-				This map is showing reports from <span id="keyStartDate"></span> to <span id="keyEndDate"></span>.<br/>
-				<span id="keyLogic">All reports on this map fall under one or more of the following categories. </span>
+				<h5><?php echo Kohana::lang('enhancedmap.map_key'); ?></h5>
+				<?php echo Kohana::lang('enhancedmap.map_key_1', array('<span id="keyStartDate"></span>','<span id="keyEndDate"></span>')); ?><br/>
+				<span id="keyLogic"> </span>
 				<br/>
 				<ul id="keyCategories">
-					<li> <div class="swatch" style="background:#cc0000;"></div> ALL CATEGORIES</li>
+					<li> <div class="swatch" style="background:#cc0000;"></div> <?php echo Kohana::lang('ui_main.all_categories'); ?></li>
 				</ul>   
 				
 				</div>

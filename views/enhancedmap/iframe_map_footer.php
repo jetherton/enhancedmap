@@ -8,7 +8,10 @@
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
  */
 ?>
-	<?php echo $google_analytics; ?>
+
+	<?php
+	echo $footer_block;
+	?>
 </body>
 
 </html>

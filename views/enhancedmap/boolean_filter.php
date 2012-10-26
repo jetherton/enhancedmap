@@ -19,7 +19,7 @@
 						<?php if($show_help){?>
 						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
 							<?php echo '<h3>'.Kohana::lang("enhancedmap.ORHEADER"). '</h3>'. Kohana::lang("enhancedmap.ORBODY"); ?>
-							">What's this?</span></div>
+							"><?php echo Kohana::lang('enhancedmap.whats_this'); ?></span></div>
 							<?php }?>
 						<a class="active" id="logicalOperator_1" href="#">							
 						<?php echo Kohana::lang("enhancedmap.OR"); ?>
@@ -29,7 +29,7 @@
 						<?php if($show_help){?>
 						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
 							<?php echo '<h3>'.Kohana::lang("enhancedmap.ANDHEADER").'</h3>'.Kohana::lang("enhancedmap.ANDBODY"); ?>							
-						">What's this?</span></div>
+						"><?php echo Kohana::lang('enhancedmap.whats_this'); ?></span></div>
 						<?php }?>
 						<a  id="logicalOperator_2" href="#">
 							<div class="status-title"><?php echo Kohana::lang("enhancedmap.AND"); ?></div>

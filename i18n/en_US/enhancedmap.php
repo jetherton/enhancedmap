@@ -51,6 +51,40 @@
 	//john's entries
 	'group_categories' => 'Group Categories',
 	'site_categories' => 'Site Categories',
+	'whats_this' => 'What\'s this?',
+	'print_a_map' => 'Print a map',
+	'print_this_map' => 'Print this map',
+	'map_printing' => 'Map Printing',
+	'read_before_printing' => 'Please Read Before Printing:',
+	'printmap_info' => 'This page is for creating maps that will be printed.
+	Printing works best using <strong>Firefox</strong> 4 or higher. <strong>Chrome, Internet Explorer,</strong> 
+	and other browsers may not print this page correctly.<br/>
+	For best results in Firefox, go to <strong>"Page Setup"</strong> and make sure that
+	<strong>"Print Background (Colors &amp; Images)"</strong> is turned on and that <strong>scaling</strong> is set to <strong>"scale to fit."</stong>',
+	'map_key' => 'Map Key:',
+	'map_key_1' => 'Reports from %s to %s.',
+	'generate_image' => 'Generate an image of this map',
+	'print_to_image' => 'Print to image',
+	'generate_url' => 'Generate a URL to share this map with others',
+	'map_url' => 'URL for this map:',
+	'page_url' => 'URL for this page:',
+	'embed_url' => 'URL to embed this map:',
+	'create_url' => 'Create URL',
+	'share_map' => 'Share this map',
+	'show_key' => 'Show key:',
+	'key_placement' => 'Key Placement:',
+	'key_options' => 'Key Options',
+	'orientation' => 'Orientation',
+	'time_chooser' => 'Time Chooser',
+	'portrait' => 'Portrait',
+	'landscape' => 'Landscape',
+	'logic_str_or' => "All reports on this map fall under one or more of the following categories.",
+	'logic_str_and' => "All reports on this map fall under all of the following categories. ",
+	'left' => 'Left',
+	'right' => 'Right',
+	'up' => 'Up',
+	'down' => 'Down',
+	'site_categories' => 'Site Categories',
 	
 	//settings
 	'enable_bigmap'=>'Enable Big Map menu item on the front end',
@@ -105,7 +139,3 @@
 
 );
 	
-	
-	
-	
-

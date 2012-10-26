@@ -21,7 +21,7 @@
 		<div id="right" class="clearingfix" >	
 		<div id="right_move" style="border:1px black solid;" onmousedown="mD(this,event)">
 			<strong style="margin-left:10px;" ><?php echo Kohana::lang("enhancedmap.FILTERS"); ?></strong>
-			<a id="toggleright" onclick="togglelayer('right_colapse', 'toggleright'); return false;" style="border: solid 1px black; marging: 1px; padding: 0px 10px; position:relative; float:right;" href="#" > 
+			<a id="toggleright" onclick="togglelayer('right_colapse', 'toggleright'); return false;" style="border: solid 1px black; margin: -1px; padding: 0px 10px; position:relative; float:right;" href="#" > 
 				<strong>-</strong> 
 			</a>
 		</div>
@@ -52,7 +52,7 @@
 				echo '<div id="timeline_holder">
 				<div id="timeline_drag" onmousedown="mD(this,event)"> 
 				<strong style="margin-left:10px">'.Kohana::lang("enhancedmap.TIME_LINE").'</strong> 
-				<a id="toggletimeline" onclick="togglelayer(\'timeline_colapse\', \'toggletimeline\'); return false;" style="border: solid 1px black; marging: 1px; padding: 0px 10px; position:relative; float:right;" href="#" > <strong>-</strong> </a>
+				<a id="toggletimeline" onclick="togglelayer(\'timeline_colapse\', \'toggletimeline\'); return false;" style="border: solid 1px black; margin: -1px; padding: 0px 10px; position:relative; float:right;" href="#" > <strong>-</strong> </a>
 				</div>
 				<div id="timeline_colapse">';
 				echo $div_timeline;
