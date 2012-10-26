@@ -8,9 +8,9 @@
  */
 ?>
 
-<h5>Map Key:</h5>
+<h5><?php echo Kohana::lang('enhancedmap.map_key'); ?></h5>
 
-Reports from <strong><?php echo $keyStartDate; ?></strong> to <strong><?php echo $keyEndDate; ?></strong>.<br/>
+<?php echo Kohana::lang('enhancedmap.map_key_1', array("<strong>$keyStartDate</strong>","<strong>$keyEndDate</strong>")); ?><br/>
 <?php echo $logic; ?>
 <br/>
 <ul id="keyCategories">

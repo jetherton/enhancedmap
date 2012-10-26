@@ -73,19 +73,7 @@ class Bigmap_Controller extends Template_Controller {
 
 		$this->template->header->this_page = "";
 
-		// Google Analytics
-		$google_analytics = Kohana::config('settings.google_analytics');
-		$this->template->footer->google_analytics = $this->themes->google_analytics($google_analytics);
-
-        // Load profiler
-        // $profiler = new Profiler;
-
-        // Get tracking javascript for stats
-        if(Kohana::config('settings.allow_stat_sharing') == 1){
-			$this->template->footer->ushahidi_stats = Stats_Model::get_javascript();
-		}else{
-			$this->template->footer->ushahidi_stats = '';
-		}
+		$this->template->footer->footer_block = $this->themes->footer_block();
 	}
 
     public function index()

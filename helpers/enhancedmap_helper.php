@@ -1365,9 +1365,9 @@ class enhancedmap_helper_Core {
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
-			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
-				 . "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " Reports</a>")) . "\",";
-			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix. "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast."\", ";
+			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = " . $link_target . " href=" . url::base() . $admin_path . $link_path_prefix
+				. "reports/index/?" . $_SERVER['QUERY_STRING'] . "&sw=" . $southwest . "&ne=" . $northeast . ">" . $cluster_count . " ".Kohana::lang('ui_main.cluster_name_reports')."</a>")) . "\",";
+			$json_item .= "\"link\": \"" . url::base() . $admin_path . $link_path_prefix . "reports/index/?" . $_SERVER['QUERY_STRING'] . "&sw=" . $southwest . "&ne=" . $northeast . "\", ";
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$dot_color."\", ";
 			$json_item .= "\"icon\": \"".$icon."\", ";

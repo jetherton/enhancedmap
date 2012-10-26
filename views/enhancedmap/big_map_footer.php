@@ -9,12 +9,11 @@
 ?>
 	
 	
-	<?php //echo $ushahidi_stats; ?>
-	<?php echo $google_analytics; ?>
-	
-
-	<!-- Task Scheduler --><script type="text/javascript">$(document).ready(function(){$.get("<?php echo url::base(); ?>scheduler");});</script><!-- End Task Scheduler -->
- 
+	<?php
+	echo $footer_block;
+	// Action::main_footer - Add items before the </body> tag
+	Event::run('ushahidi_action.main_footer');
+	?>
 </body>
 <?php Event::run('ushahidi_action.main_footer'); ?>
 </html>
