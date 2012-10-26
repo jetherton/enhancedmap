@@ -52,12 +52,14 @@ class enhancedmap {
 		if(Router::$controller != "hpbigmap_json" AND Router::$controller != "hpiframemap_json"
 				AND Router::$controller != "hpadminmap_json")
 		{
+			plugin::add_javascript("enhancedmap/js/LoadingPanel");
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_logical_operator_filter'));
 		}
 
 		
 		if(Router::$controller == "adminmap")
 		{
+			plugin::add_javascript("enhancedmap/js/LoadingPanel");
 			//hide the content div
 			Event::add('ushahidi_action.header_scripts_admin',array($this,'_hide_content_for_adminmap'));
 		}
