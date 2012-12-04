@@ -82,20 +82,25 @@ class enhancedmap_helper_Core {
 	public static function set_shares($on_backend = false, $show_on_load = false,
 			$shares_filter_view = 'enhancedmap/shares_filter', $shares_filter_id = "shares_filter")
 	{
+		// First of all make sure sharing is turned on.
+		$sharing_plugin = ORM::factory('plugin')
+			->where('plugin_name', 'sharing')
+			->where('plugin_active',1)
+			->where('plugin_installed',1)
+			->find();
 		
-		//first of all make sure sharing is turned on.
-		$db = new Database();
+		if (! $sharing_plugin->loaded) return "";
 		
-		$result = $db->query('SHOW TABLES LIKE \''.self::$table_prefix.'sharing\'');
+		// Check sharing table exists
+		$result = Database::instance()->query('SHOW TABLES LIKE \''.self::$table_prefix.'sharing\'');
 		$table_exists = false;
 		foreach($result as $r)
 		{
 			$table_exists = true;
 		}
 		
-		
 		if($table_exists)
-		{	
+		{
 			$shares = array();
 			foreach (ORM::factory('sharing')
 					->where('sharing_active', 1)
@@ -111,8 +116,6 @@ class enhancedmap_helper_Core {
 			return $view;
 		}
 		return "";
-		
-		
 	}
 	
 	
