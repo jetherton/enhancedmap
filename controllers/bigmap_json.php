@@ -113,6 +113,15 @@ class Bigmap_json_Controller extends Template_Controller
         $sharing_data = "";
         $clustering = Kohana::config('settings.allow_clustering');
         
+        // First of all make sure sharing is turned on.
+        $sharing_plugin = ORM::factory('plugin')
+          ->where('plugin_name', 'sharing')
+          ->where('plugin_active',1)
+          ->where('plugin_installed',1)
+          ->find();
+
+        if (! $sharing_plugin->loaded) return;
+
         if ($sharing_id)
         {
             // Get This Sharing ID Color
