@@ -103,13 +103,22 @@ class Iframemap_json_Controller extends Template_Controller
      * @param int $sharing_id - ID of the new Share Layer
      */
     public function share( $sharing_id = false )
-    {   
+    {
         $json = "";
         $json_item = "";
         $json_array = array();
         $sharing_data = "";
         $clustering = Kohana::config('settings.allow_clustering');
         
+        // First of all make sure sharing is turned on.
+        $sharing_plugin = ORM::factory('plugin')
+          ->where('plugin_name', 'sharing')
+          ->where('plugin_active',1)
+          ->where('plugin_installed',1)
+          ->find();
+
+        if (! $sharing_plugin->loaded) return;
+
         if ($sharing_id)
         {
             // Get This Sharing ID Color

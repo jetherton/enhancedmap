@@ -52,12 +52,14 @@ class enhancedmap {
 		if(Router::$controller != "hpbigmap_json" AND Router::$controller != "hpiframemap_json"
 				AND Router::$controller != "hpadminmap_json")
 		{
+			plugin::add_javascript("enhancedmap/js/LoadingPanel");
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_logical_operator_filter'));
 		}
 
 		
 		if(Router::$controller == "adminmap")
 		{
+			plugin::add_javascript("enhancedmap/js/LoadingPanel");
 			//hide the content div
 			Event::add('ushahidi_action.header_scripts_admin',array($this,'_hide_content_for_adminmap'));
 		}
@@ -120,7 +122,7 @@ class enhancedmap {
 			foreach($params as $key=>$value)
 			{
 	
-				if (strcmp($value, 'c.category_visible = 1') == 0)
+				if (! is_array($value) AND strcmp($value, 'c.category_visible = 1') == 0)
 				{
 					$found_it = true;
 					$i = $key;
@@ -212,10 +214,13 @@ class enhancedmap {
 			$found_it = false;
 			while($i < count($params))
 			{
-				if($params[$i] == $category_sql)
+				if(isset($params[$i]))
 				{
-					$found_it = true;
-					break;					
+					if($params[$i] == $category_sql)
+					{
+						$found_it = true;
+						break;					
+					}
 				}
 				$i++;
 			}
@@ -380,7 +385,7 @@ class enhancedmap {
 	public function _add_printmap()
 	{
 		$map = Event::$data;
-		$map = str_replace('<div id="mapOutput"></div>','<div id="mapOutput"></div><div id="printmap-link"><a href="'.url::site('printmap').'">Print a map</a></div>', $map);
+		$map = str_replace('<div id="mapOutput"></div>', '<div id="mapOutput"></div><div id="printmap-link"><a href="' . url::site('printmap') . '">'.Kohana::lang('enhancedmap.print_a_map').'</a></div>', $map);
 		Event::$data = $map;
 	}
 	

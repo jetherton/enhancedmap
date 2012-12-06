@@ -82,20 +82,25 @@ class enhancedmap_helper_Core {
 	public static function set_shares($on_backend = false, $show_on_load = false,
 			$shares_filter_view = 'enhancedmap/shares_filter', $shares_filter_id = "shares_filter")
 	{
+		// First of all make sure sharing is turned on.
+		$sharing_plugin = ORM::factory('plugin')
+			->where('plugin_name', 'sharing')
+			->where('plugin_active',1)
+			->where('plugin_installed',1)
+			->find();
 		
-		//first of all make sure sharing is turned on.
-		$db = new Database();
+		if (! $sharing_plugin->loaded) return "";
 		
-		$result = $db->query('SHOW TABLES LIKE \''.self::$table_prefix.'sharing\'');
+		// Check sharing table exists
+		$result = Database::instance()->query('SHOW TABLES LIKE \''.self::$table_prefix.'sharing\'');
 		$table_exists = false;
 		foreach($result as $r)
 		{
 			$table_exists = true;
 		}
 		
-		
 		if($table_exists)
-		{	
+		{
 			$shares = array();
 			foreach (ORM::factory('sharing')
 					->where('sharing_active', 1)
@@ -111,8 +116,6 @@ class enhancedmap_helper_Core {
 			return $view;
 		}
 		return "";
-		
-		
 	}
 	
 	
@@ -665,6 +668,37 @@ class enhancedmap_helper_Core {
 		}
 		$color = self::merge_colors($colors);	
 		
+		//if simple groups are involved things get crazy
+		
+		if(isset($_GET['sgid']))
+		{
+			$sg_cat_str = "";//only used by highest first coloring mode
+			//reset colors if the all cat color is currently being used
+			if($all_categories)
+			{
+				$colors = array();
+			}			
+			if(count($category_id) == 1 AND strlen(substr($category_id[0],3)) == 0 AND $all_categories)
+			{
+				$colors = array(Kohana::config('settings.default_map_all'));
+				$all_categories = true;
+			}
+			else
+			{
+				$all_categories = false;
+				foreach($category_id as $cat)
+				{
+					$c = ORM::factory('simplegroups_category', substr($cat,3));
+					$colors[$c->id] = $c->category_color;
+					if($sg_cat_str != ''){
+						$sg_cat_str .= ',';
+					}
+					$sg_cat_str .= $c->id;
+				}
+			}
+			$color = self::merge_colors($colors);
+		}
+		
 		//since we're on the back end, wana do anything special?
 		$admin_path = '';
 		$view_or_edit = 'view';
@@ -678,8 +712,8 @@ class enhancedmap_helper_Core {
 		$markers = (isset($_GET['page']) AND intval($_GET['page']) > 0)? reports::fetch_incidents(TRUE) : reports::fetch_incidents();
 		
 		//only do this if highest_first
-		$position_map = array();
-		if($color_mode=='highest_first'  AND !$all_categories AND $markers->count() > 0)
+		$position_map = array(); 
+		if($color_mode=='highest_first'  AND (!$all_categories) AND ($markers->count() > 0) AND (strlen($cat_str) > 0))
 		{
 			$ids_str = ""; //only used in highest first coloring mode
 			foreach ($markers as $incident)
@@ -691,7 +725,6 @@ class enhancedmap_helper_Core {
 				$ids_str .= $incident->incident_id;						
 			}
 			
-			
 			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'category.category_position ) AS position
 			FROM  `'.self::$table_prefix.'incident_category`
 			JOIN '.self::$table_prefix.'category ON '.self::$table_prefix.'incident_category.category_id = '.self::$table_prefix.'category.id
@@ -699,7 +732,6 @@ class enhancedmap_helper_Core {
 			AND category_id IN ('.$cat_str.')
 			GROUP BY '.self::$table_prefix.'incident_category.incident_id
 			ORDER BY '.self::$table_prefix.'incident_category.incident_id';
-				
 			$results = $db->query($query_str);
 			
 			//now build the map
@@ -709,12 +741,52 @@ class enhancedmap_helper_Core {
 			}	
 		}
 		
+		//if the coloring mode is highest first and simple groups are in the mix
+		if($color_mode == 'highest_first' AND !$all_categories AND strlen($sg_cat_str) > 0 AND isset($_GET['sgid']))
+		{
+		
+			$ids_str = ""; //only used in highest first coloring mode
+			foreach ($markers as $incident)
+			{
+				if($ids_str != '')
+				{
+					$ids_str .= ',';
+				}
+				$ids_str .= $incident->incident_id;
+			}
+		
+			//$position_map = array();
+			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'simplegroups_category.id ) AS position
+			FROM  `'.self::$table_prefix.'simplegroups_incident_category`
+			JOIN '.self::$table_prefix.'simplegroups_category ON '.self::$table_prefix.'simplegroups_incident_category.simplegroups_category_id = '.self::$table_prefix.'simplegroups_category.id
+			WHERE incident_id IN ('.$ids_str.')
+			AND simplegroups_category_id IN ('.$sg_cat_str.')
+			GROUP BY '.self::$table_prefix.'simplegroups_incident_category.incident_id
+			ORDER BY '.self::$table_prefix.'simplegroups_incident_category.incident_id';
+		
+			$results = $db->query($query_str);
+		
+			//now build the map
+			foreach($results as $r)
+			{
+				$position_map[$r->incident_id] = $r->position;
+			}
+		}
+		
 		
 		// Variable to store individual item for report detail page
 		$json_item_first = "";
 		
 		foreach ($markers as $marker)
 		{
+			
+			//make sure that each marker has a valid lat and lon, seems people can find ways to add non-valid lats and lons
+			if($marker->latitude == null OR strlen($marker->latitude) == 0 OR $marker->longitude == null OR strlen($marker->longitude) == 0)
+			{
+				$marker->latitude = 0;
+				$marker->longitude = 0;
+			}
+			
 			$thumb = "";
 			if ($media_type == 1)
 			{
@@ -987,16 +1059,21 @@ class enhancedmap_helper_Core {
 		//if simple groups are involved things get crazy
 		
 		if(isset($_GET['sgid']))
-		{
+		{			
 			$sg_cat_str = "";//only used by highest first coloring mode
-			$all_categories = false;
-			if(count($category_id) == 1 AND intval(substr($category_id[0],3)) == 0 )
+			//reset colors if the all cat color is currently being used
+			if($all_categories)
+			{
+				$colors = array();
+			}
+			if(count($category_id) == 1 AND strlen(substr($category_id[0],3)) == 0 AND $all_categories)
 			{
 				$colors = array(Kohana::config('settings.default_map_all'));
 				$all_categories = true;
 			}
 			else
 			{
+				$all_categories = false;
 				foreach($category_id as $cat)
 				{
 					$c = ORM::factory('simplegroups_category', substr($cat,3));
@@ -1015,6 +1092,12 @@ class enhancedmap_helper_Core {
 		$ids_str = ""; //only used in highest first coloring mode
 		foreach ($incidents as $incident)
 		{
+			//make sure that each marker has a valid lat and lon, seems people can find ways to add non-valid lats and lons
+			if($incident->latitude == null OR strlen($incident->latitude) == 0 OR $incident->longitude == null OR strlen($incident->longitude) == 0)
+			{
+				$incident->latitude = 0;
+				$incident->longitude = 0;
+			}
 			$markers[] = array(
 				'id' => $incident->incident_id,
 				'incident_title' => $incident->incident_title,
@@ -1035,7 +1118,7 @@ class enhancedmap_helper_Core {
 		}
 		$position_map = array();
 		//if the coloring mode is highest first
-		if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0)
+		if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0 AND strlen($cat_str) > 0)
 		{
 			
 			
@@ -1050,6 +1133,27 @@ class enhancedmap_helper_Core {
 			
 			$results = $db->query($query_str);
 				
+			//now build the map
+			foreach($results as $r)
+			{
+				$position_map[$r->incident_id] = $r->position;
+			}
+		}
+		//if the coloring mode is highest first and simple groups are in the mix
+		if($color_mode == 'highest_first' AND !$all_categories && strlen($ids_str) > 0 AND strlen($sg_cat_str) > 0 AND isset($_GET['sgid']))
+		{
+				
+				
+			$query_str = 'SELECT incident_id, MIN( '.self::$table_prefix.'simplegroups_category.id ) AS position
+			FROM  `'.self::$table_prefix.'simplegroups_incident_category`
+			JOIN '.self::$table_prefix.'simplegroups_category ON '.self::$table_prefix.'simplegroups_incident_category.simplegroups_category_id = '.self::$table_prefix.'simplegroups_category.id
+			WHERE incident_id IN ('.$ids_str.')
+			AND simplegroups_category_id IN ('.$sg_cat_str.')
+			GROUP BY '.self::$table_prefix.'simplegroups_incident_category.incident_id
+			ORDER BY '.self::$table_prefix.'simplegroups_incident_category.incident_id';
+				
+			$results = $db->query($query_str);
+		
 			//now build the map
 			foreach($results as $r)
 			{
@@ -1264,9 +1368,9 @@ class enhancedmap_helper_Core {
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
 			$json_item .= "\"properties\": {";
-			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = ".$link_target." href=" . url::base().$admin_path.$link_path_prefix
-				 . "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast.">" . $cluster_count . " Reports</a>")) . "\",";
-			$json_item .= "\"link\": \"".url::base().$admin_path.$link_path_prefix. "reports/index/?".$_SERVER['QUERY_STRING']."&sw=".$southwest."&ne=".$northeast."\", ";
+			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = " . $link_target . " href=" . url::base() . $admin_path . $link_path_prefix
+				. "reports/index/?" . $_SERVER['QUERY_STRING'] . "&sw=" . $southwest . "&ne=" . $northeast . ">" . $cluster_count . " ".Kohana::lang('ui_main.cluster_name_reports')."</a>")) . "\",";
+			$json_item .= "\"link\": \"" . url::base() . $admin_path . $link_path_prefix . "reports/index/?" . $_SERVER['QUERY_STRING'] . "&sw=" . $southwest . "&ne=" . $northeast . "\", ";
 			$json_item .= "\"category\":[0], ";
 			$json_item .= "\"color\": \"".$dot_color."\", ";
 			$json_item .= "\"icon\": \"".$icon."\", ";
@@ -1456,9 +1560,9 @@ class enhancedmap_helper_Core {
 		}
 		$approved_IDs_str = $approved_IDs_str.") ";
 	}
-
-        $query = 'SELECT UNIX_TIMESTAMP('.$select_date_text.') AS time, COUNT(id) AS number FROM '.enhancedmap_helper::$table_prefix.'incident WHERE incident.id in'.$approved_IDs_str.' GROUP BY '.$groupby_date_text;
-	$query = $db->query($query);
+		$table_prefix = Kohana::config('database.default.table_prefix');
+        $query = 'SELECT UNIX_TIMESTAMP('.$select_date_text.') AS time, COUNT(id) AS number FROM '.$table_prefix.'incident WHERE incident.id in'.$approved_IDs_str.' GROUP BY '.$groupby_date_text;
+		$query = $db->query($query);
 
         foreach ( $query as $items )
         {

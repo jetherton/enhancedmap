@@ -58,12 +58,13 @@
 				
 				
 				<div style="display:none;" id="key" class="right bottom">
-				<h5>Map Key:</h5>
-				This map is showing reports from <span id="keyStartDate"></span> to <span id="keyEndDate"></span>.<br/>
-				<span id="keyLogic">All reports on this map fall under one or more of the following categories. </span>
+				<h5><?php echo Kohana::lang('enhancedmap.map_key'); ?></h5>
+				<?php echo Kohana::lang('enhancedmap.map_key_1', array('<span id="keyStartDate"></span>','<span id="keyEndDate"></span>')); ?><br/>
+				<span id="keyLogic"> </span>
 				<br/>
+				<?php echo Kohana::lang('enhancedmap.logic_str_or'); ?>
 				<ul id="keyCategories">
-					<li> <div class="swatch" style="background:#cc0000;"></div> ALL CATEGORIES</li>
+					<li> <div class="swatch" style="background:#cc0000;"></div> <?php echo Kohana::lang('ui_main.all_categories'); ?></li>
 				</ul>   
 				
 				</div>

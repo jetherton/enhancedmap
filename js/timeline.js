@@ -679,7 +679,7 @@
 
 			if (thisLayer && thisLayerType == 'shares')
 			{
-				protocolUrl = baseUrl + "json/share/"+thisLayerID+"/";
+				protocolUrl = baseUrl + "json/share/index/"+thisLayerID+"/";
 				thisLayer = "Share_"+thisLayerID;
 				newlayer = true;
 			} 

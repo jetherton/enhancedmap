@@ -18,5 +18,6 @@
 	<div id="mapMousePosition" class="mapMousePosition" ></div>
 	<div id="mapProjection" class="mapProjection"></div>
 	<div id="mapOutput" class="mapOutput" ></div>
+	<div id="printmap-link"><a href="<?php echo url::site('printmap'); ?>"><?php echo Kohana::lang('enhancedmap.print_a_map'); ?></a></div>
 </div>
 <!-- / map -->

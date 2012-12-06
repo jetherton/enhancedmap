@@ -18,11 +18,11 @@ class Printmapkey_Controller extends Controller {
 		//handle the logic operator
 		if($logicalOperator == "or")
 		{
-			$logicStr = "All reports on this map fall under one or more of the following categories.";		
+			$logicStr = Kohana::lang('enhancedmap.logic_str_or');
 		}
 		else
 		{
-			$logicStr = "All reports on this map fall under all of the following categories. ";
+			$logicStr = Kohana::lang('enhancedmap.logic_str_and');
 		}
 		
 		

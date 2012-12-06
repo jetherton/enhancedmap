@@ -33,8 +33,8 @@ class Enhancedmap_settings_Controller extends Admin_Controller
 		$this->template->content->errors = array();
 		$this->template->content->form_saved = false;
 		$this->template->content->yesno_array = array(
-				'true'=>strtoupper(Kohana::lang('ui_main.yes')),
-				'false'=>strtoupper(Kohana::lang('ui_main.no')));
+				'true' => utf8::strtoupper(Kohana::lang('ui_main.yes')),
+				'false' => utf8::strtoupper(Kohana::lang('ui_main.no')));
 		
 		$form = array();
 		

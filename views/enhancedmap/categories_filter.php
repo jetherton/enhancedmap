@@ -15,7 +15,7 @@
 <!-- category filters -->
 			<div id="catsortdiv"></div>
 			<ul id="<?php echo $categories_view_id;?>" class="category-filters cat_switch">
-				<strong ><?php echo Kohana::lang("enhancedmap.Categories"); ?></strong>
+				<strong ><?php echo Kohana::lang("ui_main.categories"); ?></strong>
 				<a class="alphabetize_link" id="<?php echo $categories_view_id;?>_alphabetize_link" href="#" onclick="alphabetize('<?php echo $categories_view_id;?>'); return false;"> <?php echo Kohana::lang("enhancedmap.alphabetize"); ?></a>
 				<li><a class="active" id="cat_0" href="#"><div class="swatch" style="background-color:#<?php echo Kohana::config('settings.default_map_all');?>"></div><div class="category-title"><?php echo Kohana::lang('ui_main.all_categories');?></div></a></li>
 				<?php
