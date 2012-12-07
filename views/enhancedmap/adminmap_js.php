@@ -1089,13 +1089,20 @@
 						
 			
 		
-		/*This function is used to register event handlers for feature selection*/
+		/**
+		 * Description: This function is used to register event handlers for feature selection
+		 * @param function func - The function that will be called when a map feature is selected
+		 */
 		map.registerMapFeatureSelectionHandler = function(func)
 		{
 			this.featureSelectionEventRegistrants.push(func);
 		}
 		
-		/*This is used to unregister event handlers for feature selection*/
+
+		/**
+		 * Description: This is used to unregister event handlers for feature selection
+		 * @param function func - The function that should be removed from the list of functions called when a map feature is selected
+		 */
 		map.unregisterMapFeatureSelectionHandler = function (func)
 		{
 			var tempArray = new Array();
@@ -1110,13 +1117,20 @@
 			this.featureSelectionEventRegistrants = tempArray;
 		}
 		
-		/*This function is used to register event handlers for feature unselection*/
+	    /**
+		 * Description: This function is used to register event handlers for feature unselection
+		 * @param function func - The function that will be called when a map feature is unselected
+		 */
 		map.registerMapFeatureUnSelectionHandler = function (func)
 		{
 			this.featureUnSelectionEventRegistrants.push(func);
 		}
 		
-		/*This is used to unregister event handlers for feature unselection*/
+
+		/**
+		 * Description: This is used to unregister event handlers for feature unselection
+		 * @param function func - The function that should be removed from the list of functions called when a map feature is deselected
+		 */
 		map.unregisterMapFeatureUnSelectionHandler = function (func)
 		{
 			var tempArray = new Array();
@@ -1133,13 +1147,22 @@
 		
 		
 		
-		/*This function is used to register event handlers for category changes events*/
+		/**
+		 * Description: This function is used to register event handlers for category changes events
+		 * @param function func - The function that will be called when a category selection changes
+		 */
 		map.registerCategoryChangeHandler = function (func)
 		{
 			this.categoryChangeEventRegistrants.push(func);
 		}
 		
-		/*This is used to unregister event handlers for category change events*/
+		
+		
+		
+        /**		
+		 * Description: This is used to unregister event handlers for category change events
+		 * @param function func - The function that should be removed from the list of functions called when a category change event occurs
+		 */
 		map.unregisterCategoryChangeHandler = function (func)
 		{
 			var tempArray = new Array();
@@ -1158,7 +1181,8 @@
 		
 
 		/**
-		 * creates an array that maps incident ids to markers
+		 * Description: creates an array that maps incident ids to markers
+		 * @return array An array that maps incidents to markers
 		 */
 		map.mapIncidentsToMarkers = function (markers)
 		{
