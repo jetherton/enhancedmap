@@ -1,12 +1,34 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * This renders the a static bitmap map
- *
- *
  * @author     John Etherton <john@ethertontech.com>
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
+ * @license	   GNU Lesser GPL (LGPL) Rights pursuant to Version 3, June 2007
+ * @copyright  2012 Etherton Technologies Ltd. <http://ethertontech.com>
+ * @Date	   2011-06-09
+ * Purpose:	   This controller creates a bitmap map. For leagal reasons this can only be used with Open Street Maps
+ * This is experimental and is not activated by default.
+ * Inputs:     Internal calls from modules
+ * Outputs:    A map for viewing by users
+ *
+ * The Enhanced Map, Ushahidi Plugin is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * The Enhanced Map, Ushahidi Plugin is distributed in the hope that it will
+ * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the Enhanced Map, Ushahidi Plugin.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * Changelog:
+ * 2011-06-09:  Etherton - Initial release
+ *
+ * Developed by Etherton Technologies Ltd.
  */
-
 //TODO: Way more error checking!!!!!! and some graceful failing.
 
 	class Stitch_Controller extends Controller
@@ -15,8 +37,23 @@
 		public $TEMP_URL = '/liberia/Ushahidi_Web/media/uploads';
 			
 
+
 		/**
-		 * Creates an image of the map and then returns the URL to that image
+		 * Function: index
+		 *
+		 * Description: Creates an image of the map and then returns the URL to that image
+		 *
+		 * Parameters(POST)
+		 * - width - width of the map to render
+		 * - height - height of the map to render
+		 * - tiles - json encoded info about the tiles needed to render the map
+		 * - features- json encoded data about the features on the map (dots and polygons)
+		 * - viewport - json encoded information about the viewport on the user's client
+		 *
+		 * Views:enhancedmap/big_map_header, enhancedmap/big_map_footer
+		 *
+		 * Results: An image of the map is created and the url is returned
+		 * 
 		 * TODO: clean up old image files
 		 */
   		public function index()
@@ -105,11 +142,21 @@
 			print $url;
 		}
 		
+		
+		
+
 		/**
-		 * Processes the dots and polygons
-		 * Enter description here ...
-		 * @param unknown_type $image
-		 * @param unknown_type $features
+		 * Function: handleDotsAndPolygons
+		 *
+		 * Description: Processes the dots and polygons
+		 *
+		 * @param handle $image - Handle to the image
+		 * @param array $features - Data about the polygons and dots to render on the image
+		 * @param array $viewport - Data about the client's view port
+		 *
+		 * Views: 
+		 *
+		 * Results: an image with dots and polygons
 		 */
 		private function handleDotsAndPolygons($image, $features, $viewport)
 		{
@@ -133,12 +180,25 @@
 			return $image; 
 		}
 	
+		
+		
+		
+		
+		
 	  
+
 		/**
-		 * Creates dots on the image
-		 * @param unknown_type $image
-		 * @param unknown_type $feature
-		 * @param unknown_type $viewport
+		 * Function: handleDots
+		 *
+		 * Description: Processes the dots and polygons
+		 *
+		 * @param handle $image - Handle to the image
+		 * @param array $feature - Data about the dot to render on the image
+		 * @param array $viewport - Data about the client's view port
+		 *
+		 * Views:
+		 *
+		 * Results: an image with dots
 		 */
 		private function handleDots($image, $feature, $viewport)
 		{
@@ -202,11 +262,23 @@
 			return $image;
 		}
 		
+		
+		
+		
+		
+
 		/**
-		 * Creates polygons on the image
-		 * @param unknown_type $image
-		 * @param unknown_type $feature
-		 * @param unknown_type $viewport
+		 * Function: handlePolygons
+		 *
+		 * Description: Processes the dots and polygons
+		 *
+		 * @param handle $image - Handle to the image
+		 * @param array $feature - Data about the polygon to render on the image
+		 * @param array $viewport - Data about the client's view port
+		 *
+		 * Views:
+		 *
+		 * Results: an image with polygons
 		 */
 		private function handlePolygons($image, $feature, $viewport)
 		{
@@ -267,10 +339,25 @@
 			return $image;
 		}
 		
+		
+		
+		
+		
+		
+		
+		
+		
 		/**
-		 * turns #RGB into array(r, g, b)
+		 * Function: html2rgb
 		 *
-		 * @param unknown_type $color
+		 * Description: turns #RGB into array(r, g, b)
+		 *
+		 * @param string $color - Handle to the image
+		 * @return array - array(r,g,b)		 
+		 *
+		 * Views:
+		 *
+		 * Results: an array with r,g,b values
 		 */
 		public function html2rgb($color)
 		{
@@ -292,20 +379,48 @@
 		}
 	  
 	
-	  
-	  
-	  
-	function imagecopymerge_alpha($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $opacity)
-	{
-		$w = imagesx($src_im);
-		$h = imagesy($src_im);
-		$cut = imagecreatetruecolor($src_w, $src_h);
-		imagecopy($cut, $dst_im, 0, 0, $dst_x, $dst_y, $src_w, $src_h);
-		imagecopy($cut, $src_im, 0, 0, $src_x, $src_y, $src_w, $src_h);
-		imagecopymerge($dst_im, $cut, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $opacity);
-	}
-		
-		
+		  
+		  
+	
+		/**
+		 * Function: imagecopymerge_alpha
+		 *
+		 * Description: Copies part of a src image to a dest image with the given opacity
+		 * 
+		 * @param handle $dst_im - Handle of destination image
+		 * @param handle $src_im - Hanlde of source image
+		 * @param int $dst_x - x-coordinate of destination point.
+		 * @param int $dst_y - y-coordinate of destination point.
+		 * @param int $src_x - x-coordinate of source point.
+		 * @param int $src_y - y-coordinate of source point.
+		 * @param int $src_w - Source width
+		 * @param int $src_h - Source height
+		 * @param int $opacity - The two images will be merged according to pct which can range from 0 to 100. When pct = 0, no action is taken, when 100 this function behaves identically to imagecopy() for pallete images, except for ignoring alpha components, while it implements alpha transparency for true colour images.
+		 *
+		 * Views:
+		 *
+		 * Results: Something from the source image gets copied to the destination image
+		 */
+		function imagecopymerge_alpha($dst_im, $src_im, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $opacity)
+		{
+			$w = imagesx($src_im);
+			$h = imagesy($src_im);
+			$cut = imagecreatetruecolor($src_w, $src_h);
+			imagecopy($cut, $dst_im, 0, 0, $dst_x, $dst_y, $src_w, $src_h);
+			imagecopy($cut, $src_im, 0, 0, $src_x, $src_y, $src_w, $src_h);
+			imagecopymerge($dst_im, $cut, $dst_x, $dst_y, $src_x, $src_y, $src_w, $src_h, $opacity);
+		}
+			
+	
+		/**
+		 * Function: index
+		 *
+		 * Description: Renders the please wait view
+		 *
+		 * Views: enhancedmap/waitprint, 
+		 *
+		 * Results: Renders the please wait view
+		 */
 		public function wait()
 		{
 			$view = new View("enhancedmap/waitprint");

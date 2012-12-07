@@ -1,16 +1,35 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * Json Controller
- * Generates Map GeoJSON File for the front end
- * 
- * This file is adapted from the file Ushahidi_Web/appliction/controllers/json.php
- * Originally written by the Ushahidi Team
- *
- *
  * @author     John Etherton <john@ethertontech.com>
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
+ * @license	   GNU Lesser GPL (LGPL) Rights pursuant to Version 3, June 2007
+ * @copyright  2012 Etherton Technologies Ltd. <http://ethertontech.com>
+ * @Date	   2011-01-06
+ * Purpose:	   Json Controller. Generates Map GeoJSON File for the front end
+ *             This file is adapted from the file Ushahidi_Web/appliction/controllers/json.php
+ *             Originally written by the Ushahidi Team
+ * Inputs:     Internal calls from modules
+ * Outputs:     GeoJSON file for the openlayer java script to display to the user
+ *
+ * The Enhanced Map, Ushahidi Plugin is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * The Enhanced Map, Ushahidi Plugin is distributed in the hope that it will
+ * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the Enhanced Map, Ushahidi Plugin.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * Changelog:
+ * 2011-01-06:  Etherton - Initial release
+ *
+ * Developed by Etherton Technologies Ltd.
  */
-
 class Bigmap_json_Controller extends Template_Controller
 {
     public $auto_render = TRUE;
@@ -21,6 +40,16 @@ class Bigmap_json_Controller extends Template_Controller
     // Table Prefix
     protected $table_prefix;
 
+    
+    /**
+     * Function: __construct
+     *
+     * Description: A default constructor that initializes instance variables.
+     *
+     * Views:
+     *
+     * Results: Instance variables are set
+     */
     public function __construct()
     {
         parent::__construct();
@@ -34,16 +63,41 @@ class Bigmap_json_Controller extends Template_Controller
     }
 
 
-    /**
-     * Generate JSON in NON-CLUSTER mode
-     */
+    
+    
+    
+    
+    
+	/**
+	 * Function: index
+	 *
+	 * Description: This controller generates the non-clustered json of reports in the Ushahidi system.
+	 * This controller uses the helper class to do all the work.
+	 * 
+	 * Views:
+	 *
+	 * Results: json is sent to the requesting client
+	 */
     function index()
     {
 		enhancedmap_helper::json_index($this, false);
     }
 
-    /***************************************************************************************************************
-     * Generate JSON in CLUSTER mode
+    
+    
+    
+    
+    
+    
+     /**
+     * Function: cluster
+     *
+     * Description: This controller generates the clustered json of reports in the Ushahidi system.
+     * This controller uses the helper class to do all the work.
+     *
+     * Views:
+     *
+     * Results: json is sent to the requesting client
      */
     public function cluster()
     {
@@ -51,19 +105,42 @@ class Bigmap_json_Controller extends Template_Controller
 
     }
 
+    
+    
+    
+    
 
-     /**************************************************************
-     * Retrieve timeline JSON
+    /**
+     * Function: timeline
+     *
+     * Description: This controller generates the timeline json of reports in the Ushahidi system.
+     * This controller uses the helper class to do all the work.
+     *
+     * Views:
+     *
+     * Results: json is sent to the requesting client
      */
     public function timeline()
     {
 		enhancedmap_helper::json_timeline($this, false);
     }
 
+    
+    
+    
+    
+    
 
     /**
-     * Read in new layer KML via file_get_contents
+     * Function: layer
+     *
+     * Description: Read in new layer KML via file_get_contents
+     *
      * @param int $layer_id - ID of the new KML Layer
+     *
+     * Views:
+     *
+     * Results: KML is sent to the requesting client
      */
     public function layer($layer_id = 0)
     {
@@ -99,11 +176,24 @@ class Bigmap_json_Controller extends Template_Controller
             echo "";
         }
     }
+    
+    
+    
+    
+    
+    
 
 
     /**
-     * Read in new layer JSON from shared connection
+     * Function: share
+     *
+     * Description: Read in new layer JSON from shared connection
+     *
      * @param int $sharing_id - ID of the new Share Layer
+     *
+     * Views: bigmap_json.php
+     *
+     * Results: JSON is sent to the requesting client
      */
     public function share( $sharing_id = false )
     {   
@@ -316,21 +406,48 @@ class Bigmap_json_Controller extends Template_Controller
         $this->template->json = $json;
     }
 
+    
+    
+    
+    
+    
+    
 
     /**
-     * Convert Longitude to Cartesian (Pixels) value
+     * Function: _lonToX
+     *
+     * Description: Convert decimal Longitude to Cartesian (Pixels) value
+     *
      * @param double $lon - Longitude
-     * @return int
+     * @return int - The corresponding pixel offset for the given longitude
+     *
+     * Views:
+     *
+     * Results: The corresponding pixel offset for the given longitude is returned
      */
     private function _lonToX($lon)
     {
         return round(OFFSET + RADIUS * $lon * pi() / 180);
     }
 
+    
+    
+    
+    
+    
+    
+    
     /**
-     * Convert Latitude to Cartesian (Pixels) value
+     * Function: _lonToY
+     *
+     * Description: Convert decimal Latitude to Cartesian (Pixels) value
+     *
      * @param double $lat - Latitude
-     * @return int
+     * @return int - The corresponding pixel offset for the given latitude
+     *
+     * Views:
+     *
+     * Results: The corresponding pixel offset for the given latitude is returned
      */
     private function _latToY($lat)
     {
@@ -339,13 +456,27 @@ class Bigmap_json_Controller extends Template_Controller
                     (1 - sin($lat * pi() / 180))) / 2);
     }
 
+    
+    
+    
+    
+    
+    
+    
     /**
-     * Calculate distance using Cartesian (pixel) coordinates
+     * Function: _pixelDistance
+     *
+     * Description: calculates the distance between two decimal lat,lon points in Cartesian (pixel) coordinates
+     *
      * @param int $lat1 - Latitude for point 1
      * @param int $lon1 - Longitude for point 1
      * @param int $lon2 - Latitude for point 2
      * @param int $lon2 - Longitude for point 2
-     * @return int
+     * @return int - the distance between two decimal lat,lon points in Cartesian (pixel) coordinates
+     *
+     * Views:
+     *
+     * Results: Returns the distance between two decimal lat,lon points in Cartesian (pixel) coordinates
      */
     private function _pixelDistance($lat1, $lon1, $lat2, $lon2, $zoom)
     {
@@ -357,11 +488,26 @@ class Bigmap_json_Controller extends Template_Controller
 
         return sqrt(pow(($x1-$x2),2) + pow(($y1-$y2),2)) >> (21 - $zoom);
     }
+    
+    
+    
+    
+    
+    
+    
+    
 
     /**
-     * Calculate the center of a cluster of markers
-     * @param array $cluster
+     * Function: _calculateCenter
+     *
+     * Description: Calculate the center of a cluster of markers
+     *
+     * @param array $cluster - An array of ORM objects representing an incdent with location information
      * @return array - (center, southwest bound, northeast bound)
+     *
+     * Views:
+     *
+     * Results: Returns the average latitude and longitude and the outer bounds for all elements in $cluster
      */
     private function _calculateCenter($cluster)
     {
@@ -428,6 +574,22 @@ class Bigmap_json_Controller extends Template_Controller
     }//end function
     
     
+    
+    
+    
+    /**
+     * Function: _hex2RGB
+     *
+     * Description: Calculate the center of a cluster of markers
+     *
+     * @param String $hexStr - A string representation of a hexidecimal color value, RRGGBB or RGB.
+     * @param bool $returnAsString - If True the RGB values are returned as a string, else as an array
+     * @param String $seperator - The string that should be used as the delimiter if the result is returned as a string
+     * @return array|string - either an array of R,G,B int values or a string deliminated by $seperator
+     * Views:
+     *
+     * Results: Returns either an array of R,G,B int values or a string deliminated by $seperator
+     */
 	private function _hex2RGB($hexStr, $returnAsString = false, $seperator = ',') 
 	{
 		$hexStr = preg_replace("/[^0-9A-Fa-f]/", '', $hexStr); // Gets a proper hex string

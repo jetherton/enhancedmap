@@ -1,14 +1,32 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * This is the map controller for the iFrame Map. Since the iFrame map has special needs
- *
- * This file is adapted from the file Ushahidi_Web/appliction/controllers/json.php
- * Originally written by the Ushahidi Team
- *
- * 
- *
  * @author     John Etherton <john@ethertontech.com>
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
+ * @license	   GNU Lesser GPL (LGPL) Rights pursuant to Version 3, June 2007
+ * @copyright  2012 Etherton Technologies Ltd. <http://ethertontech.com>
+ * @Date	   2011-07-01
+ * Purpose:	   This is the map controller for the iFrame Map. Since the iFrame map has special needs
+ * Inputs:     Internal calls from modules
+ * Outputs:    A map for viewing by users
+ *
+ * The Enhanced Map, Ushahidi Plugin is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * The Enhanced Map, Ushahidi Plugin is distributed in the hope that it will
+ * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the Enhanced Map, Ushahidi Plugin.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * Changelog:
+ * 2011-07-01:  Etherton - Initial release
+ *
+ * Developed by Etherton Technologies Ltd.
  */
 class Iframemap_Controller extends Template_Controller {
 
@@ -31,7 +49,19 @@ class Iframemap_Controller extends Template_Controller {
 
 	// Themes Helper
 	protected $themes;
-
+	
+	
+	
+	
+	/**
+	 * Function: __construct
+	 *
+	 * Description: A default constructor that sets instance variables.
+	 *
+	 * Views:enhancedmap/iframe_map_header, enhancedmap/iframe_map_footer
+	 *
+	 * Results: Instance variables are set
+	 */
 	public function __construct()
 	{
 		parent::__construct();
@@ -78,6 +108,20 @@ class Iframemap_Controller extends Template_Controller {
 		$this->template->footer->footer_block = $this->themes->footer_block();
 	}
 
+	
+	
+	/**
+	 * Function: index
+	 *
+	 * Description: This controller calls the helper functions to create and assemble the various components
+	 * needed to make a working map
+	 *
+	 *	@param int $width - Width of the iframe
+	 *
+	 * Views: enhancedmap/iframe_mapview,
+	 *
+	 * Results: User gets a map that they can interact with
+	 */
     public function index($width=400)
     {
     	
@@ -142,6 +186,17 @@ class Iframemap_Controller extends Template_Controller {
     	
 	}
 	
+	
+	
+	/**
+	 * Function: setup
+	 *
+	 * Description: Creates the view for users to see the code they need to embed the iframe in their own site
+	 *
+	 * Views: enhancedmap/iframemap_setup,
+	 *
+	 * Results: Creates the view for users to see the code they need to embed the iframe in their own site
+	 */
 	public function setup()
 	{
 		$this->auto_render = FALSE;

@@ -1,12 +1,32 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * This is main map controller for the enhanced map plugin. Most all of the map
- * rendering reququest go through this controller
- *
- * 
- *
  * @author     John Etherton <john@ethertontech.com>
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
+ * @license	   GNU Lesser GPL (LGPL) Rights pursuant to Version 3, June 2007
+ * @copyright  2012 Etherton Technologies Ltd. <http://ethertontech.com>
+ * @Date	   2010-12-04
+ * Purpose:	   This is main map controller for the enhanced map plugin.
+ * Inputs:     Internal calls from modules
+ * Outputs:    A map for viewing by users
+ *
+ * The Enhanced Map, Ushahidi Plugin is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * The Enhanced Map, Ushahidi Plugin is distributed in the hope that it will
+ * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the Enhanced Map, Ushahidi Plugin.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * Changelog:
+ * 2010-12-04:  Etherton - Initial release
+ *
+ * Developed by Etherton Technologies Ltd.
  */
 class Bigmap_Controller extends Template_Controller {
 
@@ -30,6 +50,17 @@ class Bigmap_Controller extends Template_Controller {
 	// Themes Helper
 	protected $themes;
 
+	
+	
+	/**
+	 * Function: __construct
+	 *
+	 * Description: A default constructor that sets instance variables.
+	 *
+	 * Views:enhancedmap/big_map_header, enhancedmap/big_map_footer
+	 *
+	 * Results: Instance variables are set
+	 */
 	public function __construct()
 	{
 		parent::__construct();
@@ -76,6 +107,22 @@ class Bigmap_Controller extends Template_Controller {
 		$this->template->footer->footer_block = $this->themes->footer_block();
 	}
 
+	
+	
+	
+	
+	
+	
+	/**
+	 * Function: index
+	 *
+	 * Description: This controller calls the helper functions to create and assemble the various components
+	 * needed to make a working map
+	 *
+	 * Views: enhancedmap/big_mapview, 
+	 *
+	 * Results: User gets a map that they can interact with
+	 */
     public function index()
     {
     	//set the title of the page
@@ -142,8 +189,18 @@ class Bigmap_Controller extends Template_Controller {
 	}//end 
 
 	
+
+	
+	
+	
 	/**
-	 * Used to set how the category list will be displayed
+	 * Function: fitler_cats
+	 *
+	 * Description: Used to set how the category list will be displayed, alphabetized or not
+	 *
+	 * Views: enhancedmap/categories_filter
+	 *
+	 * Results: renders the cateogry filter as indicated by the settings
 	 */
 	public function fitler_cats()
 	{

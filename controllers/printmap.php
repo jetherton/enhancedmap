@@ -1,9 +1,32 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * This is the controller print map map, since it has special needs
- *
  * @author     John Etherton <john@ethertontech.com>
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
+ * @license	   GNU Lesser GPL (LGPL) Rights pursuant to Version 3, June 2007
+ * @copyright  2012 Etherton Technologies Ltd. <http://ethertontech.com>
+ * @Date	   2011-05-27
+ * Purpose:	   This is the controller print map map, since it has special needs
+ * Inputs:     Internal calls from modules
+ * Outputs:    A map for viewing by users
+ *
+ * The Enhanced Map, Ushahidi Plugin is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * The Enhanced Map, Ushahidi Plugin is distributed in the hope that it will
+ * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the Enhanced Map, Ushahidi Plugin.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * Changelog:
+ * 2011-05-27:  Etherton - Initial release
+ *
+ * Developed by Etherton Technologies Ltd.
  */
 class Printmap_Controller extends Template_Controller {
 
@@ -27,6 +50,21 @@ class Printmap_Controller extends Template_Controller {
 	// Themes Helper
 	protected $themes;
 
+	
+	
+	
+	
+	
+	
+	/**
+	 * Function: __construct
+	 *
+	 * Description: A default constructor that sets instance variables.
+	 *
+	 * Views:enhancedmap/print_map_header, enhancedmap/big_map_footer
+	 *
+	 * Results: Instance variables are set
+	 */
 	public function __construct()
 	{
 		parent::__construct();
@@ -87,7 +125,25 @@ class Printmap_Controller extends Template_Controller {
 
 		$this->template->footer->footer_block = $this->themes->footer_block();
 	}
-
+	
+	
+	
+	
+	
+	
+	
+	
+	
+	/**
+	 * Function: index
+	 *
+	 * Description: This controller calls the helper functions to create and assemble the various components
+	 * needed to make a working map
+	 *
+	 * Views: enhancedmap/print_mapview, enhancedmap/print_map_header
+	 *
+	 * Results: User gets a map that they can interact with
+	 */
     public function index()
     {
     	
@@ -171,10 +227,20 @@ class Printmap_Controller extends Template_Controller {
 	}
 	
 	
+	
+	
+	
+	
+	
 	/**
-	 * For groups
-	 * Enter description here ...
-	 * @param unknown_type $id
+	 * Function: groups
+	 *
+	 * Description: This controller sets an instance variable and calls the index 
+	 * function to show a map specific to a group, if the Simple Group plugin is enabled.
+	 * 
+	 * @param int $id - The database id of the group to render the map for
+	 * 
+	 * Results: User gets a map of reports specific to the given group that they can interact with
 	 */
 	public function groups($id=false)
 	{

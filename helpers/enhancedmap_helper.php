@@ -1,14 +1,32 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * Where all the work is done. This file handles map rendering requests and requests for Geo JSON
- * 
- * This file is adapted from the file Ushahidi_Web/appliction/controllers/json.php and
- * Ushahidi_Web/application/controllers/main.php
- * Originally written by the Ushahidi Team
- *
- *
  * @author     John Etherton <john@ethertontech.com>
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
+ * @license	   GNU Lesser GPL (LGPL) Rights pursuant to Version 3, June 2007
+ * @copyright  2012 Etherton Technologies Ltd. <http://ethertontech.com>
+ * @Date	   2012-06-06
+ * Purpose:	   Where all the work is done. This file handles map rendering requests and requests for Geo JSON
+ * Inputs:     Internal calls from modules
+ * Outputs:    Depends on function, but generally this class does the real work.
+ *
+ * The Enhanced Map, Ushahidi Plugin is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * The Enhanced Map, Ushahidi Plugin is distributed in the hope that it will
+ * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the Enhanced Map, Ushahidi Plugin.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * Changelog:
+ * 2012-06-06:  Etherton - Initial release
+ *
+ * Developed by Etherton Technologies Ltd.
  */
 class enhancedmap_helper_Core {
 
@@ -21,9 +39,20 @@ class enhancedmap_helper_Core {
 		self::$table_prefix = Kohana::config('database.default.table_prefix');
 	}
 
-	/**************************************************************************************************************
-      * Given all the parameters returns a list of incidents that meet the search criteria
-      */
+
+	/**
+	 * Function: setup_enhancedmap
+	 *
+	 * Description: Sets up the map view in the content variable of a template
+	 * 
+	 * @param obj $map_controller - The controller that wants a map
+	 * @param string $map_view - The path to the view for this map
+	 * @param string $map_css - The path to the CSS for this map
+	 *
+	 * Views: whatever is in $map_view
+	 *
+	 * Results: Sets up the map view in the content variable of a template
+	 */
 	public static function setup_enhancedmap($map_controller, $map_view = "enhancedmap/mapview", $map_css = "enhancedmap/css/enhancedmap")		
 	{
 	
@@ -45,9 +74,27 @@ class enhancedmap_helper_Core {
 	}
 	
 	
-	/****
-	* Sets up the overlays and shares
-	*/
+	
+	
+	
+	
+	
+	
+	/**
+	 * Function: set_layers
+	 *
+	 * Description: Sets up the UI element that controls the layers on the map
+	 * 
+	 * @param bool $on_backend - If true then this UI is for a page on the backend
+	 * @param bool $show_on_load - Should the layers be turned on when the page loads
+	 * @param string $layers_filter_view - Path to the view that will render the layers UI
+	 * @param string $layers_filter_id - The ID the layers filter HTML DOM element will have
+	 * @return object - A view that has been created per the specifications of the parameters
+	 *
+	 * Views: What's in $layers_filter_view,
+	 *
+	 * Results:  A view that has been created per the specifications of the parameters
+	 */
 	public static function set_layers($on_backend = false, $show_on_load = false,
 			$layers_filter_view = 'enhancedmap/layers_filter', $layers_filter_id = "layer_filter")
 	{
@@ -76,9 +123,26 @@ class enhancedmap_helper_Core {
 	}
 	
 	
-	/****
-	 * Sets up the overlays and shares
-	*/
+	
+	
+	
+	
+	
+	/**
+	 * Function: set_shares
+	 *
+	 * Description: Sets up the UI element that controls the shares on the map
+	 * 
+	 * @param bool $on_backend - If true then this UI is for a page on the backend
+	 * @param bool $show_on_load - Should the layers be turned on when the page loads
+	 * @param string $shares_filter_view - Path to the view that will render the shares UI
+	 * @param string $shares_filter_id - The ID the shares filter HTML element will have
+	 * @return object - A view that has been created per the specifications of the parameters
+	 *
+	 * Views: What's in $layers_filter_view,
+	 *
+	 * Results:  A view that has been created per the specifications of the parameters
+	 */
 	public static function set_shares($on_backend = false, $show_on_load = false,
 			$shares_filter_view = 'enhancedmap/shares_filter', $shares_filter_id = "shares_filter")
 	{
@@ -119,9 +183,29 @@ class enhancedmap_helper_Core {
 	}
 	
 	
-	/*
-	* this makes the map for this plugin
-	*/
+	
+	/**
+	 * Function: set_map
+	 *
+	 * Description: Sets up the UI element displays the map
+	 *
+	 * @param obj $template - The template view of the controller that called this method
+	 * @param obj $themes - The theme view of the controller that called this, used to access the JavaScript
+	 * @param string $json_url - URL to the json controller
+	 * @param string $json_timeline_url - URL to the json timeline controller
+	 * @param string $javascript_view - Path to the view that's used for the javascript
+	 * @param string $div_map_view - Path to the view that will render the map
+	 * @param string $div_timeline_view - Path to the view that will render the timeline
+	 * @param array $urlParams - Should just be $_GET, used to tell he JavaScript what's up
+	 * @param string $map_id - HTML element id of the map
+	 * @param string $map_status_id - HTML element id of the map status
+	 * @param string $graph_id - HTML element id of the timeline
+	 * @param string $slider_holder_id - HTML element id of the timeline slider
+	 *
+	 * Views: depends on what the user passes in
+	 *
+	 * Results:  A controller that is setup to show the map
+	 */
 	public static function set_map($template, $themes, $json_url, $json_timeline_url, $javascript_view = 'enhancedmap/adminmap_js',
 							$div_map_view = 'enhancedmap/main_map', $div_timeline_view = 'enhancedmap/main_timeline', 
 							$urlParams = array(), $map_id = "map", $map_status_id = "mapStatus", $graph_id = "graph", $slider_holder_id = "slider-holder")
@@ -353,8 +437,26 @@ class enhancedmap_helper_Core {
 
 	}
 
+	
+	
+	
+	
+	
+	
 	/**
-	 * Use this to setup the status filter
+	 * Function: get_status_filter
+	 *
+	 * Description: Sets up the UI element that displays the status (approved/unapproved) filter
+	 *
+	 * @param bool $on_backend - True if this element is going to go on a page on the backend of the website
+	 * @param string $status_filter_view - Path to the view that renders the status filter
+	 * @param string $status_filter_id - HTML elment ID of the status filter UI
+	 * @param bool $show_unapproved - True if viewing unapproved reports is set by default
+	 * @return obj - The view all ready to be inserted into your template of choice.
+	 *
+	 * Views: depends on what the user passes in
+	 *
+	 * Results:  Returns a view all ready to be inserted into your template of choice.
 	 */
 	public static function get_status_filter($on_backend = false, 
 			$status_filter_view = 'enhancedmap/status_filter', $status_filter_id = "status_filter",
@@ -367,8 +469,27 @@ class enhancedmap_helper_Core {
 		return $view;
 	}
 	
+	
+	
+	
+
+	
+	
+	
 	/**
-	 * Use this to setup the boolean filter
+	 * Function: get_boolean_filter
+	 *
+	 * Description: Sets up the UI element that displays the boolean (and/or) filter
+	 *
+	 * @param bool $on_backend - True if this element is going to go on a page on the backend of the website
+	 * @param string $boolean_filter_view - Path to the view that renders the filter
+	 * @param string $boolean_filter_id - HTML elment ID of the filter UI
+	 * @param bool $show_help - True if the help should be shown to the user
+	 * @return obj - The view all ready to be inserted into your template of choice.
+	 *
+	 * Views: depends on what the user passes in
+	 *
+	 * Results:  Returns a view all ready to be inserted into your template of choice.
 	 */
 	public static function get_boolean_filter($on_backend = false,
 			$boolean_filter_view = 'enhancedmap/boolean_filter', $boolean_filter_id = "boolean_filter",
@@ -381,8 +502,22 @@ class enhancedmap_helper_Core {
 		return $view;
 	}
 	
+
+	
+	
+	
 	/**
-	 * Use this to setup the dot size
+	 * Function: get_dotsize_selector
+	 *
+	 * Description: Sets up the UI element that lets users select their dot size.
+	 *
+	 * @param string $dotsize_selector_view - Path to the view used to render the selector
+	 * @param string $dotsize_selector_id - HTML element id of the selector
+	 * @return obj - The view all ready to be inserted into your template of choice.
+	 *
+	 * Views: depends on what the user passes in
+	 *
+	 * Results:  Returns a view all ready to be inserted into your template of choice.
 	 */
 	public static function get_dotsize_selector($dotsize_selector_view = 'enhancedmap/dotsize_selector', 
 			$dotsize_selector_id = "dot_size_selector")
@@ -397,8 +532,22 @@ class enhancedmap_helper_Core {
 	
 	
 	
+	
+	
+	
+	
 	/**
-	 * Use this to setup clustering or no clustering
+	 * Function: get_clustering_selector
+	 *
+	 * Description: Sets up the UI element that lets users select clustering or no clustering
+	 *
+	 * @param string $clustering_selector_view - Path to the view used to render the selector
+	 * @param string $clustering_selector_id - HTML element id of the selector
+	 * @return obj - The view all ready to be inserted into your template of choice.
+	 *
+	 * Views: depends on what the user passes in
+	 *
+	 * Results:  Returns a view all ready to be inserted into your template of choice.
 	 */
 	public static function get_clustering_selector($clustering_selector_view = 'enhancedmap/clustering_selector',
 			$clustering_selector_id = "cluster_selector")
@@ -411,6 +560,24 @@ class enhancedmap_helper_Core {
 	}
 	
 	
+	
+	/**
+	 * Function: set_categories
+	 *
+	 * Description: Sets up the UI element that displays the boolean (and/or) filter
+	 *
+	 * @param boolean $on_backend - True if the output of this function will grace a page on the backend
+	 * @param int $group - The database ID of a Simple Group group, or false if there isn't one.
+	 * @param string $categories_view - Path to the view that will render this filter
+	 * @param string $categories_view_id - HTML element ID of the UI for this filter
+	 * @param bool $alphabetize - True if the categories should be listed in alphabetical order, false they'll be listed in the order they are set on the manage page.
+	 * @throws Exception - If you provide a group id in $group, but the simple group plugin isn't installed
+	 * @return obj - The view all ready to be inserted into your template of choice.
+	 *
+	 * Views: depends on what the user passes in
+	 *
+	 * Results:  Returns a view all ready to be inserted into your template of choice.
+	 */
 	public static function set_categories($on_backend = false, $group = false, $categories_view = "enhancedmap/categories_filter",
 			$categories_view_id = "category_switch", $alphabetize = false)
 	{
@@ -610,11 +777,21 @@ class enhancedmap_helper_Core {
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	
 	
+	
 	/**
-	* Generate JSON in NON-CLUSTER mode
-	* $edit_report_path is used to set where the link to edit/view a report should be set to
-	* $on_the_back_end sets whether or not this user is viewing this data from the backend
-	*/
+	 * Function: json_index
+	 *
+	 * Description: Creates the json of incidents that goes on the map in an unclustered format
+	 *
+	 * @param obj $json_controller - The controller that's calling this function
+	 * @param bool $on_the_back_end - True if this json is going to a client on the backend
+	 * @param string $link_target - If links in the json should open in the current page or a new tab on the user's browser
+	 * @param string $link_path_prefix - Adds a prefix to the links to reports in the json. Use if you don't want the default /reports/view/N controller to handle the viewing of your reports.
+	 *
+	 * Views:
+	 *
+	 * Results:  Json is sent to the client
+	 */	
 	public static function json_index($json_controller,  $on_the_back_end = true,
 		$link_target = "_self",
 		$link_path_prefix = '')
@@ -879,10 +1056,19 @@ class enhancedmap_helper_Core {
 
 
 
-/************************************************************************************************
-	* Function, this'll merge colors. Given an array of category IDs it'll return a hex string
-	* of all the colors merged together
-	*/
+
+	/**
+	 * Function: merge_colors
+	 *
+	 * Description: This'll merge colors. Given an array of category IDs it'll return a hex string
+	 * of all the colors merged together
+	 * 
+	 * @param array $colors - Array of strings of hex color values 'RRGGBB'
+	 *
+	 * Views: 
+	 *
+	 * Results: Colors are blended together
+	 */
 	public static function merge_colors($colors)
 	{
 		//check if we're dealing with just one color
@@ -943,7 +1129,22 @@ class enhancedmap_helper_Core {
 	}//end method merge colors
 
 
-
+	
+	
+	
+	/**
+	 * Function: _hex2RGB
+	 *
+	 * Description: Calculate the center of a cluster of markers
+	 *
+	 * @param String $hexStr - A string representation of a hexidecimal color value, RRGGBB or RGB.
+	 * @param bool $returnAsString - If True the RGB values are returned as a string, else as an array
+	 * @param String $seperator - The string that should be used as the delimiter if the result is returned as a string
+	 * @return array|string - either an array of R,G,B int values or a string deliminated by $seperator
+	 * Views:
+	 *
+	 * Results: Returns either an array of R,G,B int values or a string deliminated by $seperator
+	 */
 	private static function _hex2RGB($hexStr, $returnAsString = false, $seperator = ',') 
 	{
 		$hexStr = preg_replace("/[^0-9A-Fa-f]/", '', $hexStr); // Gets a proper hex string
@@ -978,12 +1179,21 @@ class enhancedmap_helper_Core {
 	
 	
 
-/***************************************************************************************************************
-     * Generate JSON in CLUSTER mode
-     * $edit_report_path sets the path to the link to edit/view a report
-     * $list_report_path sets the path to view a cluster of reports
-     * $on_the_back_end sets whether or not this user is looking at this from the front end or back end
-     */
+
+	/**
+	 * Function: json_cluster
+	 *
+	 * Description: Creates the json of incidents that goes on the map in a clustered format
+	 *
+	 * @param obj $controller - The controller that's calling this function
+	 * @param bool $on_the_back_end - True if this json is going to a client on the backend
+	 * @param string $link_target - If links in the json should open in the current page or a new tab on the user's browser
+	 * @param string $link_path_prefix - Adds a prefix to the links to reports in the json. Use if you don't want the default /reports/view/N controller to handle the viewing of your reports.
+	 *
+	 * Views:
+	 *
+	 * Results:  Json is sent to the client
+	 */
     public static function json_cluster($controller, 	
 	$on_the_back_end = true,
 	$link_target = "_self",
@@ -1441,10 +1651,21 @@ class enhancedmap_helper_Core {
   
   
   
-     /**************************************************************
-     * Retrieve timeline JSON
-     * $on_the_back_end is used to set if the user is looking at this on the backend or not
-     */
+    /**
+     * Function: json_timeline
+     *
+     * Description: Creates the json of incidents that goes on the timeline
+     *
+     * @param obj $controller - The controller that's calling this function
+     * @param bool $on_the_back_end - True if this json is going to a client on the backend
+     * @param string $extra_where_text - If you want to add some extra where text to the SQL
+     * @param array $joins - Array of joins you'd like to add. Great if you're looking to select things based on non-standard tables
+     * @param array $custom_category_to_table_mapping - Maps what the joins are on.
+     * 
+     * Views:
+     *
+     * Results:  Json is sent to the client
+     */    
     public static function json_timeline( $controller, 							 
 								$on_the_back_end = true,
 								$extra_where_text = "",
@@ -1579,13 +1800,24 @@ class enhancedmap_helper_Core {
   
   
   
-  /**
-	 * Get Geometry JSON
-	 * @param int $incident_id
-	 * @param string $incident_title
-	 * @param int $incident_date
-	 * @return array $geometry
-	 */
+
+    /**
+     * Function: _get_geometry
+     *
+     * Description: Gets the geometry for an incident
+     *
+     * @param int $incident_id - Database ID of the incident that you want geometry for
+     * @param string $incident_title - Title of the incident
+     * @param string $incident_date - Date of the incident 
+     * @param bool $on_the_back_end - Are we goign to show this on a page that's on the backend?
+     * @param string $color - RRGGBB color of the incident
+     * @param string $link_target - If the link to the incident should open up in the same tab or a new tab on the browser
+     * @return string - JSON of the incident with geometry
+     *
+     * Views:
+     *
+     * Results:  Json is retunred
+     */
 	private static function _get_geometry($incident_id, $incident_title, $incident_date, $on_the_back_end, $color, $link_target = "_self")
 	{
 		$geometry = array();
@@ -1650,10 +1882,17 @@ class enhancedmap_helper_Core {
   
   
   
-  /**
-     * Calculate the center of a cluster of markers
-     * @param array $cluster
+    /**
+     * Function: _calculateCenter
+     *
+     * Description: Calculate the center of a cluster of markers
+     *
+     * @param array $cluster - An array of ORM objects representing an incdent with location information
      * @return array - (center, southwest bound, northeast bound)
+     *
+     * Views:
+     *
+     * Results: Returns the average latitude and longitude and the outer bounds for all elements in $cluster
      */
     private static function _calculateCenter($cluster)
     {

@@ -1,15 +1,45 @@
 <?php defined('SYSPATH') or die('No direct script access.');
+
 /**
- * This file hooks into Ushahidi so the admin map plugin can do its thing.
- *
- *
  * @author     John Etherton <john@ethertontech.com>
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
+ * @license	   GNU Lesser GPL (LGPL) Rights pursuant to Version 3, June 2007
+ * @copyright  2012 Etherton Technologies Ltd. <http://ethertontech.com>
+ * @Date	   2012-06-06
+ * Purpose:	   This file hooks into Ushahidi so the admin map plugin can do its thing.
+ * Inputs:     Internal calls from modules
+ * Outputs:    Depends on the function called
+ *
+ * The Enhanced Map, Ushahidi Plugin is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * The Enhanced Map, Ushahidi Plugin is distributed in the hope that it will
+ * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the Enhanced Map, Ushahidi Plugin.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * Changelog:
+ * 2012-06-06:  Etherton - Initial release
+ *
+ * Developed by Etherton Technologies Ltd.
  */
 class enhancedmap {
 	
+	
 	/**
-	 * Registers the main event add method
+	 * Function: __construct
+	 *
+	 * Description: Registers the main event add method
+	 *
+	 * Views:
+	 *
+	 * Results: The Enhanced Map plugin is plugged in to the plugin system
 	 */
 	public function __construct()
 	{
@@ -19,8 +49,15 @@ class enhancedmap {
 		
 	}
 	
+
 	/**
-	 * Adds all the events to the main Ushahidi application
+	 * Function: add
+	 *
+	 * Description: Adds all the events to the main Ushahidi application
+	 *
+	 * Views:
+	 *
+	 * Results: This plugin has registered for all the events that it wants to know about
 	 */
 	public function add()
 	{
@@ -70,8 +107,19 @@ class enhancedmap {
 		
 	}
 	
+	
+	
+	
+
 	/**
-	 * This function adds a flag that'll cause the incident::get_incidents to show all reports
+	 * Function: _add_all_reports_filter
+	 *
+	 * Description: This function adds a flag that'll cause the incident::get_incidents to show all reports.
+	 * Called as a result of the following event(s): ushahidi_filter.fetch_incidents_set_params
+	 *
+	 * Views:
+	 *
+	 * Results: sneaks a fast one in and bypasses Ushahidi's attempt to hide unapproved reports
 	 */
 	public function _add_all_reports_filter()
 	{
@@ -138,8 +186,21 @@ class enhancedmap {
 		Event::$data = $params;
 	}
 	
+	
+	
+	
+	
+	
+	
 	/**
-	 * This little guy will add the JS to the /reports page so we can switch between AND and Or
+	 * Function: _add_report_filter_js
+	 *
+	 * Description: This little guy will add the JS to the /reports page so we can switch between AND and OR
+	 * Called as a result of the following event(s): ushahidi_action.header_scripts when the controller is set to 'reports'
+	 *
+	 * Views:
+	 *
+	 * Results: Adds the JS to the /reports page so we can switch between AND and OR
 	 */
 	public function _add_report_filter_js()
 	{
@@ -149,9 +210,27 @@ class enhancedmap {
 	}
 	
 	
+	
+	
+	
+	
+	
+	
+	
+	
+
+
 	/**
-	 * This little zinger does all the HTTP GET parsing to figure out what categories are in play
-	 * Enter description here ...
+	 * Function: _get_categories
+	 *
+	 * Description: This little zinger does all the HTTP GET parsing to figure out what categories are in play
+	 * Called as a result of the following event(s): none, this is a helper method
+	 * 
+	 * @return array - Category IDs
+	 *
+	 * Views:
+	 *
+	 * Results: $_GET is parsed like you wouldn't believe
 	 */
 	private function _get_categories()
 	{
@@ -178,8 +257,19 @@ class enhancedmap {
 			return $category_ids;
 	}
 	
+
+	
+	
+	
 	/**
-	 * This little guy will add the UI to the /reports page so we can switch between AND and OR
+	 * Function: _add_report_filter_js
+	 *
+	 * Description: This little guy will add the UI to the /reports page so we can switch between AND and OR
+	 * Called as a result of the following event(s): ushahidi_action.report_filters_ui when the controller is set to 'reports'
+	 *
+	 * Views:
+	 *
+	 * Results: Adds the UI to the /reports page so we can switch between AND and OR
 	 */
 	public function _add_report_filter_ui()
 	{
@@ -190,8 +280,22 @@ class enhancedmap {
 		$view->render(true);
 	}
 	
+	
+	
+	
+	
+	
+	
+	
 	/**
-	 * implements AND in the reports fetch helper
+	 * Function: _add_logical_operator_filter
+	 *
+	 * Description: Implements AND in the reports fetch helper
+	 * Called as a result of the following event(s): ushahidi_filter.fetch_incidents_set_params
+	 *
+	 * Views:
+	 *
+	 * Results: the fetch parameters are altered
 	 */
 	public function _add_logical_operator_filter()
 	{		
@@ -277,6 +381,19 @@ class enhancedmap {
 	}//end method
 	
 	
+	
+	
+	
+	/**
+	 * Function: _create_default_category_sql
+	 *
+	 * Description: Mimics the way Ushahidi creates the fetch params array, so we can undo it, then override what it does
+	 * Called as a result of the following event(s): none, this is a helper method
+	 *
+	 * Views:
+	 *
+	 * Results: Duplicates what Ushahidi does, so we can undo it
+	 */
 	private function _create_default_category_sql()
 	{
 		// 
@@ -312,9 +429,20 @@ class enhancedmap {
 	}
 	
 	
+
+	
+	
+
+	
 	/**
-	 * figures out what the logical operator is
-	 * defaults to OR
+	 * Function: _get_logical_operator
+	 *
+	 * Description: figures out what the logical operator is. Defaults to OR.
+	 * Called as a result of the following event(s): none, this is a helper method
+	 *
+	 * Views:
+	 *
+	 * Results: Duplicates what Ushahidi does, so we can undo it
 	 */
 	private function _get_logical_operator()
 	{
@@ -329,14 +457,38 @@ class enhancedmap {
 	
 	
 	
+
+	
+	
+	
 	/**
-	 * Adds the embed code
+	 * Function: _add_embedd
+	 *
+	 * Description: Hides the url base for the iframe embedding code in a hidden span. 
+	 * Now that Ushahidi has events in the JS headers this isn't really needed.
+	 * Triggered by: ushahidi_action.main_sidebar
+	 *
+	 * Views:
+	 *
+	 * Results: things are hidden in spans that JS needs for use later
 	 */
 	public function _add_embedd()
 	{
 		echo '<span id="base_url" style="display:none;">'.url::base().'</span>';
 	}
 	
+	
+	
+	/**
+	 * Function: _admin_nav_tab
+	 *
+	 * Description: Creates the navigation tab for the admin map
+	 * Triggered by: ushahidi_action.nav_admin_main_top
+	 *
+	 * Views:
+	 *
+	 * Results: Navigation tabs for admin map are created
+	 */
 	public function _admin_nav_tab()
 	{
 		//only show this if the settings allow it
@@ -348,13 +500,35 @@ class enhancedmap {
 		}
 	}
 	
-	//adds the "Full Screen Map" button on the main page
+	
+	
+	/**
+	 * Function: _add_big_map_main_button
+	 *
+	 * Description: adds the "Full Screen Map" button on the main page
+	 * Triggered by: ushahidi_action.map_main_filters
+	 *
+	 * Views:
+	 *
+	 * Results: Big button for a big map
+	 */
 	public function _add_big_map_main_button()
 	{
 		echo '<div ><a class="bigmapbutton" style="border:2px solid grey; padding: 2px;" href="'.url::site().'bigmap"> VIEW FULL MAP </a></div>';
 	}
 	
-	//adds a tab for the big map on the front end
+	
+	
+    /**
+	 * Function: _add_big_map_tab
+	 *
+	 * Description: adds tabs for the various enahanced map pages on thefront end
+	 * Triggered by: ushahidi_action.map_main_filters
+	 *
+	 * Views:
+	 *
+	 * Results: Big button for a big map
+	 */
 	public function _add_big_map_tab()
 	{
 		//only do this if the settings allow it
@@ -382,6 +556,16 @@ class enhancedmap {
 		
 	}
 	
+	/**
+	 * Function: _add_printmap
+	 *
+	 * Description: Adds a link to the print map
+	 * Triggered by: ushahidi_filter.map_main
+	 *
+	 * Views:
+	 *
+	 * Results: A link to the print map is added to the main map
+	 */
 	public function _add_printmap()
 	{
 		$map = Event::$data;
@@ -389,15 +573,41 @@ class enhancedmap {
 		Event::$data = $map;
 	}
 	
+
+	
+	
+	
+	
 	/**
-	 * Return true if we're on the backend
-	 * false otherwise.
+	 * Function: _on_back_end
+	 *
+	 * Description: Looks at the URL and figures out if we're on the backend end or not
+	 * 
+	 * @return bool - True if we're on the backend, otherwise, false.
+	 *
+	 * Views:
+	 *
+	 * Results: Returns true if we're on the backend, otherwise, false.
 	 */
 	private function _on_back_end()
 	{
 		return strpos(url::current(), 'admin/') === 0;
 	}
 	
+	
+	
+	
+	
+	/**
+	 * Function: _hide_content_for_adminmap
+	 *
+	 * Description: Adds some CSS that hides content of the adminmap. Used when rendering the iframe map
+	 * Triggered by: ushahidi_action.header_scripts_admin
+	 *
+	 * Views:
+	 *
+	 * Results: CSS is echoed out
+	 */
 	public function _hide_content_for_adminmap()
 	{
 		echo '<style type="text/css"> #content{display:none;}</style>';
