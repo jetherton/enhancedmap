@@ -1,10 +1,45 @@
 <?php defined('SYSPATH') or die('No direct script access.');
 /**
- * Java Script for rendering and controlling a print map
- * 
- *
  * @author     John Etherton <john@ethertontech.com>
  * @package    Enhanced Map, Ushahidi Plugin - https://github.com/jetherton/enhancedmap
+ * @license	   GNU Lesser GPL (LGPL) Rights pursuant to Version 3, June 2007
+ * @copyright  2012 Etherton Technologies Ltd. <http://ethertontech.com>
+ * @Date	   2012-06-06
+ * Purpose:	   Java Script for rendering and controlling a print map. This includes the enhancedmap/adminmap_js view
+ *             and also has print map specific functions
+ * Inputs:     $urlParams - an array of GET parameters in classic key, value format
+ * 			   $json_url - url to the json controller
+ *			   $json_timeline_url - url to the timeline json controller
+ *			   $longitude - longitude of the default center point
+ *			   $latitude - latitude of the default center point
+ *			   $default_zoom - default zoom
+ *			   $marker_radius - radius of markers, in pixels
+ *			   $marker_opacity - opacity of markers, 0-100, i think
+ *			   $graph_id - HTML element id of the timeline
+ *			   $map_id - HTML element id of the map
+ *			   $active_startDate - start date for the timeline in seconds since the epoch
+ *			   $active_endDate - end date for the timeline in seconds since the epoch
+ *             $show_unapproved - Should unapproved reports be allowed? This overwrites what's in $urlParams
+ * Outputs:    JavaScript
+ *
+ * The Enhanced Map, Ushahidi Plugin is free software: you can redistribute
+ * it and/or modify it under the terms of the GNU Lesser General Public License
+ * as published by the Free Software Foundation, either version 3 of the
+ * License, or (at your option) any later version.
+ *
+ * The Enhanced Map, Ushahidi Plugin is distributed in the hope that it will
+ * be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ *
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with the Enhanced Map, Ushahidi Plugin.  If not, see
+ * <http://www.gnu.org/licenses/>.
+ *
+ * Changelog:
+ * 2012-06-06:  Etherton - Initial release
+ *
+ * Developed by Etherton Technologies Ltd.
  */
 ?>
 

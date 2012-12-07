@@ -86,7 +86,7 @@ class enhancedmap_helper_Core {
 	 * Description: Sets up the UI element that controls the layers on the map
 	 * 
 	 * @param bool $on_backend - If true then this UI is for a page on the backend
-	 * @param bool $show_on_load - Should the layers be turned on when the page loads
+	 * @param bool $show_on_load - Should the layers widget be shown or minimized when the page loads
 	 * @param string $layers_filter_view - Path to the view that will render the layers UI
 	 * @param string $layers_filter_id - The ID the layers filter HTML DOM element will have
 	 * @return object - A view that has been created per the specifications of the parameters
@@ -134,7 +134,7 @@ class enhancedmap_helper_Core {
 	 * Description: Sets up the UI element that controls the shares on the map
 	 * 
 	 * @param bool $on_backend - If true then this UI is for a page on the backend
-	 * @param bool $show_on_load - Should the layers be turned on when the page loads
+	 * @param bool $show_on_load - Should the layers widget be shown or minimized when the page loads
 	 * @param string $shares_filter_view - Path to the view that will render the shares UI
 	 * @param string $shares_filter_id - The ID the shares filter HTML element will have
 	 * @return object - A view that has been created per the specifications of the parameters
