@@ -47,7 +47,7 @@
 	<?php 
 		if(isset($_GET["pdf"])){$media="all";} else{$media="print";}
 	?>
-	<link rel="stylesheet" type="text/css" href="<?php echo url::site(); ?>plugins/enhancedmap/css/print_enhancedmap_media.css" media="<?php echo $media; ?>" />
+	<link rel="stylesheet" type="text/css" href="<?php echo url::base(); ?>plugins/enhancedmap/css/print_enhancedmap_media.css" media="<?php echo $media; ?>" />
 </head>
 
 <body id="page">
