@@ -95,11 +95,11 @@ class Hpbigmap_Controller extends Template_Controller {
     	//set the title of the page
     	$this->template->header->this_page = 'hpbigmap';
     	//javascript for the big map special features
-		plugin::add_javascript("adminmap/js/bigmap");
+		plugin::add_javascript("enhancedmap/js/bigmap");
     	
     	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Setup the map
-		adminmap_helper::setup_adminmap($this, "adminmap/big_mapview", "adminmap/css/big_adminmap");
+		adminmap_helper::setup_adminmap($this, "adminmap/big_mapview", "enhancedmap/css/big_adminmap");
 
 		
 		//ARE WE CLUSTERING?
@@ -125,8 +125,8 @@ class Hpbigmap_Controller extends Template_Controller {
 		//setup the overlays and shares
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		adminmap_helper::set_overlays_shares($this);
-		plugin::add_stylesheet("adminmap/css/jquery.hovertip-1.0");
-		plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
+		plugin::add_stylesheet("enhancedmap/css/jquery.hovertip-1.0");
+		plugin::add_javascript("enhancedmap/js/jquery.hovertip-1.0");
 		
 		
 		// Rebuild Header Block

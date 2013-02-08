@@ -27,7 +27,7 @@ class adminmap_helper_Core {
 	/**************************************************************************************************************
       * Given all the parameters returns a list of incidents that meet the search criteria
       */
-	public static function setup_adminmap($map_controller, $map_view = "adminmap/mapview", $map_css = "adminmap/css/adminmap")		
+	public static function setup_adminmap($map_controller, $map_view = "adminmap/mapview", $map_css = "enhancedmap/css/adminmap")		
 	{
 	
 		//set the CSS for this
@@ -36,10 +36,10 @@ class adminmap_helper_Core {
 			plugin::add_stylesheet($map_css);
 		}
 		
-		plugin::add_javascript("adminmap/js/jquery.flot");
-		plugin::add_javascript("adminmap/js/excanvas.min");
-		plugin::add_javascript("adminmap/js/timeline");
-		plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
+		plugin::add_javascript("enhancedmap/js/jquery.flot");
+		plugin::add_javascript("enhancedmap/js/excanvas.min");
+		plugin::add_javascript("enhancedmap/js/timeline");
+		plugin::add_javascript("enhancedmap/js/jquery.hovertip-1.0");
 		
 		$map_controller->template->content = new View($map_view);
 		
