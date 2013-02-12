@@ -103,7 +103,7 @@ class Hpiframemap_Controller extends Template_Controller {
     	
     	///////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		// Setup the map
-		adminmap_helper::setup_adminmap($this, "adminmap/iframe_mapview", "adminmap/css/iframe_adminmap");
+		adminmap_helper::setup_adminmap($this, "adminmap/iframe_mapview", "enhancedmap/css/iframe_adminmap");
 		//set the site name
 		$this->template->content->site_name = $this->template->header->site_name;
 		//set the width of the map
@@ -132,8 +132,8 @@ class Hpiframemap_Controller extends Template_Controller {
 		//setup the overlays and shares
 		/////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		adminmap_helper::set_overlays_shares($this);
-		plugin::add_stylesheet("adminmap/css/jquery.hovertip-1.0");
-		plugin::add_javascript("adminmap/js/jquery.hovertip-1.0");
+		plugin::add_stylesheet("enhancedmap/css/jquery.hovertip-1.0");
+		plugin::add_javascript("enhancedmap/js/jquery.hovertip-1.0");
 		
 		
 		// Rebuild Header Block
