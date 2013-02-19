@@ -1267,10 +1267,10 @@ class enhancedmap_helper_Core {
 		}
 		$color = self::merge_colors($colors);	
 		//if simple groups are involved things get crazy
-		
+		$sg_cat_str = "";//only used by highest first coloring mode		
 		if(isset($_GET['sgid']))
 		{			
-			$sg_cat_str = "";//only used by highest first coloring mode
+
 			//reset colors if the all cat color is currently being used
 			if($all_categories)
 			{
