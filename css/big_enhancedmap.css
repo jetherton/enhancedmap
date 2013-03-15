@@ -203,9 +203,10 @@ div.map {
 
 
 div.graph-holder {
+	display:block;
     height:110px;
     overflow:hidden;
-    width:auto;
+    width:600px;
     position:relative;
     padding:0px;
     background:transparent;
