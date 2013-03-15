@@ -40,7 +40,7 @@
 				
 					<li>
 						<?php if($show_help){?>
-						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
+						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#FF6666;" title="
 							<?php echo '<h3>'.Kohana::lang("enhancedmap.ORHEADER"). '</h3>'. Kohana::lang("enhancedmap.ORBODY"); ?>
 							"><?php echo Kohana::lang('enhancedmap.whats_this'); ?></span></div>
 							<?php }?>
@@ -50,7 +50,7 @@
 					</li>
 					<li>
 						<?php if($show_help){?>
-						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#bb0000;" title="
+						<div style="float:right; margin-left:10px;"><span style="cursor:help;text-transform:none;color:#FF6666;" title="
 							<?php echo '<h3>'.Kohana::lang("enhancedmap.ANDHEADER").'</h3>'.Kohana::lang("enhancedmap.ANDBODY"); ?>							
 						"><?php echo Kohana::lang('enhancedmap.whats_this'); ?></span></div>
 						<?php }?>
