@@ -80,7 +80,7 @@ div#right_colapse{
 }
 
 div#timeline_drag{
-	background-image: url('../images/opacitygrey60.png');
+	background-color:rgba(200,200,200,0.85);
 	border:1px solid black;
 }
 
@@ -203,17 +203,18 @@ div.map {
 
 
 div.graph-holder {
-    height:150px;
+    height:110px;
     overflow:hidden;
-    width:600px;
+    width:auto;
     position:relative;
     padding:0px;
+    background:transparent;
 }
 
 
 div#timeline_holder
 {
-	background-image: url('../images/opacity60.png');
+	background-color:rgba(255,255,255,0.85);
 	width: 620px;
 	z-index: 50;
 	position: absolute;
@@ -231,13 +232,14 @@ div#timeline_colapse
 div.slider-holder {
     font-size:70%;
     height:60px;
-    width: 600px;
+    width: auto;
     padding-left: 11px;
 	margin-top: 0px;
+	background:transparent;
 }
 
 div.slider-holder label{
-    color: #666666;
+    color: black;
 }
 
 /*Status filtes*/
@@ -505,7 +507,11 @@ ul.category-filters li ul{
 .ui-slider li, .ui-slider dd {
 	position: absolute;
 	overflow: visible;
-	color: #666;
+	color: black;
+}
+
+div.xAxis div.tickLabel, div.yAxis div.tickLabel{
+	color:black;
 }
 .ui-slider span.ui-slider-label {
 	position: absolute;
