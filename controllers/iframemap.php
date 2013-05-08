@@ -28,7 +28,7 @@
  *
  * Developed by Etherton Technologies Ltd.
  */
-class Iframemap_Controller extends Template_Controller {
+class Iframemap_Controller extends Main_Controller {
 
 	public $auto_render = TRUE;
 
@@ -75,14 +75,6 @@ class Iframemap_Controller extends Template_Controller {
         // Load Header & Footer
 		$this->template->header  = new View('enhancedmap/iframe_map_header');
 		$this->template->footer  = new View('enhancedmap/iframe_map_footer');
-
-		// Themes Helper
-		$this->themes = new Themes();
-		$this->themes->editor_enabled = false;
-		$this->themes->api_url = Kohana::config('settings.api_url');
-		$this->template->header->submit_btn = $this->themes->submit_btn();
-		$this->template->header->languages = $this->themes->languages();
-		$this->template->header->search = $this->themes->search();
 
 		// Set Table Prefix
 		$this->table_prefix = Kohana::config('database.default.table_prefix');
