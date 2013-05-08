@@ -46,6 +46,9 @@ class adminmap_Controller extends Admin_Controller
 	{
 		parent::__construct();
 		
+		$this->themes->map_enabled = TRUE;
+		$this->themes->slider_enabled = TRUE;
+		
 		$this->template->this_page = 'adminmap';
 		
 		// If this is not a super-user account, redirect to dashboard
@@ -99,7 +102,7 @@ class adminmap_Controller extends Admin_Controller
 		$clustering = cookie::get('clustering', Kohana::config('settings.allow_clustering'));
 		$json_url = ($clustering == 1) ? "admin/adminmap_json/cluster" : "admin/adminmap_json";
 		$json_timeline_url = "admin/adminmap_json/timeline/";
-		enhancedmap_helper::set_map($this->template, $this->template, $json_url, $json_timeline_url);
+		enhancedmap_helper::set_map($this->template, $this->themes, $json_url, $json_timeline_url);
 		
 		//layers
 		$this->template->content->div_layers_filter = enhancedmap_helper::set_layers(true);
