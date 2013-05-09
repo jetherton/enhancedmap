@@ -74,6 +74,9 @@ class Printmap_Controller extends Main_Controller {
 
 		// Load Session
 		$this->session = Session::instance();
+		
+		$this->themes->map_enabled = TRUE;
+		$this->themes->slider_enabled = TRUE;
 
         // Load Header & Footer
 		$this->template->header  = new View('enhancedmap/print_map_header');
