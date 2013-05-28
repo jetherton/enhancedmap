@@ -62,11 +62,14 @@ class enhancedmap {
 	public function add()
 	{
 		//Just in case we need this
+            
 		Event::add('ushahidi_action.nav_main_top', array($this, '_add_big_map_tab'));	 //adds the big map  tab		
 		Event::add('ushahidi_action.nav_admin_main_top', array($this, '_admin_nav_tab'));	 //adds the admin map  tab
 		if(Router::$controller == "main")
 		{
-			Event::add('ushahidi_action.map_main_filters', array($this, '_add_big_map_main_button'));	 //adds the big map  tab
+                        if (ORM::factory('enhancedmap_settings')->where('key', 'enable_bigmap')->find()->value == "true"){
+                            Event::add('ushahidi_action.map_main_filters', array($this, '_add_big_map_main_button'));	 //adds the big map  tab
+                        }
 			//use sneaky JS
 			if (ORM::factory('enhancedmap_settings')->where('key', 'enable_iframemap')->find()->value == "true")
 			{
@@ -74,9 +77,12 @@ class enhancedmap {
 				plugin::add_stylesheet("enhancedmap/css/embedd_setup");
 				Event::add('ushahidi_action.main_sidebar', array($this, '_add_embedd'));
 			}
-			plugin::add_stylesheet("enhancedmap/css/printmap_link");
-			Event::add('ushahidi_filter.map_main', array($this, '_add_printmap'));
+                        if(ORM::factory('enhancedmap_settings')->where('key','enable_printmap')->find()->value == "true"){
+                            plugin::add_stylesheet("enhancedmap/css/printmap_link");
+                            Event::add('ushahidi_filter.map_main', array($this, '_add_printmap'));
+                        }
 		}
+            
 		//if dealing with the
 		if(Router::$controller == "reports")
 		{
@@ -89,15 +95,12 @@ class enhancedmap {
 		if(Router::$controller != "hpbigmap_json" AND Router::$controller != "hpiframemap_json"
 				AND Router::$controller != "hpadminmap_json")
 		{
-			plugin::add_javascript("enhancedmap/js/LoadingPanel");
 			Event::add('ushahidi_filter.fetch_incidents_set_params', array($this,'_add_logical_operator_filter'));
 		}
 
 		
 		if(Router::$controller == "adminmap")
 		{
-			plugin::add_javascript("enhancedmap/js/LoadingPanel");
-			//hide the content div
 			Event::add('ushahidi_action.header_scripts_admin',array($this,'_hide_content_for_adminmap'));
 		}
 		

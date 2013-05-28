@@ -62,10 +62,6 @@ class enhancedmap_helper_Core {
 			plugin::add_stylesheet($map_css);
 		}
 		
-		plugin::add_javascript("enhancedmap/js/jquery.flot");
-		plugin::add_javascript("enhancedmap/js/excanvas.min");
-		plugin::add_javascript("enhancedmap/js/timeline");
-		plugin::add_javascript("enhancedmap/js/jquery.hovertip-1.0");
 		
 		$map_controller->template->content = new View($map_view);
 		
@@ -987,7 +983,7 @@ class enhancedmap_helper_Core {
 			$json_item .= "\"properties\": {";
 			$json_item .= "\"id\": \"".$marker->incident_id."\", \n";
 
-			$encoded_title = utf8tohtml::convert($marker->incident_title, TRUE);
+			$encoded_title = htmlentities($marker->incident_title, TRUE);
 			$encoded_title = str_ireplace('"','&#34;',$encoded_title);
 			$encoded_title = json_encode($encoded_title);
 			$encoded_title = str_ireplace('"', '', $encoded_title);
