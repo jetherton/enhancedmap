@@ -996,7 +996,10 @@ class enhancedmap_helper_Core {
 				? "\"category\":[" . $category_id . "], "
 				: "\"category\":[0], ";
 			
-			$dot_color = ($color_mode == 'highest_first' AND !$all_categories AND count($position_map) > 0 AND $markers->count() > 0) ? $colors[$position_map[$marker->incident_id]] : $color; 
+			$dot_color = ($color_mode == 'highest_first' AND !$all_categories AND count($position_map) > 0 AND $markers->count() > 0) ? $colors[$position_map[$marker->incident_id]] : $color;
+			if($marker->incident_important){
+				$dot_color = 'FF8300';
+			} 
 
 			$json_item .= "\"color\": \"".$dot_color."\", \n";
 			$json_item .= "\"icon\": \"".$icon."\", \n";
@@ -1568,6 +1571,10 @@ class enhancedmap_helper_Core {
 			$id_str = $cluster['ids'];
 			
 			$dot_color = ($color_mode == 'highest_first' AND !$all_categories) ? $colors[$cluster['min_position']] : $color;
+			
+			if(isset($marker->incident_important)){
+				$dot_color = 'FF8300';
+			}
 			
 			// Build out the JSON string
 			$json_item = "{";
