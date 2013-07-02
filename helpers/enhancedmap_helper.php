@@ -997,12 +997,18 @@ class enhancedmap_helper_Core {
 				: "\"category\":[0], ";
 			
 			$dot_color = ($color_mode == 'highest_first' AND !$all_categories AND count($position_map) > 0 AND $markers->count() > 0) ? $colors[$position_map[$marker->incident_id]] : $color;
+			$important = false;
 			if($marker->incident_important){
 				$dot_color = 'FF8300';
+				$important = true;
 			} 
 
 			$json_item .= "\"color\": \"".$dot_color."\", \n";
 			$json_item .= "\"icon\": \"".$icon."\", \n";
+			if($important){
+			    $json_item .= "\"radius\": \"" . 11 . "\",\n"; 
+			    $json_item .= "\"strokewidth\": \"" . 14 . "\",\n";
+			}
 			$json_item .= "\"ids\": [".$marker->incident_id."], ";
 			$json_item .= "\"thumb\": \"".$thumb."\", \n";
 			$json_item .= "\"timestamp\": \"" . strtotime($marker->incident_date) . "\"";
