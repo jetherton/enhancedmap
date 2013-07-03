@@ -960,8 +960,8 @@ class enhancedmap_helper_Core {
 			}
 			
 			$thumb = "";
-			if ($media_type == 1)
-			{
+			//if ($media_type == 1)
+			//{
 				$media = ORM::factory('incident', $marker->incident_id)->media;
 				if ($media->count())
 				{
@@ -976,7 +976,7 @@ class enhancedmap_helper_Core {
 						}
 					}
 				}
-			}
+			//}
 			
 			$json_item = "{";
 			$json_item .= "\"type\":\"Feature\",";
