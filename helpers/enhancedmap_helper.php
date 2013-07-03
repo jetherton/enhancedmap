@@ -998,10 +998,12 @@ class enhancedmap_helper_Core {
 			
 			$dot_color = ($color_mode == 'highest_first' AND !$all_categories AND count($position_map) > 0 AND $markers->count() > 0) ? $colors[$position_map[$marker->incident_id]] : $color;
 			$important = false;
-			if($marker->incident_important){
-				$dot_color = 'FF8300';
-				$important = true;
-			} 
+			if(isset($marker->incident_important)){
+			    if($marker->incident_important){
+				    $dot_color = 'FF8300';
+				    $important = true;
+			    } 
+			}
 
 			$json_item .= "\"color\": \"".$dot_color."\", \n";
 			$json_item .= "\"icon\": \"".$icon."\", \n";
