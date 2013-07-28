@@ -86,9 +86,9 @@ class enhancedmap {
 		//if dealing with the
 		if(Router::$controller == "reports")
 		{
-			Event::add('ushahidi_action.report_filters_ui', array($this,'_add_report_filter_ui'));
+			//Event::add('ushahidi_action.report_filters_ui', array($this,'_add_report_filter_ui'));
 			
-			Event::add('ushahidi_action.header_scripts', array($this, '_add_report_filter_js'));
+			//Event::add('ushahidi_action.header_scripts', array($this, '_add_report_filter_js'));
 		}
 
 		//always filter the fetch incidents params, well don't use it if the high performance version is at play
@@ -454,7 +454,9 @@ class enhancedmap {
 		{
 			$lo = "and";
 		}
-		return $lo;
+		//return $lo;
+		//WTM gets and turned on always
+		return "and";
 	}
 	
 	
