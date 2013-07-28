@@ -983,14 +983,20 @@ class enhancedmap_helper_Core {
 			$json_item .= "\"properties\": {";
 			$json_item .= "\"id\": \"".$marker->incident_id."\", \n";
 
+
+			$date_str = strtotime($marker->incident_date);
+			$date_str = date("d.m.Y",$date_str);
 			$encoded_title = htmlentities($marker->incident_title, TRUE);
+			$encoded_title = '<strong>'.$date_str .'</strong> | ' . $encoded_title . ' <span class=\'underline\'>more</span> &gt;';
 			$encoded_title = str_ireplace('"','&#34;',$encoded_title);
 			$encoded_title = json_encode($encoded_title);
 			$encoded_title = str_ireplace('"', '', $encoded_title);
 
+			
+
 			$json_item .= "\"name\":\"" . str_replace(chr(10), ' ', str_replace(chr(13), ' ', "<a target = '".$link_target
-					. "' href='".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->incident_id."'>".$encoded_title)."</a>") . "\","
-					. "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->incident_id."\", ";
+			    . "' href='".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->incident_id."'>".$encoded_title)."</a>") . "\","
+			    . "\"link\": \"".url::base().$admin_path.$link_path_prefix."reports/".$view_or_edit."/".$marker->incident_id."\", ";
 
 			$json_item .= (isset($category))
 				? "\"category\":[" . $category_id . "], "
