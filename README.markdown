@@ -1,5 +1,11 @@
 Enhanced Map - Ushahidi Plugin
 =================
+Not actively being developed
+-----
+Sorry folks, I stopped freelancing, and with much regret, don't have the time for side projects like this. I know this plugin doesn't work with 2.7.1. If anyone would like to take this over please let me know. If you fix a bug send me a merege request and I'll pull it in.
+
+Thanks, John.
+
 About
 -----
 * website: https://github.com/jetherton/enhancedmap
